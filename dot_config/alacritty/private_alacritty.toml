@@ -1,0 +1,31 @@
+[window]
+level = "AlwaysOnTop"
+decorations = "None"
+startup_mode = "Fullscreen"
+
+[font]
+size = 18
+normal = { family = "MesloLGS NF", style = "Regular" }
+
+[cursor]
+style = { shape = "Underline", blinking = "Always" }
+
+[hints]
+[[hints.enabled]]
+binding = { key = 'U', mods = 'Control|Shift' }
+mouse = { enabled = true, mods = 'Control' }
+regex = "(https|http|ftp)://[\\w\\d\\-./?=#&_~%]+"
+action = "Copy"
+post_processing = true
+command = "open"
+
+[mouse]
+bindings = [
+    { mouse = "Right", action = "Copy" }
+]
+
+[keyboard]
+bindings = [
+    # Add this line to your bindings
+    { key = "K", mods = "Control", action = "ClearHistory" }
+]
