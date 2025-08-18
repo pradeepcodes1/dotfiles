@@ -6,6 +6,8 @@ map("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find Files" })
 map("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Grep" })
 map("n", "<leader>/", "/", { desc = "Remapping normal text search" })
 map("n", "/", ":Telescope current_buffer_fuzzy_find<CR>", { desc = "Smart buffer search (symbols/fuzzy)" })
+map("n", "<leader>fs", ":Telescope lsp_document_symbols<CR>", { desc = "Find symbols in file" })
+map("n", "<leader>fw", ":Telescope lsp_workspace_symbols<CR>", { desc = "Find symbols in workspace" })
 
 map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP Rename" })
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
