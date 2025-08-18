@@ -4,3 +4,4 @@
 - [ ] CMP completion cancel needs to be a thing, maybe trigger only on key ?
 - [ ] BufferLine + FZF
 - [ ] Better Sessions
+- [ ] explore snacks.nvim
