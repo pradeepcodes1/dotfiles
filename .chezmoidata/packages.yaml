@@ -1,0 +1,11 @@
+packages:
+  darwin:
+    brews:
+    - 'git'
+    - 'fzf'
+    - 'fd'
+    - 'lazygit'
+    - 'tmux'
+    casks:
+    - 'alacritty'
+    - 'bitwarden'

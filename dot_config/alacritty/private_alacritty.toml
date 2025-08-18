@@ -2,10 +2,14 @@
 level = "AlwaysOnTop"
 decorations = "None"
 startup_mode = "Fullscreen"
+opacity = 0.95
+blur = true
 
 [font]
 size = 25
-normal = { family = "MesloLGS NF", style = "Regular" }
+normal = { family = "JetBrainsMono NF", style = "Regular" }
+bold = { family = "JetBrainsMono NF", style = "Bold" }
+italic = { family = "JetBrainsMono NF", style = "Italic" }
 
 [cursor]
 style = { shape = "Underline", blinking = "Always" }

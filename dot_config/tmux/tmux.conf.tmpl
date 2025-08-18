@@ -40,3 +40,6 @@ bind l select-pane -R
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
+# Search console output/scrollback buffer with fzf and copy selection to clipboard
+#bind h display-popup -E  "tmux capture-pane -p -S - | fzf --reverse | pbcopy"
+bind h display-popup -E  "{{ .chezmoi.targetFile | dir }}/tmux-fzf-search.sh"
