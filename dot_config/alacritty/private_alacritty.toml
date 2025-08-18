@@ -4,7 +4,7 @@ decorations = "None"
 startup_mode = "Fullscreen"
 
 [font]
-size = 18
+size = 25
 normal = { family = "MesloLGS NF", style = "Regular" }
 
 [cursor]
