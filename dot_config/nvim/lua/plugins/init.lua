@@ -25,33 +25,6 @@ return {
 			})
 		end,
 	},
-	{
-		"nvimdev/dashboard-nvim",
-		event = "VimEnter",
-		config = function()
-			require("dashboard").setup({
-				-- config
-				config = {
-					shortcut = {},
-					week_header = {
-						enable = false,
-					},
-					header = {
-						"Whether you think you can or think you can’t, you’re right",
-					},
-					footer = {
-						"",
-					},
-				},
-				hide = {
-					tabline = true,
-					winbar = true,
-					statusline = true,
-				},
-			})
-		end,
-		dependencies = { { "nvim-tree/nvim-web-devicons" } },
-	},
 	----------------------------------------
 	-- Git & coding aids
 	----------------------------------------
@@ -120,14 +93,37 @@ return {
 			-- refer to the configuration section below
 			bigfile = { enabled = true },
 			dashboard = {
-				enabled = enabled,
+				enabled = true,
 				preset = {
-					header = [[ 
- ____ ____ ____ ____ _________ ____ ____ ____ 
-||n |||v |||i |||m |||       |||b |||t |||w ||
-||__|||__|||__|||__|||_______|||__|||__|||__||
-|/__\|/__\|/__\|/__\|/_______\|/__\|/__\|/__\|
-]],
+					keys = {
+						{ icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+
+						{
+							icon = " ",
+							key = "f",
+							desc = "Find File",
+							action = "<leader>ff",
+						},
+
+						{
+							icon = " ",
+							key = "g",
+							desc = "Find Text",
+							action = "<leader>fg",
+						},
+						{
+							icon = " ",
+							key = "r",
+							desc = "Recent Files",
+							action = ":lua Snacks.dashboard.pick('oldfiles')",
+						},
+						{ icon = "", key = "p", desc = "Projects", action = "<leader>p" },
+						{ icon = " ", key = "q", desc = "Quit", action = ":qa" },
+					},
+				},
+				sections = {
+					{ section = "header" },
+					{ section = "keys", gap = 1, padding = 1 },
 				},
 			},
 			--explorer = { enabled = true },
@@ -172,5 +168,12 @@ return {
 				end,
 			},
 		},
+	},
+	{
+		"ahmedkhalf/project.nvim",
+		config = function()
+			require("project_nvim").setup({})
+			require("telescope").load_extension("projects")
+		end,
 	},
 }
