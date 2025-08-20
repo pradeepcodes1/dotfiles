@@ -1,6 +1,9 @@
--- core/keymaps.lua
 local map = vim.keymap.set
 vim.g.mapleader = " "
+
+-- basics
+map("i", "jk", "<Esc>", { desc = "Exit insert mode with jk" })
+map("v", "jk", "<Esc>", { desc = "Exit visual mode with jk" })
 
 -- Telescope
 map("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Explorer" })
@@ -18,9 +21,9 @@ map("n", "/", ":Telescope current_buffer_fuzzy_find<CR>", { desc = "Smart buffer
 map("n", "<leader>fs", ":Telescope lsp_document_symbols<CR>", { desc = "Find symbols in file" })
 map("n", "<leader>fw", ":Telescope lsp_workspace_symbols<CR>", { desc = "Find symbols in workspace" })
 
-map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP Rename" })
-map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
-
+-- LSP
+map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "LSP Rename" })
+map("n", "<leader>la", vim.lsp.buf.code_action, { desc = "Code Action" })
 map("n", "gd", vim.lsp.buf.definition, { desc = "Goto Definition" })
 
 -- BarBar keymaps
