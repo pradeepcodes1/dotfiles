@@ -4,7 +4,7 @@ set -g prefix C-a
 bind C-a send-prefix
 set -g mouse on
 set-option -g destroy-unattached on
-
+set-window-option -g mode-keys vi
 set -g default-terminal "screen-256color"
 set -g status-position top
 set -g status-style "fg=color248,bg=color236"
@@ -43,3 +43,7 @@ run '~/.tmux/plugins/tpm/tpm'
 # Search console output/scrollback buffer with fzf and copy selection to clipboard
 #bind h display-popup -E  "tmux capture-pane -p -S - | fzf --reverse | pbcopy"
 bind h display-popup -E  "{{ .chezmoi.targetFile | dir }}/tmux-fzf-search.sh"
+
+# C-k for nvim is being blocked
+set -g terminal-features "alacritty:c-k"
+

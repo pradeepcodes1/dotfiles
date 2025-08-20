@@ -27,9 +27,3 @@ command = "open"
 bindings = [
     { mouse = "Right", action = "Copy" }
 ]
-
-[keyboard]
-bindings = [
-    # Add this line to your bindings
-    { key = "K", mods = "Control", action = "ClearHistory" }
-]

@@ -34,4 +34,4 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 	end,
 })
 
-vim.cmd.colorscheme("kanagawa-dragon") -- set colorscheme
+vim.cmd.colorscheme("gruvbox") -- set colorscheme
