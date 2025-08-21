@@ -7,15 +7,19 @@ return {
 		dependencies = { "williamboman/mason.nvim", "neovim/nvim-lspconfig" },
 		config = function()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "ts_ls", "lua_ls", "jdtls", "clangd" },
+				ensure_installed = { "ts_ls", "lua_ls", "clangd" },
 
 				handlers = {
 					function(server_name) -- default handler (optional)
 						require("lspconfig")[server_name].setup({
 							on_attach = common.on_attach,
 							capabilities = capabilities,
+							handlers = {
+								["$/progress"] = function() end, -- disable progress notifications
+							},
 						})
 					end,
+					jdtls = function() end,
 				},
 			})
 		end,
