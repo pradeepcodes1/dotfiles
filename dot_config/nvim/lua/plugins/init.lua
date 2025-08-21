@@ -35,6 +35,18 @@ return {
 	----------------------------------------
 	-- LSP, diagnostics, formatting
 	----------------------------------------
+	{
+		"nvim-java/nvim-java",
+		config = function()
+			require("java").setup({})
+			require("lspconfig").jdtls.setup({
+				handlers = {
+					["$/progress"] = function() end,
+				},
+			})
+		end,
+	},
+	--
 	{ "neovim/nvim-lspconfig" },
 	{ "j-hui/fidget.nvim", tag = "legacy", config = true },
 	{
@@ -50,7 +62,6 @@ return {
 	-- Java specifics
 	----------------------------------------
 	-- { "mfussenegger/nvim-jdtls" },
-	{ "nvim-java/nvim-java" },
 
 	----------------------------------------
 	-- Python specifics

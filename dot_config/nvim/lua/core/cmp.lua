@@ -2,7 +2,7 @@ local cmp = require("cmp")
 cmp.setup({
 	sources = cmp.config.sources({
 		{ name = "nvim_lsp" },
-		{ name = "copilot" }, -- Add this line
+		{ name = "copilot" },
 		{ name = "buffer" },
 		{ name = "path" },
 	}),
@@ -13,6 +13,6 @@ cmp.setup({
 		["<C-f>"] = cmp.mapping.scroll_docs(4),
 		["<C-Space>"] = cmp.mapping.complete(), -- Manually trigger completion
 		["<C-e>"] = cmp.mapping.abort(), -- Close completion
-		["<CR>"] = cmp.mapping.confirm({ select = true }), -- Confirm selection
+		["<CR>"] = cmp.mapping.confirm({ select = false }), -- Confirm selection
 	}),
 })
