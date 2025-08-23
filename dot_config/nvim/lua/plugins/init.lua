@@ -20,7 +20,7 @@ return {
 		build = ":TSUpdate",
 		config = function()
 			require("nvim-treesitter.configs").setup({
-				ensure_installed = { "lua", "cpp", "python", "java", "json", "yaml", "bash", "javascript" },
+				ensure_installed = { "lua", "cpp", "python", "java", "json", "yaml", "bash", "javascript", "go" },
 				highlight = { enable = true },
 			})
 		end,
@@ -38,7 +38,14 @@ return {
 	{
 		"nvim-java/nvim-java",
 		config = function()
-			require("java").setup({})
+			require("java").setup({
+				jdtls = {
+					cmd = { "jdtls" },
+					handlers = {
+						["$/progress"] = function() end, -- disable progress notifications
+					},
+				},
+			})
 			require("lspconfig").jdtls.setup({
 				handlers = {
 					["$/progress"] = function() end,
@@ -46,8 +53,10 @@ return {
 			})
 		end,
 	},
-	--
-	{ "neovim/nvim-lspconfig" },
+
+	{ "neovim/nvim-lspconfig", dependencies = {
+		"nvim-java/nvim-java",
+	} },
 	{ "j-hui/fidget.nvim", tag = "legacy", config = true },
 	{
 		"hrsh7th/nvim-cmp",

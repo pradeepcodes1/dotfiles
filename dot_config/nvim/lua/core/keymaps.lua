@@ -16,8 +16,8 @@ map("n", "<leader>ff", function()
 	})
 end, { desc = "Find Files (no preview)" })
 map("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Grep" })
-map("n", "<leader>/", "/", { desc = "Remapping normal text search" })
-map("n", "/", ":Telescope current_buffer_fuzzy_find<CR>", { desc = "Smart buffer search (symbols/fuzzy)" })
+--map("n", "<leader>/", "/", { desc = "Remapping normal text search" })
+map("n", "<leader>/", ":Telescope current_buffer_fuzzy_find<CR>", { desc = "Smart buffer search (symbols/fuzzy)" })
 map("n", "<leader>fs", ":Telescope lsp_document_symbols<CR>", { desc = "Find symbols in file" })
 map("n", "<leader>fw", ":Telescope lsp_workspace_symbols<CR>", { desc = "Find symbols in workspace" })
 
@@ -28,8 +28,6 @@ map("n", "gd", vim.lsp.buf.definition, { desc = "Goto Definition" })
 
 -- BarBar keymaps
 local opts = { noremap = true, silent = true }
-map("n", "b<Left>", "<Cmd>BufferPrevious<CR>", opts)
-map("n", "b<Right>", "<Cmd>BufferNext<CR>", opts)
 map("n", "bk", "<Cmd>BufferPick<CR>", opts)
 
 -- Terminal keymaps
