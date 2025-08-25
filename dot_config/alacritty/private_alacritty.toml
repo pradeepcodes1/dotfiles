@@ -2,7 +2,7 @@
 level = "AlwaysOnTop"
 decorations = "None"
 startup_mode = "Fullscreen"
-opacity = 0.9
+opacity = 0.95
 blur = true
 
 [font]

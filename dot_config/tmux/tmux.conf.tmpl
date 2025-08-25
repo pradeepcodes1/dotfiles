@@ -20,6 +20,7 @@ setw -g pane-base-index 1
 # Split panes using | and - (and open in the same directory)
 bind | split-window -h -c "#{pane_current_path}"
 bind - split-window -v -c "#{pane_current_path}"
+bind r command-prompt -p "(rename-window) " "rename-window '%%'"
 unbind '"'
 unbind %
 
@@ -46,4 +47,3 @@ bind h display-popup -E  "{{ .chezmoi.targetFile | dir }}/tmux-fzf-search.sh"
 
 # C-k for nvim is being blocked
 set -g terminal-features "alacritty:c-k"
-

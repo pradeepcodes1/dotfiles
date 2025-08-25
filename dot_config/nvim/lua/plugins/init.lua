@@ -20,7 +20,18 @@ return {
 		build = ":TSUpdate",
 		config = function()
 			require("nvim-treesitter.configs").setup({
-				ensure_installed = { "lua", "cpp", "python", "java", "json", "yaml", "bash", "javascript", "go" },
+				ensure_installed = {
+					"lua",
+					"cpp",
+					"python",
+					"java",
+					"json",
+					"yaml",
+					"bash",
+					"javascript",
+					"go",
+					"proto",
+				},
 				highlight = { enable = true },
 			})
 		end,
@@ -146,7 +157,11 @@ return {
 					{ section = "keys", gap = 1, padding = 1 },
 				},
 			},
-			--explorer = { enabled = true },
+			dim = {
+				animate = {
+					enabled = false,
+				},
+			},
 			indent = {
 				enabled = true,
 
@@ -184,7 +199,11 @@ return {
 			{
 				"<leader>z",
 				function()
-					Snacks.zen()
+					Snacks.zen({
+						show = {
+							tabline = true,
+						},
+					})
 				end,
 			},
 		},
