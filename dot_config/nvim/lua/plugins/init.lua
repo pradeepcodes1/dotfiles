@@ -78,11 +78,6 @@ return {
 	},
 
 	----------------------------------------
-	-- Java specifics
-	----------------------------------------
-	-- { "mfussenegger/nvim-jdtls" },
-
-	----------------------------------------
 	-- Python specifics
 	----------------------------------------
 	{ "linux-cultist/venv-selector.nvim", cmd = "VenvSelect", opts = { search_venv_managers = false } },
@@ -156,11 +151,6 @@ return {
 					{ section = "keys", gap = 1, padding = 1 },
 				},
 			},
-			dim = {
-				animate = {
-					enabled = false,
-				},
-			},
 			indent = {
 				enabled = true,
 
@@ -201,6 +191,9 @@ return {
 					Snacks.zen({
 						show = {
 							tabline = true,
+						},
+						toggles = {
+							dim = false,
 						},
 					})
 				end,
