@@ -1,0 +1,10 @@
+alias vi=nvim
+alias ls="ls -ltra"
+
+{{- if eq .chezmoi.os "linux" }}
+if [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
+	  export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+fi
+{{- end }}
+
+export EDITOR="nvim"

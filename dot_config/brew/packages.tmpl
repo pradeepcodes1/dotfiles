@@ -1,0 +1,32 @@
+# --- Common packages (both macOS and Linux) ---
+brew "zsh"
+brew "git"
+brew "git-lfs"
+brew "fzf"
+brew "fd"
+brew "lazygit"
+brew "neovim"
+brew "tmux"
+brew "go"
+brew "zig"
+brew "zoxide"
+brew "zsh-autosuggestions"
+brew "protobuf"
+brew "yazi"
+brew "ffmpeg"
+brew "nvm"
+
+# --- Platform-specific packages ---
+{{ if eq .chezmoi.os "darwin" }}
+brew "mvn"  # macOS-specific (short for maven)
+cask "alacritty"
+cask "bitwarden"
+cask "ghostty"
+{{ end }}
+
+{{ if eq .chezmoi.os "linux" }}
+brew "maven"     # Linux package name
+brew "bitwarden-cli"
+# ghostty not available via brew on Linux as of now
+{{ end }}
+
