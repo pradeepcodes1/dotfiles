@@ -39,7 +39,6 @@ return {
 	----------------------------------------
 	-- Git & coding aids
 	----------------------------------------
-	{ "lewis6991/gitsigns.nvim", event = "BufReadPre", config = true },
 	{ "windwp/nvim-autopairs", event = "InsertEnter", config = true },
 	{ "numToStr/Comment.nvim", event = "VeryLazy", config = true },
 
