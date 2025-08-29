@@ -8,6 +8,8 @@ brew "lazygit"
 brew "neovim"
 brew "tmux"
 brew "pass"
+brew "docker"
+brew "docker-compose"
 brew "ripgrep"
 
 # -- Extras
@@ -15,6 +17,15 @@ brew "zoxide"
 brew "zsh-autosuggestions"
 brew "yazi"
 brew "ffmpeg"
+brew "btop"
+brew "httpie"
+brew "jq"
+brew "bat"
+brew "colima"
+brew "ncspot"
+
+# -- Self hosting
+brew "yt-dlp"
 
 # -- AI
 brew "gemini-cli"
@@ -31,6 +42,7 @@ brew "mvn"  # macOS-specific (short for maven)
 cask "alacritty"
 cask "bitwarden"
 cask "ghostty"
+cask "nikitabobko/tap/aerospace"
 {{ end }}
 
 {{ if eq .chezmoi.os "linux" }}

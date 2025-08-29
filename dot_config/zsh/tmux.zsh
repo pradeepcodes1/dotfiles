@@ -1,31 +1,19 @@
-# Exit the current Alacritty instance when the tmux session exits.
-# This logic only runs if a new terminal window is opened and you are not
-# already inside a Tmux session.
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-  # List of cool names for your sessions
-  declare -a names=(
-    "matrix" "terminus" "nexus" "hydra" "cipher"
-    "kronos" "ghost" "orbital" "quasar" "epsilon"
-  )
+# Automatically enter tmux with a cool session name
+# Only run this script if we are NOT already inside a tmux session.
+if [[ -z "$TMUX" ]]; then
 
-  found_session=false
+    # Try to attach to the last-used session. If that command fails...
+    tmux attach-session || {
+        # ...create a new session with a cool, random name.
+        
+        # Define lists of cool words
+        local adjectives=(Crimson Cobalt Azure Shadow Golden Iron Nova Quantum)
+        local nouns=(Jaguar Phoenix Wyvern Falcon Sentinel Matrix Nexus Relay)
 
-  # Find the first available name and create a new session
-  for name in "${names[@]}"; do
-    if ! tmux has-session -t "$name" &> /dev/null; then
-      tmux new-session -s "$name"
-      found_session=true
-      break
-    fi
-  done
+        # Pick a random word from each list and combine them
+        local session_name="${adjectives[$((RANDOM % ${#adjectives[@]}))]}-${nouns[$((RANDOM % ${#nouns[@]}))]}}"
 
-  # Fallback to a timestamped session if all names are in use
-  if [ "$found_session" = false ]; then
-    tmux new-session -s "tmux-$(date +%s)"
-  fi
-  
-  # This is the core "hack."
-  # The `exit` command will only be reached when the `tmux` command above finishes.
-  # This happens when you kill the session or detach from it.
-  exit
+        # Create the new, named session
+        tmux new-session -s "$session_name"
+    }
 fi

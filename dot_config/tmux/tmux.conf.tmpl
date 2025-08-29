@@ -3,7 +3,6 @@ unbind C-b
 set -g prefix C-a
 bind C-a send-prefix
 set -g mouse on
-set-option -g destroy-unattached on
 set-window-option -g mode-keys vi
 set -g default-terminal "screen-256color"
 set -g status-position top
@@ -47,3 +46,11 @@ bind h display-popup -E  "{{ .chezmoi.targetFile | dir }}/tmux-fzf-search.sh"
 
 # C-k for nvim is being blocked
 set -g terminal-features "alacritty:c-k"
+
+# A simpler keybind to kill the current session and switch or create a new one.
+bind-key X confirm-before -p "kill-session '#S'? (y/n)" "\
+    kill-session \; \
+    if-shell '[ -n \"$(tmux list-sessions)\" ]' \
+        'switch-client -l' \
+        'new-session' \
+"
