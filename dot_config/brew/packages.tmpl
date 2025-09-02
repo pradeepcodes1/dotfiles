@@ -11,6 +11,7 @@ brew "pass"
 brew "docker"
 brew "docker-compose"
 brew "ripgrep"
+brew "mvn"  # macOS-specific (short for maven)
 
 # -- Extras
 brew "zoxide"
@@ -36,18 +37,5 @@ brew "zig"
 brew "protobuf"
 brew "bun"
 
-# --- Platform-specific packages ---
-{{ if eq .chezmoi.os "darwin" }}
-brew "mvn"  # macOS-specific (short for maven)
 cask "alacritty"
-cask "bitwarden"
-cask "ghostty"
 cask "nikitabobko/tap/aerospace"
-{{ end }}
-
-{{ if eq .chezmoi.os "linux" }}
-brew "maven"     # Linux package name
-brew "bitwarden-cli"
-# ghostty not available via brew on Linux as of now
-{{ end }}
-

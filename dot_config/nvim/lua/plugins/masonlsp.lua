@@ -7,7 +7,7 @@ return {
 		dependencies = { "williamboman/mason.nvim", "neovim/nvim-lspconfig" },
 		config = function()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "ts_ls", "lua_ls", "clangd", "gopls" },
+				ensure_installed = { "ts_ls", "lua_ls", "clangd", "gopls", "rust_analyzer" },
 
 				handlers = {
 					function(server_name) -- default handler (optional)

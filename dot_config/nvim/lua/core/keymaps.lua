@@ -40,3 +40,6 @@ map("n", "<leader>tv", "<Cmd>ToggleTerm direction=vertical<CR>", opts)
 map("n", "<leader>p", function()
 	require("telescope").extensions.projects.projects({})
 end, { desc = "Projects" })
+
+-- Stop search highlighting when presesing escape
+map("n", "<Esc><Esc>", ":nohlsearch<CR><Esc>", { desc = "Clear search highlighting" })

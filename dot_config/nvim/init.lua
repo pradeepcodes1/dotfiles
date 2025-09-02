@@ -34,4 +34,22 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 	end,
 })
 
+-- Whe n Neovim starts with a single argument that is a directory,
+vim.api.nvim_create_autocmd("VimEnter", {
+	desc = "Change CWD to dir if it's the only argument",
+	pattern = "*",
+	once = true, -- Run only once on startup
+	callback = function()
+		-- Get the arguments passed to nvim
+		local args = vim.v.argv
+		-- Check if there is exactly one argument and it's a directory
+		if #args == 1 and vim.fn.isdirectory(args[1]) == 1 then
+			-- Change Neovim's current working directory
+			vim.cmd.cd(args[1])
+			-- Open the file explorer (netrw) in the new CWD
+			vim.cmd.edit(".")
+		end
+	end,
+})
+
 vim.cmd.colorscheme("gruvbox") -- set colorscheme
