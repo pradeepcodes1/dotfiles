@@ -25,10 +25,12 @@ map("n", "<leader>fw", ":Telescope lsp_workspace_symbols<CR>", { desc = "Find sy
 map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "LSP Rename" })
 map("n", "<leader>la", vim.lsp.buf.code_action, { desc = "Code Action" })
 map("n", "gd", vim.lsp.buf.definition, { desc = "Goto Definition" })
+map("n", "?", vim.diagnostic.open_float, { desc = "Open diagnostic float" })
 
 -- BarBar keymaps
 local opts = { noremap = true, silent = true }
 map("n", "bk", "<Cmd>BufferPick<CR>", opts)
+map("n", "<leader>q", "<Cmd>BufferClose<CR>", opts)
 
 -- Terminal keymaps
 map("n", "<leader>t", "<Cmd>ToggleTerm<CR>", opts)
