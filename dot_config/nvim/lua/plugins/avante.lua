@@ -9,12 +9,14 @@ return {
 			or "make",
 		event = "VeryLazy",
 		version = false, -- Never set this value to "*"! Never!
-		---@module 'avante'
-		---@type avante.Config
 		opts = {
 			-- add any opts here
 			-- for example
-			provider = "gemini",
+			provider = "openrouter",
+			provider_options = {
+				api_key = os.getenv("OPENROUTER_API_KEY"),
+				model = "gpt-4o",
+			},
 		},
 		dependencies = {
 			"nvim-lua/plenary.nvim",

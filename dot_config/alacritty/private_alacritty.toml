@@ -1,8 +1,6 @@
 [window]
-level = "AlwaysOnTop"
 decorations = "None"
-opacity = 0.95
-blur = true
+padding = { x = 10 , y = 10}
 
 [font]
 size = 21
@@ -25,4 +23,14 @@ command = "open"
 [mouse]
 bindings = [
     { mouse = "Right", action = "Copy" }
+]
+
+[general]
+import = [
+  # uncomment the flavour you want below:
+  #"~/.config/alacritty/latte.toml"
+# "~/.config/alacritty/dawnfox.toml"
+  # "~/.config/alacritty/catppuccin-frappe.toml"
+  # "~/.config/alacritty/catppuccin-macchiato.toml"
+  # "~/.config/alacritty/catppuccin-mocha.toml"
 ]
