@@ -58,3 +58,5 @@ bind-key X confirm-before -p "kill-session '#S'? (y/n)" "\
         'switch-client -l' \
         'new-session' \
 "
+# Copy mode + Mouse != scroll to output automatically (sometimes u select the wrong thing and it is annoying, to scroll to cmd use 'q')
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection

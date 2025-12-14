@@ -1,2 +1,2 @@
 # TODO
-- [ ] Aerospace should have a 'M' workspace dedicated to ncspot
+- [ ] Do i really need the workspace specific sessions, cons: moving window would disrupt logic

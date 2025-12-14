@@ -33,13 +33,7 @@ local opts = { noremap = true, silent = true }
 map("n", "bk", "<Cmd>BufferPick<CR>", opts)
 map("n", "<leader>q", "<Cmd>BufferClose<CR>", opts)
 
--- Terminal keymaps
-map("n", "<leader>t", "<Cmd>ToggleTerm<CR>", opts)
-map("n", "<leader>th", "<Cmd>ToggleTerm direction=horizontal<CR>", opts)
-map("n", "<leader>tv", "<Cmd>ToggleTerm direction=vertical<CR>", opts)
-
 -- Project management
---map("n", "<leader>p", ":Telescope projects<CR>", { desc = "Projects" })
 map("n", "<leader>p", function()
 	require("telescope").extensions.projects.projects({})
 end, { desc = "Projects" })
