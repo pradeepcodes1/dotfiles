@@ -40,3 +40,57 @@ end, { desc = "Projects" })
 
 -- Stop search highlighting when presesing escape
 map("n", "<Esc><Esc>", ":nohlsearch<CR><Esc>", { desc = "Clear search highlighting" })
+
+map("i", "<A-Left>", "<C-o>b", opts) -- back one word
+map("i", "<A-Right>", "<C-o>w", opts) -- forward one word
+
+map("n", "<leader>1", "<Cmd>BufferGoto 1<CR>", opts)
+map("n", "<leader>2", "<Cmd>BufferGoto 2<CR>", opts)
+map("n", "<leader>3", "<Cmd>BufferGoto 3<CR>", opts)
+map("n", "<leader>4", "<Cmd>BufferGoto 4<CR>", opts)
+map("n", "<leader>5", "<Cmd>BufferGoto 5<CR>", opts)
+map("n", "<leader>6", "<Cmd>BufferGoto 6<CR>", opts)
+map("n", "<leader>7", "<Cmd>BufferGoto 7<CR>", opts)
+map("n", "<leader>8", "<Cmd>BufferGoto 8<CR>", opts)
+map("n", "<leader>9", "<Cmd>BufferGoto 9<CR>", opts)
+map("n", "<leader>0", "<Cmd>BufferLast<CR>", opts)
+
+map("n", "<leader>!", "<Cmd>BufferMove 1<CR>", opts)
+map("n", "<leader>@", "<Cmd>BufferMove 2<CR>", opts)
+map("n", "<leader>#", "<Cmd>BufferMove 3<CR>", opts)
+map("n", "<leader>$", "<Cmd>BufferMove 4<CR>", opts)
+map("n", "<leader>%", "<Cmd>BufferMove 5<CR>", opts)
+map("n", "<leader>^", "<Cmd>BufferMove 6<CR>", opts)
+map("n", "<leader>&", "<Cmd>BufferMove 7<CR>", opts)
+map("n", "<leader>*", "<Cmd>BufferMove 8<CR>", opts)
+map("n", "<leader>(", "<Cmd>BufferMove 9<CR>", opts)
+
+local function is_diffview_open()
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+		if ft == "DiffviewFiles" or ft == "DiffviewFileHistory" then
+			return true
+		end
+	end
+	return false
+end
+
+_G.diffview_review = function()
+	vim.cmd("DiffviewOpen")
+end
+
+_G.diffview_file = function()
+	vim.cmd("DiffviewOpen -- %")
+	vim.cmd("DiffviewToggleFiles")
+end
+
+_G.diffview_close = function()
+	if is_diffview_open() then
+		vim.cmd("DiffviewClose")
+	end
+end
+
+map("n", "<leader>gr", "<cmd>lua diffview_review()<CR>")
+map("n", "<leader>gd", "<cmd>lua diffview_file()<CR>")
+map("n", "<leader>gc", "<cmd>lua diffview_close()<CR>")

@@ -12,6 +12,7 @@ opt.splitright = true
 opt.splitbelow = true
 opt.termguicolors = true
 opt.ignorecase = true
+opt.cursorline = true
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 vim.api.nvim_create_autocmd("BufWritePre", {

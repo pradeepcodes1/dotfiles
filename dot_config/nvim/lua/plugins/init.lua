@@ -207,4 +207,19 @@ return {
 			require("telescope").load_extension("projects")
 		end,
 	},
+	{
+		"sindrets/diffview.nvim",
+		config = function()
+			require("diffview").setup({
+				view = {
+					default = {
+						layout = "diff1_plain",
+					},
+					merge_tool = {
+						layout = "diff3_horizontal",
+					},
+				},
+			})
+		end,
+	},
 }
