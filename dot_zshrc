@@ -33,3 +33,21 @@ source "$HOME/.env"
 export NVM_DIR="$HOME/.nvm" 
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Enable vcs_info
+autoload -Uz vcs_info
+precmd() { vcs_info }
+
+# Git status detection
+zstyle ':vcs_info:git:*' check-for-changes true
+zstyle ':vcs_info:git:*' unstagedstr '%F{red}*%f'
+zstyle ':vcs_info:git:*' stagedstr '%F{yellow}+%f'
+
+# Git formats (branch in blue)
+zstyle ':vcs_info:git:*' formats ' %F{blue}(%b%u%c)%f'
+zstyle ':vcs_info:git:*' actionformats ' %F{blue}(%b|%a%u%c)%f'
+
+# Prompt
+PROMPT='%F{green}%1~%f${vcs_info_msg_0_} %F{cyan}❯%f '
+RPROMPT='%F{245}%~%f'
+

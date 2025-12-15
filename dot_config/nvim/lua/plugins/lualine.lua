@@ -2,14 +2,35 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		config = function()
+			local function smart_path()
+				if vim.fn.winwidth(0) < 80 then
+					return vim.fn.expand("%:t")
+				end
+
+				local path = vim.fn.expand("%:p")
+				if path == "" then
+					return ""
+				end
+
+				local home = vim.fn.expand("$HOME")
+				if path:sub(1, #home) == home then
+					return "~" .. path:sub(#home + 1)
+				end
+
+				return path
+			end
+
 			require("lualine").setup({
 				sections = {
 					lualine_a = { "mode" },
 					lualine_b = { "branch", "diff", "diagnostics" },
 					lualine_c = { "" },
-					lualine_x = {},
+					lualine_x = { smart_path },
 					lualine_y = { "progress" },
 					lualine_z = { "location" },
+				},
+				options = {
+					theme = "codedark",
 				},
 			})
 		end,
