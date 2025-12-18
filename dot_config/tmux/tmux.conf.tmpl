@@ -15,8 +15,8 @@ set -g status-interval 1
 set -g status-left "#(~/.config/tmux/scripts/tmux-spinner.sh)"
 
 # Show only numbers
-set -g window-status-format "#I#F"
-set -g window-status-current-format "#I#F"
+set -g window-status-format "#[bg=colour238,fg=white]  #I#F  "
+set -g window-status-current-format "#[bg=colour31,fg=black,bold]  #I#F  "
 
 # set -g status off
 
