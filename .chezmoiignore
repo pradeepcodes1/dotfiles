@@ -24,3 +24,6 @@ __pycache__/
 node_modules/
 
 .commit.sh
+
+dot_config/yazi/flavors/
+dot_config/yazi/package.toml
