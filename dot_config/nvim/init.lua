@@ -52,4 +52,19 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	end,
 })
 
+local readonly_libs = vim.api.nvim_create_augroup("readonly_libs", { clear = true })
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+	group = readonly_libs,
+	pattern = {
+		"*/node_modules/*",
+		"*/site-packages/*",
+		"*/vendor/*",
+	},
+	callback = function()
+		vim.opt_local.modifiable = false
+		vim.opt_local.readonly = true
+	end,
+})
+
 vim.cmd.colorscheme("kanagawa-dragon") -- set colorscheme
