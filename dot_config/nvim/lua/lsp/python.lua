@@ -4,7 +4,7 @@ local M = {}
 ---@param on_attach fun(client, bufnr)  -- your key-mapping callback
 ---@param capabilities table            -- usually from cmp_nvim_lsp
 function M.setup(on_attach, capabilities)
-  require("lspconfig").pyright.setup({
+  vim.lsp.config("pyright", {
     on_attach = on_attach,
     capabilities = capabilities,
     settings = {
@@ -19,6 +19,7 @@ function M.setup(on_attach, capabilities)
       },
     },
   })
+  vim.lsp.enable("pyright")
 end
 
 return M
