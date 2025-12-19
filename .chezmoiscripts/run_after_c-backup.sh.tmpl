@@ -1,5 +1,6 @@
+#!/bin/bash
 restic_backup() {
-  export RESTIC_REPOSITORY="$RESTIC_REPO"
+  export RESTIC_REPOSITORY="{{  pass "backups/restic-repo" }}"
 
   if (( $# == 0 )); then
     echo "Usage: restic_backup <path> [path ...]"
@@ -18,10 +19,10 @@ restic_backup() {
    fi
  done
 
- if [[ ! -d "$RESTIC_REPO" ]]; then
-   echo "Initializing restic repository..."
-   restic init --insecure-no-password
- fi
+if ! restic snapshots --insecure-no-password >/dev/null 2>&1; then
+  echo "Initializing restic repository..."
+  restic init --insecure-no-password
+fi
 
  # ---- BACKUP ----
  echo "Running restic backup..."
@@ -46,3 +47,8 @@ restic_backup() {
 
  echo "===== Backup finished at $(date) ====="
 }
+
+
+restic_backup \
+     "{{  pass "backups/obsidian" }}" \
+     "{{  pass "backups/yamtrack-db" }}"
