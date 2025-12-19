@@ -1,3 +1,6 @@
+[env]
+TERM_PROGRAM = "alacritty"
+
 [window]
 decorations = "None"
 padding = { x = 10 , y = 10}

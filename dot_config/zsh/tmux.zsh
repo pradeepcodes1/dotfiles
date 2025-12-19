@@ -21,7 +21,9 @@
 
 #!/bin/bash
 
-if [[ -z "$TMUX" ]]; then
+if [[ -z "$TMUX" \
+  && "$TERM_PROGRAM" == "alacritty" ]]; then
+
 # Get the focused workspace name from the Aerospace CLI using jq
 WORKSPACE_NAME=$(aerospace list-workspaces --focused)
 
