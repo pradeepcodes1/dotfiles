@@ -7,12 +7,11 @@ set-window-option -g mode-keys vi
 set -g default-terminal "screen-256color"
 set -g status-position top
 set -g status-style "fg=color248,bg=color234"
-set -g status-justify centre
+set -g status-justify right
 set -g status-right ""
 
 set -g status-left-length 15
 set -g status-interval 1
-set -g status-left "#(~/.config/tmux/scripts/tmux-spinner.sh)"
 
 # Show only numbers
 set -g window-status-format "#[bg=colour238,fg=white]  #I#F  "
@@ -34,7 +33,7 @@ setw -g pane-base-index 1
 # Split panes using | and - (and open in the same directory)
 bind | split-window -h -p 40 -c "#{pane_current_path}"
 bind - split-window -v -p 40 -c "#{pane_current_path}"
-bind r command-prompt -p "(rename-window) " "rename-window '%%'"
+bind r source-file ~/.config/tmux/tmux.conf \; display-message "tmux reloaded"
 unbind '"'
 unbind %
 
