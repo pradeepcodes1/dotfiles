@@ -56,11 +56,12 @@ return {
 					},
 				},
 			})
-			require("lspconfig").jdtls.setup({
+			vim.lsp.config("jdtls", {
 				handlers = {
 					["$/progress"] = function() end,
 				},
 			})
+			vim.lsp.enable("jdtls")
 		end,
 	},
 
@@ -212,9 +213,6 @@ return {
 		config = function()
 			require("diffview").setup({
 				view = {
-					default = {
-						layout = "diff1_plain",
-					},
 					merge_tool = {
 						layout = "diff3_horizontal",
 					},

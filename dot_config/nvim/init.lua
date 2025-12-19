@@ -1,4 +1,3 @@
--- init.lua
 require("core.options")
 require("core.keymaps")
 
@@ -60,6 +59,7 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 		"*/node_modules/*",
 		"*/site-packages/*",
 		"*/vendor/*",
+		"*/homebrew/Cellar/*",
 	},
 	callback = function()
 		vim.opt_local.modifiable = false
@@ -68,3 +68,19 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 })
 
 vim.cmd.colorscheme("kanagawa-dragon") -- set colorscheme
+
+-- Suppress specific deprecation warnings
+-- TODO: Remove once plugins are updated
+local original_deprecate = vim.deprecate
+vim.deprecate = function(name, alternative, version, plugin, backtrace)
+	if
+		name == "vim.lsp.buf_get_clients()"
+		or name == "client.is_stopped"
+		or name == "vim.tbl_flatten"
+		or name == "vim.tbl_islist"
+		or name == "vim.validate"
+	then
+		return
+	end
+	original_deprecate(name, alternative, version, plugin, backtrace)
+end

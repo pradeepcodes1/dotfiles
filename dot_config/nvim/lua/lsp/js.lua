@@ -11,21 +11,11 @@ function M.setup(on_attach, capabilities)
   ---------------------------------------------------------------------------
   -- 2. Register the server with nvim-lspconfig ----------------------------
   ---------------------------------------------------------------------------
-  require("lspconfig").ts_ls.setup({
+  vim.lsp.config("ts_ls", {
     on_attach = on_attach,
     capabilities = capabilities,
-    -- settings = {
-    --   python = {
-    --     analysis = {
-    --       -- adjust to taste; “basic” is lenient, “strict” is merciless 🙂
-    --       typeCheckingMode = "basic",
-    --       autoSearchPaths  = true,
-    --       useLibraryCodeForTypes = true,
-    --       diagnosticMode   = "openFilesOnly",
-    --     },
-    --   },
-    -- },
   })
+  vim.lsp.enable("ts_ls")
 end
 
 return M
