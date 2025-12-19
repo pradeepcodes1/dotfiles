@@ -15,6 +15,3 @@ if command -v ya >/dev/null 2>&1; then
 fi
 
 
-# Backups
-restic_backup $BACKUPS_YAMTRACK $BACKUPS_OBSIDIAN 
-
