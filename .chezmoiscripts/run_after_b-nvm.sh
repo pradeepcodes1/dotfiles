@@ -13,3 +13,5 @@ if command -v ya >/dev/null 2>&1; then
     echo "yazi flavors already installed, skipping"
   fi
 fi
+
+
