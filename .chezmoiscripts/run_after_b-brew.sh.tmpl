@@ -1,0 +1,51 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+autoload -U colors && colors
+
+# ---------- config ----------
+CHEZMOI_SOURCE="${CHEZMOI_SOURCE:-$HOME/.local/share/chezmoi}"
+TEMPLATE="$CHEZMOI_SOURCE/dot_config/brew/packages.tmpl"
+
+# Formulae you intentionally do NOT track
+IGNORE_REGEX='^(chezmoi|gcc|mise)$'
+# ----------------------------
+
+command -v brew >/dev/null || exit 0
+command -v chezmoi >/dev/null || exit 0
+[[ -f "$TEMPLATE" ]] || exit 0
+
+# Render template → extract tracked formula names
+TRACKED=$(
+  chezmoi execute-template < "$TEMPLATE" \
+    | grep -E '^brew "' \
+    | sed -E 's/^brew "([^"]+)".*/\1/' \
+    | sort -u
+)
+
+# Installed leaf formulae
+INSTALLED=$(brew leaves | sort -u)
+
+# Installed − tracked
+UNTRACKED=$(comm -23 \
+  <(printf "%s\n" "$INSTALLED") \
+  <(printf "%s\n" "$TRACKED"))
+
+# Apply ignore list
+if [[ -n $IGNORE_REGEX ]]; then
+  UNTRACKED=$(printf "%s\n" "$UNTRACKED" | grep -Ev "$IGNORE_REGEX" || true)
+fi
+
+# Output
+if [[ -n $UNTRACKED ]]; then
+  echo
+  echo "---------------------------------------------"
+  print -P "%F{yellow}⚠️  Untracked Homebrew installs detected:%f"
+  echo "---------------------------------------------"
+  printf "  • %s\n" ${(f)UNTRACKED}
+  echo "---------------------------------------------"
+  echo
+else
+  echo "✅ All Homebrew leaf formulae are tracked"
+fi
+
+
