@@ -94,3 +94,9 @@ end
 map("n", "<leader>gr", "<cmd>lua diffview_review()<CR>")
 map("n", "<leader>gd", "<cmd>lua diffview_file()<CR>")
 map("n", "<leader>gc", "<cmd>lua diffview_close()<CR>")
+
+map("n", "<leader>Q", "<cmd>qa<CR>", {
+	noremap = true,
+	silent = true,
+	desc = "Quit Neovim",
+})
