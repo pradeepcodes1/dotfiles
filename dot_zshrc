@@ -49,3 +49,5 @@ zstyle ':vcs_info:git:*' actionformats ' %F{blue}(%b|%a%u%c)%f'
 PROMPT='%F{green}%1~%f${vcs_info_msg_0_} %F{cyan}❯%f '
 RPROMPT='%F{245}%~%f'
 
+# Colorful man pages
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
