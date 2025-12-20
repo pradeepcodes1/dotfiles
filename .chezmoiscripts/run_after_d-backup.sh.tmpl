@@ -9,6 +9,14 @@ restic_backup() {
 
   local SOURCES=("$@")
 
+if ! restic snapshots --insecure-no-password >/dev/null 2>&1; then
+  echo "Initializing restic repository..."
+  if ! restic init --insecure-no-password; then
+    echo "Failed to initialize repository. Exiting."
+    exit 0
+  fi
+fi
+
  echo "===== Backup started at $(date) ====="
  echo "Sources: ${SOURCES[*]}"
 
@@ -19,13 +27,6 @@ restic_backup() {
    fi
  done
 
-if ! restic snapshots --insecure-no-password >/dev/null 2>&1; then
-  echo "Initializing restic repository..."
-  if ! restic init --insecure-no-password; then
-    echo "Failed to initialize repository. Exiting."
-    exit 0
-  fi
-fi
 
  # ---- BACKUP ----
  echo "Running restic backup..."
