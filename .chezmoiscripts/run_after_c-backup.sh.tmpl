@@ -21,7 +21,10 @@ restic_backup() {
 
 if ! restic snapshots --insecure-no-password >/dev/null 2>&1; then
   echo "Initializing restic repository..."
-  restic init --insecure-no-password
+  if ! restic init --insecure-no-password; then
+    echo "Failed to initialize repository. Exiting."
+    exit 0
+  fi
 fi
 
  # ---- BACKUP ----
