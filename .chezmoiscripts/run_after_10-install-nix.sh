@@ -9,9 +9,17 @@ fi
 
 echo "Installing Nix..."
 
-# Use Determinate Systems installer (recommended for macOS)
-# It handles daemon setup, creates /nix, and enables flakes by default
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+# Detect systemd (Docker / CI do NOT have it)
+if [ -d /run/systemd/system ]; then
+  echo "Systemd detected → installing Nix with daemon"
+  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
+    | sh -s -- install --no-confirm
+else
+  echo "No systemd detected → installing Nix without daemon"
+  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix \
+    | sh -s -- install linux --init none --no-confirm
+fi
+
 
 echo "Nix installed successfully"
 echo "Please restart your shell or run: . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
