@@ -23,17 +23,5 @@
 
 if [[ -z "$TMUX" \
   && "$TERM_PROGRAM" == "alacritty" ]]; then
-
-# Get the focused workspace name from the Aerospace CLI using jq
-WORKSPACE_NAME=$(aerospace list-workspaces --focused)
-
-# Check if a tmux session with the workspace name already exists
-# The `2>/dev/null` silences the "can't find session" error
-if tmux has-session -t "$WORKSPACE_NAME" 2>/dev/null; then
-  # If session exists, attach to it
-  tmux attach-session -t "$WORKSPACE_NAME"
-else
-  # If session does not exist, create it with the workspace name
-  tmux new-session -s "$WORKSPACE_NAME"
-fi
+    tmux
 fi

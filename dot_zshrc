@@ -2,7 +2,11 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-eval "$(brew shellenv)"
+
+# Force Nix paths to front (Nix is sourced in /etc/zshrc before brew prepends)
+if [ -e "$HOME/.nix-profile/bin" ]; then
+  export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+fi
 
 export ZSH="$HOME/.oh-my-zsh"
 
