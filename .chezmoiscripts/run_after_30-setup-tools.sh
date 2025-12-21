@@ -1,9 +1,9 @@
 #!/bin/bash
 
-uv tool install --force  --with pip aider-chat@latest
+#uv tool install --force  --with pip aider-chat@latest
 uv tool update-shell
 
-brew upgrade
+#brew upgrade
 
 mise install
 mise upgrade
