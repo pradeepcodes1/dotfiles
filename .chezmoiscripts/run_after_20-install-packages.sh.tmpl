@@ -26,10 +26,26 @@ fi
 
 # Install packages from nix flake (if not already installed)
 FLAKE_PATH="{{ .chezmoi.sourceDir }}/nix/default"
+
+# Load nix environment
+if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+
+# Single-user Nix (Docker / CI) needs user-owned state dir
+if [ ! -d /run/systemd/system ]; then
+  export NIX_STATE_DIR="$HOME/.nix"
+fi
+
 profiles=$(nix profile list 2>/dev/null || true)
+
 if ! echo "$profiles" | grep -q "pradeep-cli"; then
   echo "Installing nix profile from $FLAKE_PATH..."
   nix profile install "$FLAKE_PATH" --verbose
+else
+  echo "Nix profile already installed"
 fi
 
 # Upgrade the profile
