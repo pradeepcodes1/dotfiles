@@ -1,7 +1,35 @@
-# Change prefix to Ctrl+a
+# Traditional prefix (Ctrl+l) - kept for compatibility
 unbind C-b
 set -g prefix C-l
 bind C-a send-prefix
+
+# Right Option + key bindings (via Karabiner sending prefix + key)
+# Window management
+bind c new-window -c "#{pane_current_path}"                          # ROpt+c: new window
+bind n next-window                                                   # ROpt+n: next window
+bind p previous-window                                               # ROpt+p: previous window
+bind w choose-window                                                 # ROpt+w: choose window
+bind 1 select-window -t :=1                                          # ROpt+1: window 1
+bind 2 select-window -t :=2                                          # ROpt+2: window 2
+bind 3 select-window -t :=3                                          # ROpt+3: window 3
+bind 4 select-window -t :=4                                          # ROpt+4: window 4
+bind 5 select-window -t :=5                                          # ROpt+5: window 5
+bind 6 select-window -t :=6                                          # ROpt+6: window 6
+bind 7 select-window -t :=7                                          # ROpt+7: window 7
+bind 8 select-window -t :=8                                          # ROpt+8: window 8
+bind 9 select-window -t :=9                                          # ROpt+9: window 9
+
+# Pane management (h/j/k/l defined below)
+bind z resize-pane -Z                                                # ROpt+z: zoom pane
+bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane             # ROpt+x: kill pane
+
+# Session management
+bind d detach-client                                                 # ROpt+d: detach
+bind s choose-session                                                # ROpt+s: choose session
+
+# Copy mode
+bind [ copy-mode                                                     # ROpt+[: copy mode
+
 set -g mouse on
 set-window-option -g mode-keys vi
 set -g default-terminal "screen-256color"
