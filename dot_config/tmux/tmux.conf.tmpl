@@ -3,41 +3,32 @@ unbind C-b
 set -g prefix C-l
 bind C-a send-prefix
 
-# Caps Lock + key bindings (mapped to F-keys via Karabiner)
+# Right Option + key bindings (via Karabiner sending prefix + key)
 # Window management
-bind -n F13 new-window -c "#{pane_current_path}"                    # Caps+c: new window
-bind -n F14 next-window                                              # Caps+n: next window
-bind -n F15 previous-window                                          # Caps+p: previous window
-bind -n F20 choose-window                                            # Caps+w: choose window
-bind -n C-F13 select-window -t :=1                                   # Caps+1: window 1
-bind -n C-F14 select-window -t :=2                                   # Caps+2: window 2
-bind -n C-F15 select-window -t :=3                                   # Caps+3: window 3
-bind -n C-F16 select-window -t :=4                                   # Caps+4: window 4
-bind -n C-F17 select-window -t :=5                                   # Caps+5: window 5
-bind -n C-F18 select-window -t :=6                                   # Caps+6: window 6
-bind -n C-F19 select-window -t :=7                                   # Caps+7: window 7
-bind -n C-F20 select-window -t :=8                                   # Caps+8: window 8
-bind -n C-F21 select-window -t :=9                                   # Caps+9: window 9
+bind c new-window -c "#{pane_current_path}"                          # ROpt+c: new window
+bind n next-window                                                   # ROpt+n: next window
+bind p previous-window                                               # ROpt+p: previous window
+bind w choose-window                                                 # ROpt+w: choose window
+bind 1 select-window -t :=1                                          # ROpt+1: window 1
+bind 2 select-window -t :=2                                          # ROpt+2: window 2
+bind 3 select-window -t :=3                                          # ROpt+3: window 3
+bind 4 select-window -t :=4                                          # ROpt+4: window 4
+bind 5 select-window -t :=5                                          # ROpt+5: window 5
+bind 6 select-window -t :=6                                          # ROpt+6: window 6
+bind 7 select-window -t :=7                                          # ROpt+7: window 7
+bind 8 select-window -t :=8                                          # ROpt+8: window 8
+bind 9 select-window -t :=9                                          # ROpt+9: window 9
 
-# Pane management
-bind -n F16 select-pane -L                                           # Caps+h: left pane
-bind -n F17 select-pane -D                                           # Caps+j: down pane
-bind -n F18 select-pane -U                                           # Caps+k: up pane
-bind -n F19 select-pane -R                                           # Caps+l: right pane
-bind -n S-F15 split-window -h -p 40 -c "#{pane_current_path}"        # Caps+|: split horizontal
-bind -n S-F16 split-window -v -p 40 -c "#{pane_current_path}"        # Caps+-: split vertical
-bind -n F23 resize-pane -Z                                           # Caps+z: zoom pane
-bind -n F24 confirm-before -p "kill-pane #P? (y/n)" kill-pane        # Caps+x: kill pane
+# Pane management (h/j/k/l defined below)
+bind z resize-pane -Z                                                # ROpt+z: zoom pane
+bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane             # ROpt+x: kill pane
 
 # Session management
-bind -n F22 detach-client                                            # Caps+d: detach
-bind -n F21 choose-session                                           # Caps+s: choose session
+bind d detach-client                                                 # ROpt+d: detach
+bind s choose-session                                                # ROpt+s: choose session
 
 # Copy mode
-bind -n S-F14 copy-mode                                              # Caps+[: copy mode
-
-# Misc
-bind -n S-F13 source-file ~/.config/tmux/tmux.conf \; display-message "tmux reloaded"  # Caps+r: reload config
+bind [ copy-mode                                                     # ROpt+[: copy mode
 
 set -g mouse on
 set-window-option -g mode-keys vi
