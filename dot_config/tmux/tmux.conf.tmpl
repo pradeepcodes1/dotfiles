@@ -38,8 +38,9 @@ set -g status-style "fg=color248,bg=color234"
 set -g status-justify right
 set -g status-right ""
 
-set -g status-left-length 15
+set -g status-left-length 50
 set -g status-interval 1
+set -g status-left '#S | #{b:@pane_home} '
 
 # Show only numbers
 set -g window-status-format "#[bg=colour238,fg=white]  #I#F  "
