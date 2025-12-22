@@ -39,7 +39,8 @@ set -g status-right ""
 
 set -g status-left-length 50
 set -g status-interval 1
-set -g status-left '#S | #{b:@pane_home} '
+set -g status-left ' #S | #{b:@pane_home} '
+set -g display-time 1000
 
 # Source theme based on _DOTFILES_THEME_NAME env var
 run-shell 'tmux source-file ~/.config/tmux/themes/${_DOTFILES_THEME_NAME:-kanagawa-dragon}.conf 2>/dev/null || tmux source-file ~/.config/tmux/themes/kanagawa-dragon.conf'
