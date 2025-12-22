@@ -5,5 +5,5 @@ if [ -f "$ZSH_AUTOSUGGESTIONS_DIR/../share/zsh-autosuggestions/zsh-autosuggestio
   source "$ZSH_AUTOSUGGESTIONS_DIR/../share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
-eval "$(zoxide init zsh)"
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 export PATH="$HOME/go/bin":$PATH
