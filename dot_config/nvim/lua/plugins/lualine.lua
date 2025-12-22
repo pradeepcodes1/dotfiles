@@ -20,6 +20,9 @@ return {
 				return path
 			end
 
+			-- Lualine theme from env var (set by ~/.config/colors/*.sh)
+			local lualine_theme = os.getenv("_DOTFILES_NVIM_LUALINE") or "codedark"
+
 			require("lualine").setup({
 				sections = {
 					lualine_a = { "mode" },
@@ -30,7 +33,7 @@ return {
 					lualine_z = { "location" },
 				},
 				options = {
-					theme = "codedark",
+					theme = lualine_theme,
 				},
 			})
 		end,

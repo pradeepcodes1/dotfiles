@@ -36,22 +36,10 @@ source "$HOME/.env"
  
 command -v mise &>/dev/null && eval "$(mise activate zsh)"
 
-# Enable vcs_info
+# Enable vcs_info (colors set by theme.zsh)
 autoload -Uz vcs_info
-precmd() { vcs_info }
-
-# Git status detection
 zstyle ':vcs_info:git:*' check-for-changes true
-zstyle ':vcs_info:git:*' unstagedstr '%F{red}*%f'
-zstyle ':vcs_info:git:*' stagedstr '%F{yellow}+%f'
-
-# Git formats (branch in blue)
-zstyle ':vcs_info:git:*' formats ' %F{blue}(%b%u%c)%f'
-zstyle ':vcs_info:git:*' actionformats ' %F{blue}(%b|%a%u%c)%f'
-
-# Prompt
-PROMPT='%F{green}%1~%f${vcs_info_msg_0_} %F{cyan}❯%f '
-RPROMPT='%F{245}%~%f'
+precmd() { vcs_info }
 
 # Colorful man pages
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
