@@ -169,6 +169,7 @@ _apply_theme() {
   _update_alacritty_theme
   _update_tmux_theme
   _update_yazi_theme
+  _update_fzf_theme
 }
 
 # Update zsh prompt using sourced color variables
@@ -265,6 +266,19 @@ _update_yazi_theme() {
   fi
 }
 
+# Update fzf theme
+_update_fzf_theme() {
+  # Use transparent bg (-1) if theme supports it, otherwise use theme bg
+  local fzf_bg="-1"
+  [[ "$_DOTFILES_THEME_TRANSPARENT" != "1" ]] && fzf_bg="$bg"
+
+  export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+    --color=fg:$fg,bg:$fzf_bg,hl:$magenta \
+    --color=fg+:$fg,bg+:$ui_inactive,hl+:$ui_active \
+    --color=info:$bright_black,prompt:$ui_accent,pointer:$ui_accent \
+    --color=marker:$green,spinner:$ui_accent,header:$bright_black"
+}
+
 # Initialize on shell startup
 _init_theme() {
   local theme_name
@@ -275,6 +289,7 @@ _init_theme() {
     if [[ -f "$_DOTFILES_COLORS_DIR/${theme_name}.sh" ]]; then
       _load_theme_colors "$theme_name"
       _update_zsh_prompt
+      _update_fzf_theme
       return
     fi
   fi
@@ -289,6 +304,7 @@ _init_theme() {
 
   _load_theme_colors "$theme_name"
   _update_zsh_prompt
+  _update_fzf_theme
 }
 
 _init_theme

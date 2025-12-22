@@ -6,6 +6,7 @@ Centralized color definitions for all CLI tools. Each theme has one source file 
 - Tmux status bar
 - Neovim colorscheme + lualine
 - Yazi file manager
+- fzf fuzzy finder
 
 ## Usage
 
