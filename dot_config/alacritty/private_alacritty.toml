@@ -10,6 +10,7 @@ size = 18
 normal = { family = "JetBrainsMono NF", style = "Regular" }
 bold = { family = "JetBrainsMono NF", style = "Bold" }
 italic = { family = "JetBrainsMono NF", style = "Italic" }
+offset = { x = 0, y = 3 }
 
 [cursor]
 style = { shape = "Underline", blinking = "Always" }
@@ -29,14 +30,7 @@ bindings = [
 ]
 
 [general]
-import = [
-  # uncomment the flavour you want below:
-  #"~/.config/alacritty/latte.toml"
-# "~/.config/alacritty/dawnfox.toml"
-  # "~/.config/alacritty/catppuccin-frappe.toml"
-  # "~/.config/alacritty/catppuccin-macchiato.toml"
-  # "~/.config/alacritty/catppuccin-mocha.toml"
-]
+import = ["~/.config/alacritty/themes/kanagawa-dragon.toml"]
 
 [[keyboard.bindings]]
 key = "Left"
