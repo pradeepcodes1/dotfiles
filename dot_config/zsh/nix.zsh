@@ -27,6 +27,7 @@ _nix_ensure_profiles() {
 }
 
 # Set up symlinks in new home directory
+# Returns 0 if setup was performed (first run), 1 if skipped
 _nix_setup_home() {
     local new_home="$1"
     local real_home="$2"
@@ -34,7 +35,7 @@ _nix_setup_home() {
     # Check if directory is empty (or only has .nix-profile etc)
     local file_count=$(find "$new_home" -maxdepth 1 -type f -o -type l 2>/dev/null | wc -l)
     if [[ $file_count -gt 0 ]]; then
-        return 0  # Not empty, skip setup
+        return 1  # Not empty, skip setup
     fi
 
     echo "Setting up symlinks in $new_home..."
@@ -47,6 +48,28 @@ _nix_setup_home() {
             echo "  Linked: $item"
         fi
     done
+    return 0  # First run setup completed
+}
+
+# Run first-time setup tasks (mise install, nvim plugins)
+_nix_first_run_setup() {
+    local home_path="$1"
+
+    echo "Running first-time setup..."
+
+    # Install mise-managed tools
+    if command -v mise &>/dev/null; then
+        echo "Installing mise tools..."
+        HOME="$home_path" mise install --yes
+    fi
+
+    # Install nvim plugins via lazy.nvim
+    if command -v nvim &>/dev/null; then
+        echo "Installing nvim plugins..."
+        HOME="$home_path" nvim --headless "+Lazy! sync" +qa 2>/dev/null
+    fi
+
+    echo "First-time setup complete!"
 }
 
 # List available flakes
@@ -171,8 +194,11 @@ flake() {
     # Ensure home directory exists
     mkdir -p "$home_path"
 
-    # Set up symlinks if home is empty
-    _nix_setup_home "$home_path" "$real_home"
+    # Set up symlinks if home is empty (track if first run)
+    local is_first_run=0
+    if _nix_setup_home "$home_path" "$real_home"; then
+        is_first_run=1
+    fi
 
     # Install/upgrade flake before switching
     echo "Applying flake: ${flake_name} from ${flake_path}"
@@ -186,6 +212,11 @@ flake() {
     # Upgrade all packages in profile
     echo "Upgrading nix profile..."
     nix profile upgrade '.*' --profile "${home_path}/.nix-profile" 2>/dev/null || true
+
+    # Run first-time setup if this is a new home
+    if [[ $is_first_run -eq 1 ]]; then
+        _nix_first_run_setup "$home_path"
+    fi
 
     echo "Switching to environment: ${profile_name:-$flake_name}"
 
