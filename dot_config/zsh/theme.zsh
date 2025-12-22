@@ -225,6 +225,8 @@ EOF
 _update_tmux_theme() {
   local theme_file="$HOME/.config/tmux/themes/${_DOTFILES_THEME_NAME}.conf"
 
+  mkdir -p "$(dirname "$theme_file")"
+
   # Generate theme file from colors
   # Use ui_inactive for status bar bg to stand out from terminal bg
   cat > "$theme_file" <<EOF
