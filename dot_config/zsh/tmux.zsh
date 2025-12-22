@@ -31,5 +31,21 @@ if command -v tmux &>/dev/null; then
     if [[ -n "$TMUX" ]]; then
         tmux set-option -p @pane_home "$HOME"
     fi
+
+    # Garbage collect unattached tmux sessions (keep threshold sessions max)
+    local threshold=5
+    local sessions=$(tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null)
+    local total=$(echo "$sessions" | wc -l | tr -d ' ')
+
+    if [[ $total -gt $threshold ]]; then
+        echo "$sessions" | while IFS=: read -r name attached; do
+            # Skip attached sessions and special sessions
+            [[ "$attached" == "1" || "$name" == "music" ]] && continue
+            # Delete unattached session
+            tmux kill-session -t "$name" 2>/dev/null
+            total=$((total - 1))
+            [[ $total -le $threshold ]] && break
+        done
+    fi
 fi
 
