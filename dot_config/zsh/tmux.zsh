@@ -23,7 +23,7 @@
 
 if command -v tmux &>/dev/null; then
     if [[ -z "$TMUX" \
-      && "$TERM_PROGRAM" == "alacritty" ]]; then
+      && ( "$TERM_PROGRAM" == "alacritty" || "$TERM_PROGRAM" == "ghostty" ) ]]; then
         tmux
     fi
 
