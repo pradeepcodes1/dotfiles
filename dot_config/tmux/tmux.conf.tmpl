@@ -34,7 +34,6 @@ set -g mouse on
 set-window-option -g mode-keys vi
 set -g default-terminal "screen-256color"
 set -g status-position top
-set -g status-style "fg=color248,bg=color234"
 set -g status-justify right
 set -g status-right ""
 
@@ -42,9 +41,8 @@ set -g status-left-length 50
 set -g status-interval 1
 set -g status-left '#S | #{b:@pane_home} '
 
-# Show only numbers
-set -g window-status-format "#[bg=colour238,fg=white]  #I#F  "
-set -g window-status-current-format "#[bg=colour31,fg=black,bold]  #I#F  "
+# Source theme based on _DOTFILES_THEME_NAME env var
+run-shell 'tmux source-file ~/.config/tmux/themes/${_DOTFILES_THEME_NAME:-kanagawa-dragon}.conf 2>/dev/null || tmux source-file ~/.config/tmux/themes/kanagawa-dragon.conf'
 
 # set -g status off
 

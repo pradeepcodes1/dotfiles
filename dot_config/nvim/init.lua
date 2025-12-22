@@ -17,21 +17,27 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup("plugins") -- load plugin specs
 require("core.cmp")
 require("core.notes")
-vim.api.nvim_create_augroup("TransparentBG", { clear = true })
-vim.api.nvim_create_autocmd("ColorScheme", {
-	pattern = "*",
-	group = "TransparentBG",
-	callback = function()
-		-- Set the main background to transparent
-		vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
 
-		-- Set backgrounds for non-current windows, line numbers, etc., to transparent
-		vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
-		vim.api.nvim_set_hl(0, "LineNr", { bg = "NONE" })
-		vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE" })
-		vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE" })
-	end,
-})
+-- Theme configuration from dotfiles env vars (set by ~/.config/colors/*.sh)
+local nvim_colorscheme = os.getenv("_DOTFILES_NVIM_COLORSCHEME") or "kanagawa-dragon"
+local nvim_background = os.getenv("_DOTFILES_NVIM_BACKGROUND") -- nil, "dark", or "light"
+local theme_transparent = os.getenv("_DOTFILES_THEME_TRANSPARENT") == "1"
+
+-- Only enable transparent background if theme metadata says it's ok
+if theme_transparent then
+	vim.api.nvim_create_augroup("TransparentBG", { clear = true })
+	vim.api.nvim_create_autocmd("ColorScheme", {
+		pattern = "*",
+		group = "TransparentBG",
+		callback = function()
+			vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "LineNr", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE" })
+		end,
+	})
+end
 
 -- Whe n Neovim starts with a single argument that is a directory,
 vim.api.nvim_create_autocmd("VimEnter", {
@@ -68,7 +74,11 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 	end,
 })
 
-vim.cmd.colorscheme("kanagawa-dragon") -- set colorscheme
+-- Apply theme from env vars
+if nvim_background then
+	vim.o.background = nvim_background
+end
+vim.cmd.colorscheme(nvim_colorscheme)
 
 -- Suppress specific deprecation warnings
 -- TODO: Remove once plugins are updated
