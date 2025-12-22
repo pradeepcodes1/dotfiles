@@ -1,8 +1,4 @@
 [tools]
-bun = "latest"
-go = "1.25.5"
-java = "25"
+go = "latest"
 node = "25"
-protobuf = "latest"
 python = "3.14"
-zig = "latest"
