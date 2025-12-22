@@ -4,6 +4,23 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Right Option + Arrow keys for tab switching (Zen Browser)",
+                        "manipulators": [
+                            {
+                                "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^app\\.zen-browser\\.zen$"]}],
+                                "from": {"key_code": "up_arrow", "modifiers": {"mandatory": ["right_option"]}},
+                                "to": [{"key_code": "tab", "modifiers": ["control", "shift"]}],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^app\\.zen-browser\\.zen$"]}],
+                                "from": {"key_code": "down_arrow", "modifiers": {"mandatory": ["right_option"]}},
+                                "to": [{"key_code": "tab", "modifiers": ["control"]}],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Right Option + keys for tmux (Alacritty only)",
                         "manipulators": [
                             {
