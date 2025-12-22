@@ -170,6 +170,7 @@ _apply_theme() {
   _update_tmux_theme
   _update_yazi_theme
   _update_fzf_theme
+  _update_claude_theme
 }
 
 # Update zsh prompt using sourced color variables
@@ -263,6 +264,21 @@ _update_yazi_theme() {
     echo "[flavor]\ndark = \"$flavor\"" > "$yazi_config"
   else
     echo "[flavor]\nlight = \"$flavor\"" > "$yazi_config"
+  fi
+}
+
+# Update Claude CLI theme
+_update_claude_theme() {
+  local claude_config="$HOME/.claude.json"
+  local mode="$_DOTFILES_THEME_MODE"
+
+  [[ ! -f "$claude_config" ]] && return
+
+  # Update theme using sed (jq may not be available)
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' 's/"theme": *"[^"]*"/"theme": "'"$mode"'"/' "$claude_config"
+  else
+    sed -i 's/"theme": *"[^"]*"/"theme": "'"$mode"'"/' "$claude_config"
   fi
 }
 
