@@ -1,0 +1,30 @@
+# Ghostty Terminal Configuration
+
+# Font configuration
+font-family = JetBrainsMono NF
+font-size = 18
+font-thicken = true
+font-thicken-strength = 0
+adjust-cell-height = 6
+
+# Window settings
+window-decoration = false
+window-padding-x = 10
+window-padding-y = 10
+
+# Cursor
+cursor-style = underline
+cursor-style-blink = true
+
+# Selection/Copy behavior
+copy-on-select = true
+
+# macOS specific
+macos-option-as-alt = true
+
+# Keybindings for word navigation (Alt+Left/Right)
+keybind = alt+left=text:\x1bb
+keybind = alt+right=text:\x1bf
+
+# Include theme colors (managed by theme system)
+config-file = themes/current.conf
