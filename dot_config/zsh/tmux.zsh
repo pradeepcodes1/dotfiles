@@ -21,13 +21,15 @@
 
 #!/bin/bash
 
-if [[ -z "$TMUX" \
-  && "$TERM_PROGRAM" == "alacritty" ]]; then
-    tmux
-fi
+if command -v tmux &>/dev/null; then
+    if [[ -z "$TMUX" \
+      && "$TERM_PROGRAM" == "alacritty" ]]; then
+        tmux
+    fi
 
-# Store HOME in pane-specific option so status bar can read it
-if [[ -n "$TMUX" ]]; then
-    tmux set-option -p @pane_home "$HOME"
+    # Store HOME in pane-specific option so status bar can read it
+    if [[ -n "$TMUX" ]]; then
+        tmux set-option -p @pane_home "$HOME"
+    fi
 fi
 
