@@ -15,6 +15,15 @@ return {
 						enabled = false,
 					},
 				},
+				routes = {
+					{
+						filter = {
+							event = "notify",
+							find = "No results from textDocument/documentSymbol",
+						},
+						opts = { skip = true },
+					},
+				},
 			})
 		end,
 	},
