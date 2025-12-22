@@ -25,14 +25,13 @@
         name = "pradeep-cli";
         paths = with pkgs; [
           # core
-          git git-lfs gh neovim tmux zsh chezmoi lazygit
+          wget git git-lfs gh neovim tmux zsh chezmoi lazygit
 
           # navigation / UX
           ripgrep fd fzf bat btop tree zoxide yazi
 
           # infra
-          docker docker-compose kind
-          rclone restic scrcpy
+          docker docker-compose
 
           # network / security
           httpie jq openssl gnupg pass unbound
@@ -40,7 +39,7 @@
           # shell tooling
           mise zsh-syntax-highlighting zsh-autosuggestions
 
-          pinentry-curses
+          pinentry-curses 
         ];
       };
     });
