@@ -15,6 +15,7 @@ NIX_CONFIG_SYMLINKS=(
     ".oh-my-zsh"
     ".p10k.zsh"
     "nix"
+    "Library/Keychains"
 )
 
 # Ensure profiles file exists
@@ -41,6 +42,7 @@ _nix_setup_home() {
         local src="${real_home}/${item}"
         local dst="${new_home}/${item}"
         if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
+            mkdir -p "$(dirname "$dst")"
             ln -s "$src" "$dst"
             echo "  Linked: $item"
         fi
