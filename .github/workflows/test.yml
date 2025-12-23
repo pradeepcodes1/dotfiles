@@ -10,7 +10,13 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: Test on ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -88,10 +94,11 @@ jobs:
         if: always()
         run: |
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          ## Chezmoi Test Results
+          ## Chezmoi Test Results (${{ matrix.os }})
 
           | Metric | Value |
           |--------|-------|
+          | OS | \`${{ matrix.os }}\` |
           | Duration | ${{ steps.duration.outputs.formatted }} |
           | Branch | \`${{ github.ref_name }}\` |
           | Commit | \`${{ github.sha }}\` |
@@ -120,6 +127,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: chezmoi-logs
+          name: chezmoi-logs-${{ matrix.os }}
           path: /tmp/chezmoi-apply.log
           retention-days: 7
