@@ -1,3 +1,7 @@
+[settings]
+# Auto-approve all prompts (fixes trust issues in flake environments)
+yes = true
+
 [tools]
 go = "latest"
 node = "25"

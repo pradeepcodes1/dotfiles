@@ -61,7 +61,9 @@ _nix_first_run_setup() {
     # Install mise-managed tools
     if command -v mise &>/dev/null; then
         echo "Installing mise tools..."
-        HOME="$home_path" mise install --yes
+        # Trust all mise configs to prevent prompts in flake environments
+        HOME="$home_path" MISE_YES=1 mise trust --all 2>/dev/null || true
+        HOME="$home_path" MISE_YES=1 mise install --yes
     fi
 
     # Install nvim plugins via lazy.nvim
@@ -249,6 +251,11 @@ flake() {
     # Run first-time setup if this is a new home
     if [[ $is_first_run -eq 1 ]]; then
         _nix_first_run_setup "$home_path"
+    else
+        # Trust mise configs on every run (in case new configs were added)
+        if command -v mise &>/dev/null; then
+            HOME="$home_path" MISE_YES=1 mise trust --all 2>/dev/null || true
+        fi
     fi
 
     echo "Switching to environment: ${profile_name}"
@@ -262,6 +269,7 @@ flake() {
     export REAL_HOME="$real_home"
     export FLAKE_ENV="${flakes_array[*]}"
     export HOME="$home_path"
+    export MISE_YES=1  # Auto-approve mise prompts in flake environments
     cd "$HOME"
     exec zsh
 }
