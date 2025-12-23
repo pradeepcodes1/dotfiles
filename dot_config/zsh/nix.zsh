@@ -233,7 +233,10 @@ flake() {
         # Install the flake to profile (if not already installed)
         if ! nix profile list --profile "${home_path}/.nix-profile" 2>/dev/null | grep -q "${flake_path}"; then
             echo "Installing flake: $flake_name..."
-            nix profile install "${flake_path}" --profile "${home_path}/.nix-profile"
+            # Use priority 10 to allow conflicts (higher = lower priority, existing packages win)
+            if ! nix profile add "${flake_path}" --profile "${home_path}/.nix-profile" --priority 10 2>&1; then
+                echo "Warning: Failed to install flake '$flake_name', continuing..."
+            fi
         else
             echo "Flake already installed: $flake_name"
         fi
