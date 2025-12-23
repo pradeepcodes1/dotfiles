@@ -26,17 +26,11 @@ jobs:
         id: start
         run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
 
-      # --- Install chezmoi (the ONLY external install) ---
-      - name: Install chezmoi
-        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
-
-      # --- Run chezmoi apply (everything else happens inside) ---
-      # First run: templates use fallback values (pass not yet available)
-      # run_before scripts install nix, bootstrap, and setup dummy pass
-      - name: Run chezmoi apply
+      # --- Run bootstrap (installs nix, runs chezmoi apply in nix shell) ---
+      - name: Run bootstrap
         id: apply
         run: |
-          chezmoi apply --source="${GITHUB_WORKSPACE}" 2>&1 | tee /tmp/chezmoi-apply.log
+          ./bootstrap.sh 2>&1 | tee /tmp/chezmoi-apply.log
           exit ${PIPESTATUS[0]}
 
       # --- Summary ---
