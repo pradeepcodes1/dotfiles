@@ -1,3 +1,8 @@
-# TODO
-- [ ] Do i really need the workspace specific sessions, cons: moving window would disrupt logic
-- [ ] Close of diffview is not working correctly, random failures.
+# Setup
+``` bash
+cd ~/.local/share/chezmoi
+
+git clone https://github.com/pradeepcodes1/dotfiles.git
+
+./bootstrap.sh
+```
