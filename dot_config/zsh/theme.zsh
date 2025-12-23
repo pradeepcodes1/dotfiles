@@ -25,6 +25,22 @@ _DOTFILES_YAZI_FLAVORS=(
   [dawnfox]="catppuccin-latte"
 )
 
+# Bat theme mapping (theme name -> bat theme name)
+typeset -A _DOTFILES_BAT_THEMES
+_DOTFILES_BAT_THEMES=(
+  [kanagawa-dragon]="TwoDark"
+  [kanagawa-wave]="TwoDark"
+  [kanagawa-lotus]="OneHalfLight"
+  [catppuccin-mocha]="Catppuccin Mocha"
+  [catppuccin-latte]="Catppuccin Latte"
+  [gruvbox-dark]="gruvbox-dark"
+  [gruvbox-light]="gruvbox-light"
+  [everforest-dark]="TwoDark"
+  [everforest-light]="OneHalfLight"
+  [nightfox]="Catppuccin Mocha"
+  [dawnfox]="Catppuccin Latte"
+)
+
 # Detect macOS appearance
 _detect_macos_theme() {
   if defaults read -g AppleInterfaceStyle &>/dev/null; then
@@ -172,6 +188,19 @@ _apply_theme() {
   _update_yazi_theme
   _update_fzf_theme
   _update_claude_theme
+  _update_bat_theme
+}
+
+# Update bat theme
+_update_bat_theme() {
+  local bat_config="$HOME/.config/bat/config"
+  local bat_theme="${_DOTFILES_BAT_THEMES[$_DOTFILES_THEME_NAME]}"
+  
+  # Default to TwoDark if not mapped
+  [[ -z "$bat_theme" ]] && bat_theme="TwoDark"
+
+  mkdir -p "$(dirname "$bat_config")"
+  echo "--theme=\"$bat_theme\"" > "$bat_config"
 }
 
 # Update zsh prompt using sourced color variables

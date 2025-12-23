@@ -33,7 +33,7 @@ if command -v tmux &>/dev/null; then
     fi
 
     # Garbage collect unattached tmux sessions (keep threshold sessions max)
-    local threshold=5
+    local threshold=2
     local sessions=$(tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null)
     local total=$(echo "$sessions" | wc -l | tr -d ' ')
 

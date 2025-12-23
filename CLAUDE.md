@@ -144,6 +144,10 @@ Add to `dot_config/mise/config.toml` instead of using version managers like nvm,
 - Lazy.nvim auto-loads all files in the plugins/ directory
 - Plugin configs use lazy.nvim spec format
 
+### Missing Tools
+If a script requires a tool that is missing, use `nix` to install it temporarily or permanently.
+Example: `nix shell nixpkgs#toolname` or add to `dot_config/mise/config.toml`.
+
 ## Conditional Logic in Templates
 
 Templates can use chezmoi template variables:
