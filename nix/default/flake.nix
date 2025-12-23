@@ -32,6 +32,7 @@
             paths = with pkgs; [
               # core
               chezmoi
+              restic
 
               gnupg
               pass
