@@ -27,3 +27,10 @@ node_modules/
 
 dot_config/yazi/flavors/
 dot_config/yazi/package.toml
+
+# macOS-only configs (ignore on Linux)
+{{ if ne .chezmoi.os "darwin" }}
+dot_config/private_karabiner/
+dot_config/aerospace/
+dot_config/alacritty/
+{{ end }}
