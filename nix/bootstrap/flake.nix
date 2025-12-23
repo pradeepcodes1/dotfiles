@@ -32,6 +32,9 @@
           default = pkgs.buildEnv {
             name = "chezmoi-bootstrap";
             paths = with pkgs; [
+              # Chezmoi itself
+              chezmoi
+
               # Required for chezmoi templates using pass
               pass
               gnupg
