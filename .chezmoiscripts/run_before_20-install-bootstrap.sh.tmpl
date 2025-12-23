@@ -14,20 +14,22 @@ if ! command -v nix >/dev/null 2>&1; then
   exit 0
 fi
 
-BOOTSTRAP_FLAKE="{{ .chezmoi.sourceDir }}/nix/bootstrap"
+# In CI, bootstrap.sh already provides tools via nix shell - skip profile install
+# For regular usage, install bootstrap profile permanently
+if [ -z "$CI" ]; then
+  BOOTSTRAP_FLAKE="{{ .chezmoi.sourceDir }}/nix/bootstrap"
+  profiles=$(nix profile list 2>/dev/null || true)
 
-# Check if bootstrap profile is already installed
-profiles=$(nix profile list 2>/dev/null || true)
+  if ! echo "$profiles" | grep -q "chezmoi-bootstrap"; then
+    echo "📦 Installing bootstrap tools from $BOOTSTRAP_FLAKE..."
+    nix profile install "$BOOTSTRAP_FLAKE"
+  else
+    echo "✅ Bootstrap tools already installed"
+  fi
 
-if ! echo "$profiles" | grep -q "chezmoi-bootstrap"; then
-  echo "📦 Installing bootstrap tools from $BOOTSTRAP_FLAKE..."
-  nix profile install "$BOOTSTRAP_FLAKE"
-else
-  echo "✅ Bootstrap tools already installed"
+  # Reload PATH to get newly installed tools
+  hash -r 2>/dev/null || true
 fi
-
-# Reload PATH to get newly installed tools
-hash -r 2>/dev/null || true
 
 # Setup dummy pass for CI if not already configured
 if [ -n "$CI" ] && [ ! -d "$HOME/.password-store" ]; then
