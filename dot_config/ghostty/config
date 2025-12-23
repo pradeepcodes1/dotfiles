@@ -21,6 +21,7 @@ copy-on-select = true
 
 # macOS specific
 macos-option-as-alt = true
+confirm-close-surface = false
 
 # Keybindings for word navigation (Alt+Left/Right)
 keybind = alt+left=text:\x1bb
