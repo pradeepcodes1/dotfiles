@@ -10,7 +10,9 @@
     let
       systems = [
         "aarch64-darwin"
+        "x86_64-darwin"
         "aarch64-linux"
+        "x86_64-linux"
       ];
 
       forAllSystems =
@@ -30,8 +32,21 @@
           default = pkgs.buildEnv {
             name = "pradeep-config-dev";
             paths = with pkgs; [
+              # Chezmoi and secrets
               chezmoi
               age
+
+              # Editor and development tools
+              neovim
+              git
+
+              # Shell utilities
+              fzf
+              ripgrep
+              jq
+
+              # Diff and merge tools
+              diffutils
             ];
           };
         }
