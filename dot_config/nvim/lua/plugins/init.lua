@@ -106,20 +106,6 @@ return {
 				preset = {
 					keys = {
 						{ icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-
-						{
-							icon = " ",
-							key = "f",
-							desc = "Find File",
-							action = "<leader>ff",
-						},
-
-						{
-							icon = " ",
-							key = "g",
-							desc = "Find Text",
-							action = "<leader>fg",
-						},
 						{
 							icon = " ",
 							key = "r",
@@ -131,7 +117,6 @@ return {
 					},
 				},
 				sections = {
-					{ section = "header" },
 					{ section = "keys", gap = 1, padding = 1 },
 				},
 			},
