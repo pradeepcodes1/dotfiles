@@ -30,6 +30,12 @@ return {
 						},
 						opts = { skip = true },
 					},
+					{
+						filter = {
+							warning = true,
+						},
+						opts = { skip = true },
+					},
 				},
 			})
 		end,
