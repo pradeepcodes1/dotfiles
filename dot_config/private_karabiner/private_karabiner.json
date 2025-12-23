@@ -172,6 +172,12 @@
                                 "from": {"key_code": "9", "modifiers": {"mandatory": ["right_option"]}},
                                 "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "9"}],
                                 "type": "basic"
+                            },
+                            {
+                                "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^org\\.alacritty$", "^com\\.mitchellh\\.ghostty$"]}],
+                                "from": {"key_code": "b", "modifiers": {"mandatory": ["right_option"]}},
+                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "b"}],
+                                "type": "basic"
                             }
                         ]
                     }

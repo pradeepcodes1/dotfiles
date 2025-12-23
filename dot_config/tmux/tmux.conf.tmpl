@@ -85,6 +85,7 @@ run '~/.tmux/plugins/tpm/tpm'
 # Search console output/scrollback buffer with fzf and copy selection to clipboard
 #bind h display-popup -E  "tmux capture-pane -p -S - | fzf --reverse | pbcopy"
 bind h display-popup -E  "{{ .chezmoi.targetFile | dir }}/tmux-fzf-search.sh"
+bind b set-option -g status
 
 # C-k for nvim is being blocked
 set -g terminal-features "alacritty:c-k"
@@ -98,3 +99,6 @@ bind-key X confirm-before -p "kill-session '#S'? (y/n)" "\
 "
 # Copy mode + Mouse != scroll to output automatically (sometimes u select the wrong thing and it is annoying, to scroll to cmd use 'q')
 bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
+
+# Hook to handle session switching (kill old session if 1 window)
+set-hook -g client-session-changed 'run-shell "{{ .chezmoi.targetFile | dir }}/session-cleaner.sh"'

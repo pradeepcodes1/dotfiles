@@ -37,3 +37,4 @@ dot_config/private_karabiner/
 dot_config/aerospace/
 dot_config/alacritty/
 {{ end }}
+*.md

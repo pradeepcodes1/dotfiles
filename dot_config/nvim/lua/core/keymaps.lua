@@ -4,6 +4,7 @@ vim.g.mapleader = " "
 -- basics
 map("i", "jk", "<Esc>", { desc = "Exit insert mode with jk" })
 map("v", "jk", "<Esc>", { desc = "Exit visual mode with jk" })
+map("n", "<ScrollWheelRight>", "<Nop>")
 
 -- Telescope
 map("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Explorer" })
