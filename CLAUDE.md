@@ -34,14 +34,17 @@ chezmoi status
 
 ### Development Workflow
 ```bash
-# After modifying files in this directory, apply changes:
-chezmoi apply
+# IMPORTANT: Always use bootstrap.sh to apply changes (runs chezmoi apply in nix shell)
+./bootstrap.sh
+
+# View what would change without applying:
+chezmoi diff
 
 # View rendered template before applying:
 chezmoi execute-template < dot_config/brew/packages.tmpl
 
-# Test a specific script:
-bash .chezmoiscripts/run_after_b-brew.sh.tmpl
+# Edit config using the config-edit shell function:
+config-edit  # Opens nix shell, then run ./bootstrap.sh to apply
 ```
 
 ## Architecture & Structure
@@ -124,7 +127,7 @@ This setup uses **Aerospace** (tiling window manager) with tight tmux integratio
 ### When Adding New Dotfiles
 1. Add file to chezmoi: `chezmoi add ~/.config/tool/config`
 2. Edit in source: `chezmoi edit ~/.config/tool/config`
-3. Apply changes: `chezmoi apply`
+3. Apply changes: `./bootstrap.sh` (from the chezmoi source directory)
 
 ### When Adding Secrets
 Use `pass` and template syntax instead of hardcoding:
