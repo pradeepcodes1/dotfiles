@@ -1,4 +1,5 @@
-GEMINI_API_KEY={{ pass "api/ai/gemini" }}
-OPENROUTER_API_KEY={{ pass "api/ai/openrouter" }}
-AWS_SECRET_ACCESS_KEY={{ pass "aws/secret_key" }}
-AWS_ACCESS_KEY_ID={{ pass "aws/access_key" }}
+{{- $hasPass := and (lookPath "pass") (stat (joinPath .chezmoi.homeDir ".password-store")) -}}
+GEMINI_API_KEY={{ if $hasPass }}{{ pass "api/ai/gemini" }}{{ else }}not-configured{{ end }}
+OPENROUTER_API_KEY={{ if $hasPass }}{{ pass "api/ai/openrouter" }}{{ else }}not-configured{{ end }}
+AWS_SECRET_ACCESS_KEY={{ if $hasPass }}{{ pass "aws/secret_key" }}{{ else }}not-configured{{ end }}
+AWS_ACCESS_KEY_ID={{ if $hasPass }}{{ pass "aws/access_key" }}{{ else }}not-configured{{ end }}

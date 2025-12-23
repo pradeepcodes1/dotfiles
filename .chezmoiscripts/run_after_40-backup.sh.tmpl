@@ -1,7 +1,8 @@
 #!/bin/bash
 {{- $isCI := env "CI" }}
-{{- if $isCI }}
-echo "Skipping backup in CI environment"
+{{- $hasPass := and (lookPath "pass") (stat (joinPath .chezmoi.homeDir ".password-store")) }}
+{{- if or $isCI (not $hasPass) }}
+echo "Skipping backup (CI={{ $isCI }}, pass configured={{ $hasPass }})"
 exit 0
 {{- end }}
 
@@ -13,7 +14,7 @@ elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
 fi
 
 restic_backup() {
-  export RESTIC_REPOSITORY="{{  pass "backups/restic-repo" }}"
+  export RESTIC_REPOSITORY="{{ pass "backups/restic-repo" }}"
 
   if (( $# == 0 )); then
     echo "Usage: restic_backup <path> [path ...]"
