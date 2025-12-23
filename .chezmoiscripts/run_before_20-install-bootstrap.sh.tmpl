@@ -1,42 +1,19 @@
 #!/bin/bash
 set -e
 
-# Load nix environment
-if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
-  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
-  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-fi
-
-# Check if nix is available
-if ! command -v nix >/dev/null 2>&1; then
-  echo "⚠️  Nix not found, skipping bootstrap"
-  exit 0
-fi
-
-# In CI, bootstrap.sh already provides tools via nix shell - skip profile install
-# For regular usage, install bootstrap profile permanently
-if [ -z "$CI" ]; then
-  BOOTSTRAP_FLAKE="{{ .chezmoi.sourceDir }}/nix/bootstrap"
-  profiles=$(nix profile list 2>/dev/null || true)
-
-  if ! echo "$profiles" | grep -q "chezmoi-bootstrap"; then
-    echo "📦 Installing bootstrap tools from $BOOTSTRAP_FLAKE..."
-    nix profile install "$BOOTSTRAP_FLAKE"
-  else
-    echo "✅ Bootstrap tools already installed"
-  fi
-
-  # Reload PATH to get newly installed tools
-  hash -r 2>/dev/null || true
-fi
+# Define bootstrap flake path
+BOOTSTRAP_FLAKE="{{ .chezmoi.sourceDir }}/nix/bootstrap"
 
 # Setup dummy pass for CI if not already configured
 if [ -n "$CI" ] && [ ! -d "$HOME/.password-store" ]; then
   echo "🔧 Setting up dummy pass for CI..."
 
-  # Create GPG key for pass (non-interactive)
-  cat > /tmp/gpg-key-config <<EOF
+  # We run the setup inside a nix shell to ensure gpg and pass are available
+  # regardless of the host environment.
+  nix shell "$BOOTSTRAP_FLAKE" --command bash -c "
+    set -e
+    echo '🔑 Generating GPG key...'
+    cat > /tmp/gpg-key-config <<EOF
 %no-protection
 Key-Type: RSA
 Key-Length: 2048
@@ -45,27 +22,33 @@ Name-Email: ci@test.local
 Expire-Date: 0
 %commit
 EOF
-  gpg --batch --gen-key /tmp/gpg-key-config
-  rm /tmp/gpg-key-config
+    gpg --batch --gen-key /tmp/gpg-key-config
+    rm /tmp/gpg-key-config
 
-  # Get the key ID
-  KEY_ID=$(gpg --list-keys --keyid-format LONG ci@test.local | grep pub | awk '{print $2}' | cut -d'/' -f2)
+    # Get the key ID
+    KEY_ID=\$(gpg --list-keys --keyid-format LONG ci@test.local | grep pub | awk '{print \$2}' | cut -d'/' -f2)
 
-  # Initialize pass
-  pass init "$KEY_ID"
+    echo '🔐 Initializing pass with key: \$KEY_ID'
+    pass init \"\$KEY_ID\"
 
-  # Insert dummy secrets for all pass paths used in templates
-  echo "dummy-gemini-key" | pass insert -e api/ai/gemini
-  echo "dummy-openrouter-key" | pass insert -e api/ai/openrouter
-  echo "dummy-aws-secret" | pass insert -e aws/secret_key
-  echo "dummy-aws-access" | pass insert -e aws/access_key
-  echo "/tmp/dummy-restic-repo" | pass insert -e backups/restic-repo
-  echo "/tmp/dummy-obsidian" | pass insert -e backups/obsidian
-  echo "/tmp/dummy-yamtrack" | pass insert -e backups/yamtrack-db
+    # Insert dummy secrets
+    echo 'dummy-gemini-key' | pass insert -e api/ai/gemini
+    echo 'dummy-openrouter-key' | pass insert -e api/ai/openrouter
+    echo 'dummy-aws-secret' | pass insert -e aws/secret_key
+    echo 'dummy-aws-access' | pass insert -e aws/access_key
+    echo '/tmp/dummy-restic-repo' | pass insert -e backups/restic-repo
+    echo '/tmp/dummy-obsidian' | pass insert -e backups/obsidian
+    echo '/tmp/dummy-yamtrack' | pass insert -e backups/yamtrack-db
+  "
 
   echo "✅ Dummy pass initialized for CI"
-elif command -v pass >/dev/null 2>&1; then
-  echo "✅ pass is available"
+
 else
-  echo "⚠️  pass not found in PATH after bootstrap install"
+  echo "ℹ️  Skipping bootstrap profile installation (relying on nix shell execution)."
+  
+  if command -v pass >/dev/null 2>&1; then
+    echo "✅ pass is available in PATH"
+  else
+    echo "⚠️  pass is NOT available in PATH. Templates using 'pass' may resolve to defaults."
+  fi
 fi
