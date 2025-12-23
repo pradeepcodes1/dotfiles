@@ -1,15 +1,6 @@
 #!/bin/sh
 set -e
 
-# Load nix environment first only if nix is not already available
-if ! command -v nix >/dev/null 2>&1; then
-  if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
-    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-  elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
-    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-  fi
-fi
-
 # Function: Initialize brew environment
 setup_brew_env() {
   if [ -x "/opt/homebrew/bin/brew" ]; then
@@ -30,23 +21,4 @@ elif [ -x "/opt/homebrew/bin/brew" ]; then
   /opt/homebrew/bin/brew bundle --file="$HOME/.config/brew/packages"
 else
   echo "⚠️  Homebrew not found, skipping brew bundle"
-fi
-
-# Install main nix profile (if not already installed)
-if command -v nix >/dev/null 2>&1; then
-  FLAKE_PATH="{{ .chezmoi.sourceDir }}/nix/default"
-  profiles=$(nix profile list 2>/dev/null || true)
-
-  if ! echo "$profiles" | grep -q "pradeep-cli"; then
-    echo "📦 Installing nix profile from $FLAKE_PATH..."
-    nix profile install "$FLAKE_PATH"
-  else
-    echo "✅ Nix profile already installed"
-  fi
-
-  # Upgrade profiles
-  echo "📦 Upgrading nix profiles..."
-  nix profile upgrade '.*' 2>/dev/null || true
-else
-  echo "⚠️  Nix not found, skipping nix packages"
 fi

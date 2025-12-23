@@ -14,6 +14,7 @@ NIX_CONFIG_SYMLINKS=(
     ".env"
     ".oh-my-zsh"
     ".p10k.zsh"
+    ".gnupg"
     "nix"
     "Library/Keychains"
 )

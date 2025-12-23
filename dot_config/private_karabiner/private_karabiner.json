@@ -178,6 +178,24 @@
                                 "from": {"key_code": "b", "modifiers": {"mandatory": ["right_option"]}},
                                 "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "b"}],
                                 "type": "basic"
+                            },
+                            {
+                                "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^org\\.alacritty$", "^com\\.mitchellh\\.ghostty$"]}],
+                                "from": {"key_code": "right_arrow", "modifiers": {"mandatory": ["right_option"]}},
+                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "n"}],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^org\\.alacritty$", "^com\\.mitchellh\\.ghostty$"]}],
+                                "from": {"key_code": "left_arrow", "modifiers": {"mandatory": ["right_option"]}},
+                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "p"}],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^org\\.alacritty$", "^com\\.mitchellh\\.ghostty$"]}],
+                                "from": {"key_code": "tab", "modifiers": {"mandatory": ["right_option"]}},
+                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "l"}],
+                                "type": "basic"
                             }
                         ]
                     }
