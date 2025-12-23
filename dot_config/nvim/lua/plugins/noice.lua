@@ -23,6 +23,13 @@ return {
 						},
 						opts = { skip = true },
 					},
+					{
+						filter = {
+							event = "lsp",
+							kind = "message",
+						},
+						opts = { skip = true },
+					},
 				},
 			})
 		end,
