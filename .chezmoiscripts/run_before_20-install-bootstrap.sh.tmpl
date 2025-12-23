@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+# Load nix environment
+if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+
+# Check if nix is available
+if ! command -v nix >/dev/null 2>&1; then
+  echo "⚠️  Nix not found, skipping bootstrap"
+  exit 0
+fi
+
+BOOTSTRAP_FLAKE="{{ .chezmoi.sourceDir }}/nix/bootstrap"
+
+# Check if bootstrap profile is already installed
+profiles=$(nix profile list 2>/dev/null || true)
+
+if ! echo "$profiles" | grep -q "chezmoi-bootstrap"; then
+  echo "📦 Installing bootstrap tools from $BOOTSTRAP_FLAKE..."
+  nix profile install "$BOOTSTRAP_FLAKE"
+else
+  echo "✅ Bootstrap tools already installed"
+fi
+
+# Verify pass is available
+if command -v pass >/dev/null 2>&1; then
+  echo "✅ pass is available"
+else
+  echo "⚠️  pass not found in PATH after bootstrap install"
+  echo "   You may need to restart your shell or source nix profile"
+fi

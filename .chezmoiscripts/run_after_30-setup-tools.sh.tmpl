@@ -1,12 +1,23 @@
 #!/bin/bash
+set -e
 
-#uv tool install --force  --with pip aider-chat@latest
-uv tool update-shell
+# Load nix environment
+if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
 
-#brew upgrade
+# uv tool setup
+if command -v uv >/dev/null 2>&1; then
+  uv tool update-shell 2>/dev/null || true
+fi
 
-mise install
-mise upgrade
+# mise setup
+if command -v mise >/dev/null 2>&1; then
+  mise install 2>/dev/null || true
+  mise upgrade 2>/dev/null || true
+fi
 
 # Yazi flavors for theme system
 if command -v ya >/dev/null 2>&1; then
@@ -19,5 +30,3 @@ if command -v ya >/dev/null 2>&1; then
   ya pkg add bennyyip/gruvbox-dark 2>/dev/null || true
   ya pkg add Chromium-3-Oxide/everforest-medium 2>/dev/null || true
 fi
-
-

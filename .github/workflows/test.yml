@@ -16,15 +16,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Record overall start time
-        id: overall_start
+      - name: Record start time
+        id: start
         run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
 
-      # --- Install Dependencies ---
-      - name: Install dependencies
+      # --- Install Nix ---
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      # --- Install bootstrap tools via nix (includes pass, gnupg) ---
+      - name: Install bootstrap tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y curl git pass gnupg
+          nix profile install ./nix/bootstrap
 
       # --- Setup pass with dummy secrets ---
       - name: Setup pass with dummy secrets
@@ -47,7 +50,7 @@ jobs:
           # Initialize pass
           pass init "$KEY_ID"
 
-          # Insert dummy secrets
+          # Insert dummy secrets for all pass paths used in templates
           echo "dummy-gemini-key" | pass insert -e api/ai/gemini
           echo "dummy-openrouter-key" | pass insert -e api/ai/openrouter
           echo "dummy-aws-secret" | pass insert -e aws/secret_key
@@ -56,168 +59,64 @@ jobs:
           echo "/tmp/dummy-obsidian" | pass insert -e backups/obsidian
           echo "/tmp/dummy-yamtrack" | pass insert -e backups/yamtrack-db
 
-          echo "Pass initialized with dummy secrets"
+          echo "✅ Pass initialized with dummy secrets"
 
-      # --- Chezmoi Installation (direct, no brew) ---
-      - name: Install chezmoi (start timer)
-        id: chezmoi_start
-        run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
-
+      # --- Install chezmoi ---
       - name: Install chezmoi
-        run: |
-          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $HOME/.local/bin
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: nix profile install nixpkgs#chezmoi
 
-      - name: Chezmoi install duration
-        id: chezmoi_end
-        run: |
-          END=$(date +%s)
-          DURATION=$((END - ${{ steps.chezmoi_start.outputs.time }}))
-          echo "duration=${DURATION}" >> $GITHUB_OUTPUT
-          echo "Chezmoi installed in ${DURATION}s"
-
-      - name: Verify chezmoi
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          chezmoi --version
-
-      # --- Homebrew Installation (optional, may fail in some environments) ---
-      - name: Install Homebrew (start timer)
-        id: brew_start
-        run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
-
-      - name: Install Homebrew (optional)
-        id: brew_install
-        continue-on-error: true
-        run: |
-          echo "::group::Installing Homebrew"
-          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo "::endgroup::"
-
-          # Add brew to PATH for subsequent steps
-          echo "/home/linuxbrew/.linuxbrew/bin" >> $GITHUB_PATH
-          echo "/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
-
-      - name: Homebrew install duration
-        id: brew_end
-        run: |
-          END=$(date +%s)
-          DURATION=$((END - ${{ steps.brew_start.outputs.time }}))
-          echo "duration=${DURATION}" >> $GITHUB_OUTPUT
-          if [ "${{ steps.brew_install.outcome }}" = "success" ]; then
-            echo "Homebrew installed in ${DURATION}s"
-          else
-            echo "Homebrew install skipped/failed in ${DURATION}s (continuing without it)"
-          fi
-
-      # --- Chezmoi Init (dry run) ---
-      - name: Chezmoi init (start timer)
-        id: init_start
-        run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
-
-      - name: Run chezmoi init
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          if [ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          fi
-          chezmoi init --source="${GITHUB_WORKSPACE}"
-
-      - name: Chezmoi init duration
-        id: init_end
-        run: |
-          END=$(date +%s)
-          DURATION=$((END - ${{ steps.init_start.outputs.time }}))
-          echo "duration=${DURATION}" >> $GITHUB_OUTPUT
-          echo "Chezmoi init in ${DURATION}s"
-
-      # --- Chezmoi Apply ---
-      - name: Chezmoi apply (start timer)
-        id: apply_start
-        run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
-
+      # --- Run chezmoi apply ---
       - name: Run chezmoi apply
+        id: apply
         run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          if [ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          fi
           chezmoi apply --source="${GITHUB_WORKSPACE}" 2>&1 | tee /tmp/chezmoi-apply.log
-          # Fail if chezmoi apply failed
           exit ${PIPESTATUS[0]}
 
-      - name: Chezmoi apply duration
-        id: apply_end
-        run: |
-          END=$(date +%s)
-          DURATION=$((END - ${{ steps.apply_start.outputs.time }}))
-          echo "duration=${DURATION}" >> $GITHUB_OUTPUT
-          echo "Chezmoi apply in ${DURATION}s"
-
       # --- Summary ---
-      - name: Calculate total duration
-        id: total
+      - name: Calculate duration
+        id: duration
+        if: always()
         run: |
           END=$(date +%s)
-          START=${{ steps.overall_start.outputs.time }}
+          START=${{ steps.start.outputs.time }}
           DURATION=$((END - START))
           MINUTES=$((DURATION / 60))
           SECONDS=$((DURATION % 60))
-          echo "duration=${DURATION}" >> $GITHUB_OUTPUT
           echo "formatted=${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
 
       - name: Print summary
+        if: always()
         run: |
-          BREW_STATUS="${{ steps.brew_install.outcome }}"
-          if [ "$BREW_STATUS" = "success" ]; then
-            BREW_NOTE=""
-          else
-            BREW_NOTE=" (skipped - CPU not supported)"
-          fi
-
           cat >> $GITHUB_STEP_SUMMARY << EOF
           ## Chezmoi Test Results
 
-          ### Timing Breakdown
-
-          | Step | Duration |
-          |------|----------|
-          | Chezmoi Install | ${{ steps.chezmoi_end.outputs.duration }}s |
-          | Homebrew Install | ${{ steps.brew_end.outputs.duration }}s${BREW_NOTE} |
-          | Chezmoi Init | ${{ steps.init_end.outputs.duration }}s |
-          | Chezmoi Apply | ${{ steps.apply_end.outputs.duration }}s |
-          | **Total** | **${{ steps.total.outputs.formatted }}** |
-
-          ### Run Info
-
           | Metric | Value |
           |--------|-------|
-          | Runner | \`ubuntu-latest\` |
+          | Duration | ${{ steps.duration.outputs.formatted }} |
           | Branch | \`${{ github.ref_name }}\` |
           | Commit | \`${{ github.sha }}\` |
-          | Triggered by | \`${{ github.event_name }}\` |
-          | Homebrew | \`${BREW_STATUS}\` |
+          | Status | \`${{ steps.apply.outcome }}\` |
           EOF
 
           if [ -f /tmp/chezmoi-apply.log ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### Apply Log (last 100 lines)" >> $GITHUB_STEP_SUMMARY
+            echo "### Apply Log (last 50 lines)" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -100 /tmp/chezmoi-apply.log >> $GITHUB_STEP_SUMMARY
+            tail -50 /tmp/chezmoi-apply.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: List applied files
+        if: always()
         run: |
-          echo "::group::Files in ~/.config"
-          ls -la ~/.config/ 2>/dev/null || echo "No .config directory"
+          echo "::group::~/.config"
+          ls -la ~/.config/ 2>/dev/null || echo "No .config"
+          echo "::endgroup::"
+          echo "::group::Home dotfiles"
+          ls -la ~/ | grep '^\.' || true
           echo "::endgroup::"
 
-          echo "::group::Files in home directory"
-          ls -la ~/ | grep -E '^\.' || true
-          echo "::endgroup::"
-
-      - name: Upload logs as artifact
+      - name: Upload logs
         uses: actions/upload-artifact@v4
         if: always()
         with:

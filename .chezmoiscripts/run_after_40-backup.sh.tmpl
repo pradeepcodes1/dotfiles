@@ -5,6 +5,13 @@ echo "Skipping backup in CI environment"
 exit 0
 {{- end }}
 
+# Load nix environment
+if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+
 restic_backup() {
   export RESTIC_REPOSITORY="{{  pass "backups/restic-repo" }}"
 
