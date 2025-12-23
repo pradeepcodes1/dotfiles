@@ -83,20 +83,13 @@ jobs:
         id: init_start
         run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
 
-      - name: Run chezmoi init (dry-run)
+      - name: Run chezmoi init
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           if [ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           fi
-
-          echo "::group::Chezmoi init"
-          chezmoi init --source="${GITHUB_WORKSPACE}" --verbose
-          echo "::endgroup::"
-
-          echo "::group::Chezmoi diff (what would change)"
-          chezmoi diff || true
-          echo "::endgroup::"
+          chezmoi init --source="${GITHUB_WORKSPACE}"
 
       - name: Chezmoi init duration
         id: init_end
@@ -117,10 +110,9 @@ jobs:
           if [ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           fi
-
-          echo "::group::Applying chezmoi config"
-          chezmoi apply --source="${GITHUB_WORKSPACE}" --verbose 2>&1 | tee /tmp/chezmoi-apply.log
-          echo "::endgroup::"
+          chezmoi apply --source="${GITHUB_WORKSPACE}" 2>&1 | tee /tmp/chezmoi-apply.log
+          # Fail if chezmoi apply failed
+          exit ${PIPESTATUS[0]}
 
       - name: Chezmoi apply duration
         id: apply_end
