@@ -1,4 +1,10 @@
 #!/bin/bash
+{{- $isCI := env "CI" }}
+{{- if $isCI }}
+echo "Skipping backup in CI environment"
+exit 0
+{{- end }}
+
 restic_backup() {
   export RESTIC_REPOSITORY="{{  pass "backups/restic-repo" }}"
 

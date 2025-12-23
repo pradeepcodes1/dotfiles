@@ -1,4 +1,13 @@
+{{- $isCI := env "CI" -}}
+{{- if $isCI }}
+# CI environment - using dummy values
+GEMINI_API_KEY=dummy-gemini-key-for-ci
+OPENROUTER_API_KEY=dummy-openrouter-key-for-ci
+AWS_SECRET_ACCESS_KEY=dummy-aws-secret-for-ci
+AWS_ACCESS_KEY_ID=dummy-aws-access-for-ci
+{{- else }}
 GEMINI_API_KEY={{ pass "api/ai/gemini" }}
 OPENROUTER_API_KEY={{ pass "api/ai/openrouter" }}
 AWS_SECRET_ACCESS_KEY={{ pass "aws/secret_key" }}
 AWS_ACCESS_KEY_ID={{ pass "aws/access_key" }}
+{{- end }}
