@@ -110,7 +110,7 @@ return {
                             icon = " ",
                             key = "r",
                             desc = "Recent Files",
-                            action = ":lua Snacks.dashboard.pick('oldfiles')",
+                            action = ":Telescope oldfiles",
                         },
                         { icon = "", key = "p", desc = "Projects", action = "<leader>p" },
                         { icon = " ", key = "q", desc = "Quit", action = ":qa" },
