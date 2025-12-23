@@ -31,15 +31,9 @@
           default = pkgs.buildEnv {
             name = "pradeep-cli";
             paths = with pkgs; [
-              # core
-              chezmoi
+              # core (chezmoi installed separately, not here)
               restic
-
-              gnupg
-              pass
               unbound
-
-              pinentry-curses
             ];
           };
         }
