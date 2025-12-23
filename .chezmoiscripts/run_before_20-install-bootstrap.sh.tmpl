@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # Load nix environment
@@ -26,10 +26,44 @@ else
   echo "✅ Bootstrap tools already installed"
 fi
 
-# Verify pass is available
-if command -v pass >/dev/null 2>&1; then
+# Reload PATH to get newly installed tools
+hash -r 2>/dev/null || true
+
+# Setup dummy pass for CI if not already configured
+if [ -n "$CI" ] && [ ! -d "$HOME/.password-store" ]; then
+  echo "🔧 Setting up dummy pass for CI..."
+
+  # Create GPG key for pass (non-interactive)
+  cat > /tmp/gpg-key-config <<EOF
+%no-protection
+Key-Type: RSA
+Key-Length: 2048
+Name-Real: CI Test
+Name-Email: ci@test.local
+Expire-Date: 0
+%commit
+EOF
+  gpg --batch --gen-key /tmp/gpg-key-config
+  rm /tmp/gpg-key-config
+
+  # Get the key ID
+  KEY_ID=$(gpg --list-keys --keyid-format LONG ci@test.local | grep pub | awk '{print $2}' | cut -d'/' -f2)
+
+  # Initialize pass
+  pass init "$KEY_ID"
+
+  # Insert dummy secrets for all pass paths used in templates
+  echo "dummy-gemini-key" | pass insert -e api/ai/gemini
+  echo "dummy-openrouter-key" | pass insert -e api/ai/openrouter
+  echo "dummy-aws-secret" | pass insert -e aws/secret_key
+  echo "dummy-aws-access" | pass insert -e aws/access_key
+  echo "/tmp/dummy-restic-repo" | pass insert -e backups/restic-repo
+  echo "/tmp/dummy-obsidian" | pass insert -e backups/obsidian
+  echo "/tmp/dummy-yamtrack" | pass insert -e backups/yamtrack-db
+
+  echo "✅ Dummy pass initialized for CI"
+elif command -v pass >/dev/null 2>&1; then
   echo "✅ pass is available"
 else
   echo "⚠️  pass not found in PATH after bootstrap install"
-  echo "   You may need to restart your shell or source nix profile"
 fi
