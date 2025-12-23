@@ -24,7 +24,39 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl git
+          sudo apt-get install -y curl git pass gnupg
+
+      # --- Setup pass with dummy secrets ---
+      - name: Setup pass with dummy secrets
+        run: |
+          # Create a GPG key for pass (non-interactive)
+          cat > /tmp/gpg-key-config <<EOF
+          %no-protection
+          Key-Type: RSA
+          Key-Length: 2048
+          Name-Real: CI Test
+          Name-Email: ci@test.local
+          Expire-Date: 0
+          %commit
+          EOF
+          gpg --batch --gen-key /tmp/gpg-key-config
+
+          # Get the key ID
+          KEY_ID=$(gpg --list-keys --keyid-format LONG ci@test.local | grep pub | awk '{print $2}' | cut -d'/' -f2)
+
+          # Initialize pass
+          pass init "$KEY_ID"
+
+          # Insert dummy secrets
+          echo "dummy-gemini-key" | pass insert -e api/ai/gemini
+          echo "dummy-openrouter-key" | pass insert -e api/ai/openrouter
+          echo "dummy-aws-secret" | pass insert -e aws/secret_key
+          echo "dummy-aws-access" | pass insert -e aws/access_key
+          echo "/tmp/dummy-restic-repo" | pass insert -e backups/restic-repo
+          echo "/tmp/dummy-obsidian" | pass insert -e backups/obsidian
+          echo "/tmp/dummy-yamtrack" | pass insert -e backups/yamtrack-db
+
+          echo "Pass initialized with dummy secrets"
 
       # --- Chezmoi Installation (direct, no brew) ---
       - name: Install chezmoi (start timer)
