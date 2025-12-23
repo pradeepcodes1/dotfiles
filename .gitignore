@@ -1,0 +1,6 @@
+# Binaries installed by nix/chezmoi
+bin/
+
+# Nix result symlinks
+result
+result-*

@@ -52,6 +52,7 @@
 
               # infra
               docker
+              colima
               docker-compose
 
               # network / security

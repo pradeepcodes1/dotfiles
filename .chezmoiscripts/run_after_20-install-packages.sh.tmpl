@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 
+# Load nix environment first
+if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+
 # Function: Initialize brew environment
 setup_brew_env() {
   if [ -x "/opt/homebrew/bin/brew" ]; then
@@ -10,10 +17,9 @@ setup_brew_env() {
   fi
 }
 
-# Setup brew environment first (in case PATH isn't set)
 setup_brew_env
 
-# Check if brew is available (either via PATH or at known locations)
+# Check if brew is available
 if command -v brew >/dev/null 2>&1; then
   echo "✅ Running brew bundle..."
   brew bundle --file="$HOME/.config/brew/packages"
@@ -24,30 +30,21 @@ else
   echo "⚠️  Homebrew not found, skipping brew bundle"
 fi
 
-# Install packages from nix flake (if not already installed)
-FLAKE_PATH="{{ .chezmoi.sourceDir }}/nix/default"
+# Install main nix profile (if not already installed)
+if command -v nix >/dev/null 2>&1; then
+  FLAKE_PATH="{{ .chezmoi.sourceDir }}/nix/default"
+  profiles=$(nix profile list 2>/dev/null || true)
 
-# Load nix environment
-if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
-  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
-  . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-fi
+  if ! echo "$profiles" | grep -q "pradeep-cli"; then
+    echo "📦 Installing nix profile from $FLAKE_PATH..."
+    nix profile install "$FLAKE_PATH"
+  else
+    echo "✅ Nix profile already installed"
+  fi
 
-# Single-user Nix (Docker / CI) needs user-owned state dir
-if [ ! -d /run/systemd/system ]; then
-  export NIX_STATE_DIR="$HOME/.nix"
-fi
-
-profiles=$(nix profile list 2>/dev/null || true)
-
-if ! echo "$profiles" | grep -q "pradeep-cli"; then
-  echo "Installing nix profile from $FLAKE_PATH..."
-  nix profile install "$FLAKE_PATH" --verbose
+  # Upgrade profiles
+  echo "📦 Upgrading nix profiles..."
+  nix profile upgrade '.*' 2>/dev/null || true
 else
-  echo "Nix profile already installed"
+  echo "⚠️  Nix not found, skipping nix packages"
 fi
-
-# Upgrade the profile
-echo "Upgrading nix profiles..."
-nix profile upgrade '.*' --verbose 2>/dev/null || true

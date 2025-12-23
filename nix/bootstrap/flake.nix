@@ -1,5 +1,5 @@
 {
-  description = "Pradeep default CLI tools";
+  description = "Bootstrap tools for chezmoi setup";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -30,11 +30,19 @@
         { pkgs, system }:
         {
           default = pkgs.buildEnv {
-            name = "pradeep-cli";
+            name = "chezmoi-bootstrap";
             paths = with pkgs; [
-              # core (chezmoi installed separately, not here)
-              restic
-              unbound
+              # Chezmoi itself
+              chezmoi
+
+              # Required for chezmoi templates using pass
+              pass
+              gnupg
+              pinentry-curses
+
+              # Basic tools
+              git
+              curl
             ];
           };
         }
