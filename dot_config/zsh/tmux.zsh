@@ -33,12 +33,13 @@ if command -v tmux &>/dev/null; then
     fi
 
     # Garbage collect unattached tmux sessions (keep threshold sessions max)
+    # Sort by creation time (oldest first) to remove old sessions before new ones
     local threshold=2
-    local sessions=$(tmux list-sessions -F "#{session_name}:#{session_attached}" 2>/dev/null)
+    local sessions=$(tmux list-sessions -F "#{session_created}:#{session_name}:#{session_attached}" 2>/dev/null | sort -n)
     local total=$(echo "$sessions" | wc -l | tr -d ' ')
 
     if [[ $total -gt $threshold ]]; then
-        echo "$sessions" | while IFS=: read -r name attached; do
+        echo "$sessions" | while IFS=: read -r created name attached; do
             # Skip attached sessions and special sessions
             [[ "$attached" == "1" || "$name" == "music" ]] && continue
             # Delete unattached session

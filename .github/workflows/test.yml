@@ -10,14 +10,14 @@ env:
   CI: true
 
 jobs:
-  test:
+  bootstrap:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
-    name: Test on ${{ matrix.os }}
+    name: Bootstrap on ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -50,7 +50,7 @@ jobs:
         if: always()
         run: |
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          ## Chezmoi Test Results (${{ matrix.os }})
+          ## Bootstrap Test Results (${{ matrix.os }})
 
           | Metric | Value |
           |--------|-------|
@@ -83,6 +83,84 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: chezmoi-logs-${{ matrix.os }}
+          name: bootstrap-logs-${{ matrix.os }}
           path: /tmp/chezmoi-apply.log
+          retention-days: 7
+
+  flake:
+    needs: bootstrap
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: Flake tests on ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Record start time
+        id: start
+        run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
+
+      # --- Run bootstrap (required for flake function to work) ---
+      - name: Run bootstrap
+        id: apply
+        run: |
+          ./bootstrap.sh 2>&1 | tee /tmp/chezmoi-apply.log
+          exit ${PIPESTATUS[0]}
+
+      # --- Run flake tests ---
+      - name: Run flake tests
+        id: flake_tests
+        run: |
+          ./tests/test-flake.sh 2>&1 | tee /tmp/flake-tests.log
+          exit ${PIPESTATUS[0]}
+
+      # --- Summary ---
+      - name: Calculate duration
+        id: duration
+        if: always()
+        run: |
+          END=$(date +%s)
+          START=${{ steps.start.outputs.time }}
+          DURATION=$((END - START))
+          MINUTES=$((DURATION / 60))
+          SECONDS=$((DURATION % 60))
+          echo "formatted=${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
+
+      - name: Print summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## Flake Test Results (${{ matrix.os }})
+
+          | Metric | Value |
+          |--------|-------|
+          | OS | \`${{ matrix.os }}\` |
+          | Duration | ${{ steps.duration.outputs.formatted }} |
+          | Branch | \`${{ github.ref_name }}\` |
+          | Commit | \`${{ github.sha }}\` |
+          | Bootstrap | \`${{ steps.apply.outcome }}\` |
+          | Flake Tests | \`${{ steps.flake_tests.outcome }}\` |
+          EOF
+
+          if [ -f /tmp/flake-tests.log ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Flake Test Log" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/flake-tests.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: flake-logs-${{ matrix.os }}
+          path: |
+            /tmp/chezmoi-apply.log
+            /tmp/flake-tests.log
           retention-days: 7
