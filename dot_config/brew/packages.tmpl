@@ -1,6 +1,11 @@
+{{- if eq .chezmoi.os "darwin" }}
+# macOS casks (GUI applications)
 cask "alacritty"
 cask "ghostty"
 cask "nikitabobko/tap/aerospace"
 cask "localsend"
 cask "karabiner-elements"
 cask "bitwarden"
+{{- else }}
+# Linux - casks not available, skipping GUI apps
+{{- end }}
