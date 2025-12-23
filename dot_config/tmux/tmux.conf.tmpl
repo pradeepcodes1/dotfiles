@@ -21,7 +21,7 @@ bind 9 select-window -t :=9                                          # ROpt+9: w
 
 # Pane management (h/j/k/l defined below)
 bind z resize-pane -Z                                                # ROpt+z: zoom pane
-bind x confirm-before -p "kill-pane #P? (y/n)" kill-pane             # ROpt+x: kill pane
+bind x kill-pane                                                      # ROpt+x: kill pane
 
 # Session management
 bind d detach-client                                                 # ROpt+d: detach
