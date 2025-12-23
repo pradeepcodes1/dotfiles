@@ -23,6 +23,9 @@ copy-on-select = true
 macos-option-as-alt = true
 confirm-close-surface = false
 
+# Scrolling configuration for smoother scrolling
+mouse-scroll-multiplier = 4
+
 # Keybindings for word navigation (Alt+Left/Right)
 keybind = alt+left=text:\x1bb
 keybind = alt+right=text:\x1bf

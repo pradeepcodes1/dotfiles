@@ -15,6 +15,11 @@ opt.ignorecase = true
 opt.cursorline = true
 opt.wrap = false
 
+-- Smooth scrolling options
+opt.scrolloff = 8        -- Keep 8 lines visible above/below cursor
+opt.sidescrolloff = 8    -- Keep 8 columns visible left/right of cursor
+opt.smoothscroll = true  -- Enable smooth scrolling (Neovim 0.10+)
+
 -- Disable terminal title to prevent conflicts with tmux status bar colors
 opt.title = false
 opt.titlestring = ""
