@@ -31,6 +31,7 @@ return {
 	----------------------------------------
 	{
 		"nvim-java/nvim-java",
+		ft = "java", -- lazy load only for Java files
 		config = function()
 			require("java").setup({
 				jdtls = {
@@ -49,9 +50,7 @@ return {
 		end,
 	},
 
-	{ "neovim/nvim-lspconfig", dependencies = {
-		"nvim-java/nvim-java",
-	} },
+	{ "neovim/nvim-lspconfig" },
 	{ "j-hui/fidget.nvim", tag = "legacy", config = true },
 	{
 		"hrsh7th/nvim-cmp",

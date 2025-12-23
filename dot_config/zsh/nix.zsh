@@ -81,20 +81,24 @@ _nix_list_flakes() {
     done
 }
 
-# Add a new profile
+# Add a new profile (supports multiple flakes)
 _nix_add_profile() {
     local home_path="$1"
-    local flake_name="$2"
-    local profile_name="$3"
+    local profile_name="$2"
+    shift 2
+    local flakes=("$@")  # remaining args are flake names
 
     _nix_ensure_profiles
+
+    # Convert flakes array to JSON array
+    local flakes_json=$(printf '%s\n' "${flakes[@]}" | jq -R . | jq -s .)
 
     # Add profile using jq
     local tmp=$(mktemp)
     jq --arg name "$profile_name" \
        --arg home "$home_path" \
-       --arg flake "$flake_name" \
-       '. += [{"name": $name, "home": $home, "flake": $flake}]' \
+       --argjson flakes "$flakes_json" \
+       '. += [{"name": $name, "home": $home, "flakes": $flakes}]' \
        "$NIX_PROFILES_FILE" > "$tmp" && mv "$tmp" "$NIX_PROFILES_FILE"
 }
 
@@ -102,39 +106,43 @@ _nix_add_profile() {
 _nix_create_profile() {
     echo "Creating new profile..."
 
-    # Get profile name
-    echo -n "Profile name: "
+    # Get profile name (becomes home dir name)
+    echo -n "Home name: "
     read profile_name
 
     if [[ -z "$profile_name" ]]; then
-        echo "Profile name required"
+        echo "Home name required"
         return 1
     fi
 
     # Home is always under ~/.nix-homes/<name>
     local home_path="${NIX_HOMES_DIR}/${profile_name}"
 
-    # Select flake with fzf
-    local flakes=($(_nix_list_flakes))
-    if [[ ${#flakes[@]} -eq 0 ]]; then
+    # Multi-select flakes with fzf
+    local available_flakes=($(_nix_list_flakes))
+    if [[ ${#available_flakes[@]} -eq 0 ]]; then
         echo "No flakes found in $FLAKES_DIR"
         return 1
     fi
 
-    local flake_name
-    flake_name=$(printf '%s\n' "${flakes[@]}" | fzf --prompt="Select flake: " --height=40% --reverse)
+    local selected_flakes
+    selected_flakes=$(printf '%s\n' "${available_flakes[@]}" | fzf --multi --prompt="Select flakes (TAB=multi, ENTER=confirm): " --height=40% --reverse)
 
-    if [[ -z "$flake_name" ]]; then
-        echo "No flake selected"
+    if [[ -z "$selected_flakes" ]]; then
+        echo "No flakes selected"
         return 1
     fi
 
-    # Save the profile
-    _nix_add_profile "$home_path" "$flake_name" "$profile_name"
-    echo "Profile '$profile_name' saved!"
+    # Convert newline-separated to array
+    local flakes_array=("${(@f)selected_flakes}")
 
-    # Return the profile for immediate use
-    echo "$profile_name|$home_path|$flake_name"
+    # Save the profile
+    _nix_add_profile "$home_path" "$profile_name" "${flakes_array[@]}"
+    echo "Profile '$profile_name' saved with flakes: ${flakes_array[*]}"
+
+    # Return the profile for immediate use (flakes joined by comma)
+    local flakes_str="${(j:,:)flakes_array}"
+    echo "$profile_name|$home_path|$flakes_str"
 }
 
 # Main function to switch to a nix flake environment
@@ -142,8 +150,14 @@ flake() {
     _nix_ensure_profiles
 
     # Build list: saved profiles + "New profile" option
+    # Handle both old format (single flake) and new format (flakes array)
     local profiles
-    profiles=$(jq -r '.[] | "\(.name) [\(.flake)] → \(.home)"' "$NIX_PROFILES_FILE" 2>/dev/null)
+    profiles=$(jq -r '.[] |
+        if .flakes then
+            "\(.name) [\(.flakes | join(", "))] → \(.home)"
+        else
+            "\(.name) [\(.flake)] → \(.home)"
+        end' "$NIX_PROFILES_FILE" 2>/dev/null)
 
     local options
     if [[ -n "$profiles" ]]; then
@@ -160,7 +174,7 @@ flake() {
         return 0
     fi
 
-    local home_path flake_name
+    local home_path flakes_csv profile_name
 
     if [[ "$selected" == "[+] New profile..." ]]; then
         # Create new profile
@@ -169,27 +183,31 @@ flake() {
         if [[ $? -ne 0 ]]; then
             return 1
         fi
-        # Parse the result (last line contains: name|home|flake)
+        # Parse the result (last line contains: name|home|flakes_csv)
         local last_line=$(echo "$result" | tail -1)
+        profile_name=$(echo "$last_line" | cut -d'|' -f1)
         home_path=$(echo "$last_line" | cut -d'|' -f2)
-        flake_name=$(echo "$last_line" | cut -d'|' -f3)
+        flakes_csv=$(echo "$last_line" | cut -d'|' -f3)
     else
         # Extract profile name from selection
-        local profile_name=$(echo "$selected" | sed 's/ \[.*//')
+        profile_name=$(echo "$selected" | sed 's/ \[.*//')
 
-        # Get home and flake from profile
+        # Get home and flakes from profile (handle both old and new format)
         home_path=$(jq -r --arg name "$profile_name" '.[] | select(.name == $name) | .home' "$NIX_PROFILES_FILE")
-        flake_name=$(jq -r --arg name "$profile_name" '.[] | select(.name == $name) | .flake' "$NIX_PROFILES_FILE")
+        flakes_csv=$(jq -r --arg name "$profile_name" '.[] | select(.name == $name) |
+            if .flakes then .flakes | join(",") else .flake end' "$NIX_PROFILES_FILE")
     fi
 
-    if [[ -z "$home_path" ]] || [[ -z "$flake_name" ]]; then
-        echo "Error: Could not determine home or flake"
+    if [[ -z "$home_path" ]] || [[ -z "$flakes_csv" ]]; then
+        echo "Error: Could not determine home or flakes"
         return 1
     fi
 
+    # Convert CSV to array
+    local flakes_array=("${(@s:,:)flakes_csv}")
+
     # Store original HOME
     local real_home="$HOME"
-    local flake_path="${FLAKES_DIR}/${flake_name}"
 
     # Ensure home directory exists
     mkdir -p "$home_path"
@@ -200,14 +218,25 @@ flake() {
         is_first_run=1
     fi
 
-    # Install/upgrade flake before switching
-    echo "Applying flake: ${flake_name} from ${flake_path}"
+    # Install/upgrade each flake
+    echo "Applying flakes: ${flakes_array[*]}"
 
-    # Install the flake to profile (if not already installed)
-    if ! nix profile list --profile "${home_path}/.nix-profile" 2>/dev/null | grep -q "${flake_path}"; then
-        echo "Installing flake..."
-        nix profile install "${flake_path}" --profile "${home_path}/.nix-profile"
-    fi
+    for flake_name in "${flakes_array[@]}"; do
+        local flake_path="${FLAKES_DIR}/${flake_name}"
+
+        if [[ ! -d "$flake_path" ]]; then
+            echo "Warning: Flake '$flake_name' not found at $flake_path, skipping"
+            continue
+        fi
+
+        # Install the flake to profile (if not already installed)
+        if ! nix profile list --profile "${home_path}/.nix-profile" 2>/dev/null | grep -q "${flake_path}"; then
+            echo "Installing flake: $flake_name..."
+            nix profile install "${flake_path}" --profile "${home_path}/.nix-profile"
+        else
+            echo "Flake already installed: $flake_name"
+        fi
+    done
 
     # Upgrade all packages in profile
     echo "Upgrading nix profile..."
@@ -218,7 +247,7 @@ flake() {
         _nix_first_run_setup "$home_path"
     fi
 
-    echo "Switching to environment: ${profile_name:-$flake_name}"
+    echo "Switching to environment: ${profile_name}"
 
     # Update tmux pane HOME display
     if [[ -n "$TMUX" ]]; then
@@ -227,8 +256,7 @@ flake() {
 
     # Set environment and exec new shell with new HOME
     export REAL_HOME="$real_home"
-    export FLAKE_ENV="$flake_name"
-    export FLAKE_PATH="$flake_path"
+    export FLAKE_ENV="${flakes_array[*]}"
     export HOME="$home_path"
     cd "$HOME"
     exec zsh
