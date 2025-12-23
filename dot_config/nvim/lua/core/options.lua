@@ -14,6 +14,10 @@ opt.termguicolors = true
 opt.ignorecase = true
 opt.cursorline = true
 opt.wrap = false
+
+-- Disable terminal title to prevent conflicts with tmux status bar colors
+opt.title = false
+opt.titlestring = ""
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 vim.api.nvim_create_autocmd("BufWritePre", {
