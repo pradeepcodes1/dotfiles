@@ -2,9 +2,9 @@
 {{- $isCI := env "CI" }}
 {{- $hasPass := and (lookPath "pass") (stat (joinPath .chezmoi.homeDir ".password-store")) }}
 {{- if or $isCI (not $hasPass) }}
-echo "Skipping backup (CI={{ $isCI }}, pass configured={{ $hasPass }})"
+echo "Skipping backup (CI or pass not configured)"
 exit 0
-{{- end }}
+{{- else }}
 
 # Load nix environment
 if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
@@ -68,5 +68,6 @@ fi
 
 
 restic_backup \
-     "{{  pass "backups/obsidian" }}" \
-     "{{  pass "backups/yamtrack-db" }}"
+     "{{ pass "backups/obsidian" }}" \
+     "{{ pass "backups/yamtrack-db" }}"
+{{- end }}
