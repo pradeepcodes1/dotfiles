@@ -26,20 +26,27 @@ jobs:
         id: start
         run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
 
-      # --- Install Nix ---
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+      # --- Install chezmoi (the only external install) ---
+      - name: Install chezmoi
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
 
-      # --- Install bootstrap tools via nix (includes pass, gnupg) ---
-      - name: Install bootstrap tools
+      # --- Install nix (using the same script chezmoi would use) ---
+      - name: Install nix
         run: |
-          nix profile install ./nix/bootstrap
+          curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | \
+            sh -s -- install --no-confirm
 
-      # --- Setup pass with dummy secrets ---
+      # --- Setup pass with dummy secrets (inside nix shell with bootstrap tools) ---
       - name: Setup pass with dummy secrets
+        shell: bash
         run: |
-          # Create a GPG key for pass (non-interactive)
-          cat > /tmp/gpg-key-config <<EOF
+          # Source nix
+          . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+
+          # Run inside nix shell with bootstrap tools (pass, gnupg, etc.)
+          nix shell ./nix/bootstrap --command bash -c '
+            # Create a GPG key for pass (non-interactive)
+            cat > /tmp/gpg-key-config <<EOF
           %no-protection
           Key-Type: RSA
           Key-Length: 2048
@@ -48,35 +55,36 @@ jobs:
           Expire-Date: 0
           %commit
           EOF
-          gpg --batch --gen-key /tmp/gpg-key-config
+            gpg --batch --gen-key /tmp/gpg-key-config
 
-          # Get the key ID
-          KEY_ID=$(gpg --list-keys --keyid-format LONG ci@test.local | grep pub | awk '{print $2}' | cut -d'/' -f2)
+            # Get the key ID
+            KEY_ID=$(gpg --list-keys --keyid-format LONG ci@test.local | grep pub | awk "{print \$2}" | cut -d"/" -f2)
 
-          # Initialize pass
-          pass init "$KEY_ID"
+            # Initialize pass
+            pass init "$KEY_ID"
 
-          # Insert dummy secrets for all pass paths used in templates
-          echo "dummy-gemini-key" | pass insert -e api/ai/gemini
-          echo "dummy-openrouter-key" | pass insert -e api/ai/openrouter
-          echo "dummy-aws-secret" | pass insert -e aws/secret_key
-          echo "dummy-aws-access" | pass insert -e aws/access_key
-          echo "/tmp/dummy-restic-repo" | pass insert -e backups/restic-repo
-          echo "/tmp/dummy-obsidian" | pass insert -e backups/obsidian
-          echo "/tmp/dummy-yamtrack" | pass insert -e backups/yamtrack-db
+            # Insert dummy secrets
+            echo "dummy-gemini-key" | pass insert -e api/ai/gemini
+            echo "dummy-openrouter-key" | pass insert -e api/ai/openrouter
+            echo "dummy-aws-secret" | pass insert -e aws/secret_key
+            echo "dummy-aws-access" | pass insert -e aws/access_key
+            echo "/tmp/dummy-restic-repo" | pass insert -e backups/restic-repo
+            echo "/tmp/dummy-obsidian" | pass insert -e backups/obsidian
+            echo "/tmp/dummy-yamtrack" | pass insert -e backups/yamtrack-db
 
-          echo "✅ Pass initialized with dummy secrets"
+            echo "✅ Pass initialized with dummy secrets"
+          '
 
-      # --- Install chezmoi ---
-      - name: Install chezmoi
-        run: nix profile install nixpkgs#chezmoi
-
-      # --- Run chezmoi apply ---
+      # --- Run chezmoi apply (nix shell provides pass for template rendering) ---
       - name: Run chezmoi apply
         id: apply
+        shell: bash
         run: |
-          chezmoi apply --source="${GITHUB_WORKSPACE}" 2>&1 | tee /tmp/chezmoi-apply.log
-          exit ${PIPESTATUS[0]}
+          . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+          nix shell ./nix/bootstrap --command bash -c '
+            chezmoi apply --source="${GITHUB_WORKSPACE}" 2>&1 | tee /tmp/chezmoi-apply.log
+            exit ${PIPESTATUS[0]}
+          '
 
       # --- Summary ---
       - name: Calculate duration
