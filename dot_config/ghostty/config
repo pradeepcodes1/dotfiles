@@ -9,8 +9,8 @@ adjust-cell-height = 6
 
 # Window settings
 window-decoration = false
-window-padding-x = 10
-window-padding-y = 10
+window-padding-x = 8
+window-padding-y = 6,0
 
 # Cursor
 cursor-style = underline

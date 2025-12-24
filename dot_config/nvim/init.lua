@@ -67,6 +67,7 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 		"*/site-packages/*",
 		"*/vendor/*",
 		"*/homebrew/Cellar/*",
+		"*/mise/installs/*",
 		vim.fn.expand("~") .. "/go/*",
 	},
 	callback = function()
