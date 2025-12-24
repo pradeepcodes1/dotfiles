@@ -149,13 +149,9 @@ log_command() {
   fi
 }
 
-# Export all logging functions
-export -f _log 2>/dev/null || true
-export -f debug_log 2>/dev/null || true
-export -f info_log 2>/dev/null || true
-export -f warn_log 2>/dev/null || true
-export -f error_log 2>/dev/null || true
-export -f log_command 2>/dev/null || true
+# Note: In zsh, functions are automatically available throughout the shell session.
+# Unlike bash, zsh doesn't need 'export -f' and doesn't support it.
+# Functions defined here are available to all zsh configuration files.
 
 # Log that logging system is initialized (only in verbose mode)
 debug_log "logging" "Logging system initialized (DEBUG_DOTFILES=${DEBUG_DOTFILES:-0})"
