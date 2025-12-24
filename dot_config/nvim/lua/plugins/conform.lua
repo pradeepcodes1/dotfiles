@@ -13,6 +13,12 @@ return {
 					html = { "prettier" },
 					css = { "prettier" },
 					cpp = { "clang-format" },
+					go = { "gofmt" },
+					rust = { "rustfmt" },
+					json = { "prettier" },
+					yaml = { "prettier" },
+					markdown = { "prettier" },
+					toml = { "taplo" },
 				},
 				format_on_save = {
 					-- These options will be passed to conform.format()

@@ -49,6 +49,7 @@
               tree
               zoxide
               yazi
+              eza
 
               # infra
               docker
