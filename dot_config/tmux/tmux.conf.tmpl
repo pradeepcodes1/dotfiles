@@ -6,8 +6,8 @@ bind C-a send-prefix
 # Right Option + key bindings (via Karabiner sending prefix + key)
 # Window management
 bind c new-window -c "#{pane_current_path}"                          # ROpt+c: new window
-bind n next-window                                                   # ROpt+n: next window
-bind p previous-window                                               # ROpt+p: previous window
+bind \; previous-window                                              # ROpt+;: previous window
+bind "'" next-window                                                 # ROpt+': next window
 bind w choose-window                                                 # ROpt+w: choose window
 bind 1 select-window -t :=1                                          # ROpt+1: window 1
 bind 2 select-window -t :=2                                          # ROpt+2: window 2
