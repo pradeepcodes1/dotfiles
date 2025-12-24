@@ -223,9 +223,6 @@ _apply_theme() {
   debug_log "theme" "_apply_theme: updating zsh prompt..."
   _update_zsh_prompt
 
-  debug_log "theme" "_apply_theme: updating alacritty..."
-  _update_alacritty_theme
-
   debug_log "theme" "_apply_theme: updating ghostty..."
   _update_ghostty_theme
 
@@ -279,60 +276,6 @@ _update_zsh_prompt() {
   RPROMPT="%F{$prompt_path}%~%f"
 
   debug_log "theme" "_update_zsh_prompt: prompt updated"
-}
-
-# Generate and apply Alacritty theme
-_update_alacritty_theme() {
-  local config="$HOME/.config/alacritty/alacritty.toml"
-  local theme_file="$HOME/.config/alacritty/themes/${_DOTFILES_THEME_NAME}.toml"
-
-  debug_log "theme" "_update_alacritty_theme: config='$config' theme_file='$theme_file'"
-
-  if [[ ! -f "$config" ]]; then
-    debug_log "theme" "_update_alacritty_theme: config not found, skipping"
-    return
-  fi
-
-  # Generate theme file from colors
-  mkdir -p "$(dirname "$theme_file")"
-  if cat > "$theme_file" <<EOF
-[colors.primary]
-background = "$bg"
-foreground = "$fg"
-
-[colors.normal]
-black = "$black"
-red = "$red"
-green = "$green"
-yellow = "$yellow"
-blue = "$blue"
-magenta = "$magenta"
-cyan = "$cyan"
-white = "$white"
-
-[colors.bright]
-black = "$bright_black"
-red = "$bright_red"
-green = "$bright_green"
-yellow = "$bright_yellow"
-blue = "$bright_blue"
-magenta = "$bright_magenta"
-cyan = "$bright_cyan"
-white = "$bright_white"
-EOF
-  then
-    debug_log "theme" "_update_alacritty_theme: wrote theme file"
-  else
-    error_log "theme" "_update_alacritty_theme: failed to write theme file"
-    return 1
-  fi
-
-  # Update import line
-  if sed -i '' 's|^import = \[.*\]|import = ["~/.config/alacritty/themes/'"$_DOTFILES_THEME_NAME"'.toml"]|' "$config"; then
-    debug_log "theme" "_update_alacritty_theme: updated import in config"
-  else
-    error_log "theme" "_update_alacritty_theme: failed to update import"
-  fi
 }
 
 # Generate and apply Ghostty theme
@@ -443,7 +386,7 @@ _update_yazi_theme() {
   [[ -z "$flavor" ]] && return
 
   if [[ ! -d "$HOME/.config/yazi/flavors/${flavor}.yazi" ]]; then
-    echo "Note: yazi flavor '$flavor' not installed" >&2
+    warn_log "theme" "Yazi flavor '$flavor' not installed"
     return
   fi
 
