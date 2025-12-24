@@ -31,14 +31,14 @@
                             },
                             {
                                 "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^org\\.alacritty$", "^com\\.mitchellh\\.ghostty$"]}],
-                                "from": {"key_code": "n", "modifiers": {"mandatory": ["right_option"]}},
-                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "n"}],
+                                "from": {"key_code": "semicolon", "modifiers": {"mandatory": ["right_option"]}},
+                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "semicolon"}],
                                 "type": "basic"
                             },
                             {
                                 "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^org\\.alacritty$", "^com\\.mitchellh\\.ghostty$"]}],
-                                "from": {"key_code": "p", "modifiers": {"mandatory": ["right_option"]}},
-                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "p"}],
+                                "from": {"key_code": "quote", "modifiers": {"mandatory": ["right_option"]}},
+                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "quote"}],
                                 "type": "basic"
                             },
                             {
@@ -182,13 +182,13 @@
                             {
                                 "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^org\\.alacritty$", "^com\\.mitchellh\\.ghostty$"]}],
                                 "from": {"key_code": "right_arrow", "modifiers": {"mandatory": ["right_option"]}},
-                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "n"}],
+                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "quote"}],
                                 "type": "basic"
                             },
                             {
                                 "conditions": [{"type": "frontmost_application_if", "bundle_identifiers": ["^org\\.alacritty$", "^com\\.mitchellh\\.ghostty$"]}],
                                 "from": {"key_code": "left_arrow", "modifiers": {"mandatory": ["right_option"]}},
-                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "p"}],
+                                "to": [{"key_code": "l", "modifiers": ["control"]}, {"key_code": "semicolon"}],
                                 "type": "basic"
                             },
                             {
