@@ -44,7 +44,9 @@
               ripgrep
               fd
               fzf
+              atuin
               bat
+              delta
               btop
               tree
               zoxide
@@ -65,6 +67,8 @@
               mise
               zsh-syntax-highlighting
               zsh-autosuggestions
+              zsh-fzf-tab
+              carapace
             ];
           };
         }
