@@ -22,7 +22,6 @@ return {
 
 				handlers = {
 					function(server_name) -- default handler (optional)
-						vim.notify("Setting up LSP: " .. server_name, vim.log.levels.INFO)
 						vim.lsp.config(server_name, {
 							on_attach = common.on_attach,
 							capabilities = capabilities,

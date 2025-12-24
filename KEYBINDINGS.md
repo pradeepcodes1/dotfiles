@@ -212,3 +212,148 @@ Enter service mode with `Alt+Shift+;`, then:
 2. **Tmux sessions**: Auto-created per Aerospace workspace for terminal isolation
 3. **Neovim projects**: Use `<leader>p` to quickly switch between project directories
 4. **Git workflow**: Use `<leader>gr` for review, `<leader>gd` for focused file diffs
+
+---
+
+## Yazi (File Manager)
+
+### Navigation
+
+#### Basic Movement
+| Key | Action |
+|-----|--------|
+| `j` / `↓` | Move cursor down |
+| `k` / `↑` | Move cursor up |
+| `h` / `←` | Go to parent directory |
+| `l` / `→` / `Enter` | Enter directory or open file |
+
+#### Quick Movement
+| Key | Action |
+|-----|--------|
+| `g` | Go to top of list |
+| `G` | Go to bottom of list |
+| `Ctrl-u` | Move up half a page |
+| `Ctrl-d` | Move down half a page |
+| `Ctrl-b` | Move up one full page |
+| `Ctrl-f` | Move down one full page |
+
+#### Directory Navigation
+| Key | Action |
+|-----|--------|
+| `~` | Go to home directory |
+| `-` | Go to previous directory |
+| `z` | Jump to directory using zoxide |
+
+### File Operations
+
+#### Basic Operations
+| Key | Action |
+|-----|--------|
+| `o` | Open file with default application |
+| `O` | Open file interactively (choose application) |
+| `e` | Edit file (using $EDITOR) |
+| `Enter` | Open file or enter directory |
+
+#### File Management
+| Key | Action |
+|-----|--------|
+| `y` | Yank (copy) selected files |
+| `x` | Cut selected files |
+| `p` | Paste files |
+| `P` | Paste files (overwrite) |
+| `d` | Delete selected files (move to trash) |
+| `D` | Permanently delete files (bypass trash) |
+| `a` | Create new file or directory |
+| `r` | Rename file/directory |
+
+#### Advanced Operations
+| Key | Action |
+|-----|--------|
+| `c` | Copy selected files to... |
+| `m` | Move selected files to... |
+| `.` | Toggle hidden files |
+| `z` | Show file info |
+| `Ctrl-s` | Symlink selected files |
+
+### Selection
+
+#### Single Selection
+| Key | Action |
+|-----|--------|
+| `Space` | Toggle selection of current file |
+| `v` | Enter visual mode |
+| `V` | Enter visual mode (unset existing selection) |
+
+#### Multiple Selection
+| Key | Action |
+|-----|--------|
+| `Ctrl-a` | Select all files in current directory |
+| `Ctrl-r` | Inverse selection |
+| `Esc` | Cancel selection |
+
+### Tabs
+| Key | Action |
+|-----|--------|
+| `t` | Create new tab |
+| `1-9` | Switch to tab 1-9 |
+| `[` / `Shift-Tab` | Switch to previous tab |
+| `]` / `Tab` | Switch to next tab |
+| `{` | Move current tab left |
+| `}` | Move current tab right |
+| `w` | Close current tab |
+
+### Search & Filter
+
+#### Search
+| Key | Action |
+|-----|--------|
+| `/` | Search forward |
+| `?` | Search backward |
+| `n` | Jump to next search result |
+| `N` | Jump to previous search result |
+
+#### Filter
+| Key | Action |
+|-----|--------|
+| `f` | Filter files (interactive) |
+| `Ctrl-s` | Search files by content (ripgrep) |
+
+### Sorting
+| Key | Action |
+|-----|--------|
+| `s` | Sort files interactively |
+| `S` | Reverse sort order |
+
+**Sort Options**: By name, modified time, created time, size, extension, natural
+
+### Visual Mode
+Enter visual mode with `v` or `V`, then:
+| Key | Action |
+|-----|--------|
+| `j` / `k` | Extend selection up/down |
+| `y` | Yank (copy) selected files |
+| `x` | Cut selected files |
+| `d` | Delete selected files |
+| `Esc` | Exit visual mode |
+
+### Shell & Commands
+| Key | Action |
+|-----|--------|
+| `:` | Execute shell command |
+| `!` | Execute shell command (blocking) |
+| `;` | Execute command for selected files |
+| `Ctrl-z` | Suspend yazi (return with `fg`) |
+
+### Help & Quit
+| Key | Action |
+|-----|--------|
+| `?` / `F1` | Show help |
+| `q` | Quit current tab |
+| `Q` | Quit all tabs and yazi |
+
+### Yazi Tips
+- **Bulk rename**: Select files (`Space`), press `r`, edit in editor
+- **Quick preview**: Files are previewed in right pane automatically
+- **Shell integration**: The `y()` wrapper function allows changing directory on exit
+- **Hidden files**: Press `.` to toggle visibility of dotfiles
+- **Theme integration**: Managed by `theme.zsh` - use `theme toggle` to change

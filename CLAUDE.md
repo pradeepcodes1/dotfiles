@@ -69,12 +69,13 @@ Chezmoi uses special prefixes to determine how files are processed:
 - **Entry point**: `dot_zshrc` sources modular configs from `~/.config/zsh/*.zsh`
 - **Custom modules** in `dot_config/zsh/`:
   - `00-logging.zsh` - Centralized logging system (sourced first alphabetically)
+  - `basics.zsh.tmpl` - Basic environment setup and eza aliases
+  - `navigation.zsh` - Smart directory navigation with zoxide integration
+  - `plugins.zsh` - Zsh plugin configuration (autosuggestions, zoxide)
+  - `theme.zsh` - Theme management system
   - `tmux.zsh` - Auto-attaches tmux sessions per Aerospace workspace
   - `cp.zsh` - Competitive programming toolkit (`cpt` command)
-  - `basics.zsh.tmpl` - Basic environment setup
   - `music.zsh` - Music player shortcuts
-  - `plugins.zsh` - Zsh plugin configuration
-  - `theme.zsh` - Theme management system
 
 #### 2. Tool Version Management (mise)
 - **Config**: `dot_config/mise/config.toml`
@@ -149,6 +150,30 @@ Add to `dot_config/brew/packages.tmpl` to track installations
 
 ### When Adding Language Runtimes
 Add to `dot_config/mise/config.toml` instead of using version managers like nvm, rbenv, etc.
+
+### Navigation Helpers (navigation.zsh)
+The `navigation.zsh` module provides smart directory navigation with zoxide integration:
+
+**Smart cd wrapper:**
+- `cd <path>` - Enhanced cd that automatically tracks directories in zoxide
+- `cd <fuzzy>` - If path doesn't exist, tries fuzzy matching via zoxide
+
+**Interactive navigation:**
+- `zi [query]` - Interactive directory picker with fzf (or fuzzy search with query)
+- `zz` - Alias for `zi` (quick access)
+
+**Directory utilities:**
+- `mkcd <path>` - Create directory and cd into it
+- `cdf <file>` - cd to the directory containing a file
+- `up [N]` - Go up N directories (default: 1)
+- `bd <dirname>` - Go back to a specific parent directory by name
+- `fcd [start]` - Browse and cd using fzf from starting directory
+- `cdls <dir>` - cd and ls in one command
+
+**Zoxide shortcuts:**
+- `zstats` - Show zoxide statistics (most used directories)
+
+All cd operations are automatically tracked in zoxide for intelligent fuzzy matching.
 
 ### Debugging & Logging
 The repository includes a centralized logging system for all scripts:
