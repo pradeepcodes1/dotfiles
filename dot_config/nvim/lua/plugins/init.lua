@@ -11,7 +11,58 @@ return {
         dependencies = { "plenary.nvim" },
         opts = {
             defaults = {
-                file_ignore_patterns = { "node_modules", ".git", "build" },
+                file_ignore_patterns = {
+                    -- Version control
+                    ".git/",
+                    ".svn/",
+                    ".hg/",
+
+                    -- Dependencies
+                    "node_modules/",
+                    "vendor/",
+                    ".bundle/",
+                    "bower_components/",
+
+                    -- Build outputs
+                    "build/",
+                    "dist/",
+                    "out/",
+                    "target/",
+                    "*.min.js",
+                    "*.min.css",
+
+                    -- Caches
+                    ".cache/",
+                    ".next/",
+                    ".nuxt/",
+                    ".turbo/",
+                    ".vite/",
+                    ".parcel%-cache/",
+
+                    -- Test/coverage
+                    "coverage/",
+                    ".nyc_output/",
+                    ".pytest_cache/",
+                    "__pycache__/",
+
+                    -- Lock files
+                    "package%-lock.json",
+                    "yarn.lock",
+                    "pnpm%-lock.yaml",
+                    "Cargo.lock",
+                    "poetry.lock",
+
+                    -- OS/IDE
+                    ".DS_Store",
+                    "Thumbs.db",
+                    ".idea/",
+                    ".vscode/",
+
+                    -- Logs
+                    "%.log",
+                    "npm%-debug.log",
+                    "yarn%-error.log",
+                },
             },
             pickers = {
                 find_files = {
