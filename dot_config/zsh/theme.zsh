@@ -390,6 +390,7 @@ EOF
 # Generate and apply tmux theme
 _update_tmux_theme() {
   local theme_file="$HOME/.config/tmux/themes/${_DOTFILES_THEME_NAME}.conf"
+  local current_file="$HOME/.config/tmux/themes/current.conf"
 
   debug_log "theme" "_update_tmux_theme: theme_file='$theme_file'"
 
@@ -412,6 +413,13 @@ EOF
   else
     error_log "theme" "_update_tmux_theme: failed to write theme file"
     return 1
+  fi
+
+  # Copy to current.conf so tmux reload always uses the active theme
+  if cp "$theme_file" "$current_file"; then
+    debug_log "theme" "_update_tmux_theme: copied to current.conf"
+  else
+    error_log "theme" "_update_tmux_theme: failed to copy to current.conf"
   fi
 
   # Source if inside tmux
@@ -491,6 +499,7 @@ _init_theme() {
       _load_theme_colors "$theme_name"
       _update_zsh_prompt
       _update_fzf_theme
+      _update_tmux_theme
       debug_log "theme" "_init_theme: complete (persisted)"
       return
     else
@@ -514,6 +523,7 @@ _init_theme() {
   _load_theme_colors "$theme_name"
   _update_zsh_prompt
   _update_fzf_theme
+  _update_tmux_theme
   debug_log "theme" "_init_theme: complete (system default)"
 }
 

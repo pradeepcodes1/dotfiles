@@ -34,8 +34,15 @@ chezmoi status
 
 ### Development Workflow
 ```bash
-# IMPORTANT: Always use bootstrap.sh to apply changes (runs chezmoi apply in nix shell)
+# CRITICAL WORKFLOW: When modifying dotfiles, ALWAYS follow this sequence:
+# 1. Edit files in the source directory (dot_*, etc.)
+# 2. Add changed files to git FIRST
+# 3. Then run bootstrap.sh to apply
+git add <changed-files>
 ./bootstrap.sh
+
+# NEVER run `chezmoi apply --force` directly - always add to git first
+# This prevents merge conflicts and ensures proper state management
 
 # View what would change without applying:
 chezmoi diff
