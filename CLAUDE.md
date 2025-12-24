@@ -61,11 +61,13 @@ Chezmoi uses special prefixes to determine how files are processed:
 #### 1. Shell Configuration (Zsh)
 - **Entry point**: `dot_zshrc` sources modular configs from `~/.config/zsh/*.zsh`
 - **Custom modules** in `dot_config/zsh/`:
+  - `00-logging.zsh` - Centralized logging system (sourced first alphabetically)
   - `tmux.zsh` - Auto-attaches tmux sessions per Aerospace workspace
   - `cp.zsh` - Competitive programming toolkit (`cpt` command)
   - `basics.zsh.tmpl` - Basic environment setup
   - `music.zsh` - Music player shortcuts
   - `plugins.zsh` - Zsh plugin configuration
+  - `theme.zsh` - Theme management system
 
 #### 2. Tool Version Management (mise)
 - **Config**: `dot_config/mise/config.toml`
@@ -140,6 +142,69 @@ Add to `dot_config/brew/packages.tmpl` to track installations
 
 ### When Adding Language Runtimes
 Add to `dot_config/mise/config.toml` instead of using version managers like nvm, rbenv, etc.
+
+### Debugging & Logging
+The repository includes a centralized logging system for all scripts:
+
+**Console Logging:**
+```bash
+# Enable debug logging
+export DEBUG_DOTFILES=1
+
+# Enable verbose debug logging with timestamps
+export DEBUG_DOTFILES=2
+
+# Run commands to see debug output
+theme toggle
+```
+
+**File Logging:**
+```bash
+# Log to file in addition to console
+export DOTFILES_LOG_FILE="$HOME/.local/state/dotfiles/debug.log"
+
+# Combine with debug mode
+export DEBUG_DOTFILES=1
+export DOTFILES_LOG_FILE="$HOME/.local/state/dotfiles/debug.log"
+theme toggle
+
+# View the log file
+tail -f ~/.local/state/dotfiles/debug.log
+
+# Note: Logs are automatically rotated when they exceed 10MB
+# Old logs are saved as debug.log.old
+```
+
+**In Scripts:**
+```bash
+# Available logging functions (automatically loaded from 00-logging.zsh)
+debug_log "component" "Debug message"     # Only shows if DEBUG_DOTFILES >= 1
+info_log "component" "Info message"       # Only shows if DEBUG_DOTFILES >= 1
+warn_log "component" "Warning message"    # Always shows
+error_log "component" "Error message"     # Always shows
+
+# Log command execution with timing
+log_command "component" "description" command args...
+```
+
+**Log Levels:**
+- **DEBUG** 🔍 (cyan) - Detailed execution flow, only when `DEBUG_DOTFILES >= 1`
+- **INFO** ℹ️ (green) - Informational messages, only when `DEBUG_DOTFILES >= 1`
+- **WARN** ⚠️ (yellow) - Warnings, always shown
+- **ERROR** ❌ (red) - Errors, always shown
+
+**File Format:**
+Console logs use colors and emojis. File logs are plain text with full timestamps:
+```
+[2025-12-24 14:40:32] [DEBUG] [theme] Loading colors: 'kanagawa-dragon'
+[2025-12-24 14:40:33] [INFO] [theme] Theme applied successfully
+[2025-12-24 14:40:34] [WARN] [theme] Yazi flavor not installed
+[2025-12-24 14:40:35] [ERROR] [theme] Failed to write config file
+```
+
+**Components using logging:**
+- `theme.zsh` - Theme switching and application
+- Add logging to your custom scripts for better debugging
 
 ### Nvim Plugin Management
 - Add new plugins in `dot_config/nvim/lua/plugins/`
