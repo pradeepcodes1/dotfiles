@@ -35,6 +35,5 @@ dot_config/yazi/package.toml
 {{ if ne .chezmoi.os "darwin" }}
 dot_config/private_karabiner/
 dot_config/aerospace/
-dot_config/alacritty/
 {{ end }}
 *.md

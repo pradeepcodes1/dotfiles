@@ -129,7 +129,7 @@ Chezmoi uses special prefixes to determine how files are processed:
 ### Workspace Management
 This setup uses **Aerospace** (tiling window manager) with tight tmux integration:
 - Each Aerospace workspace gets a corresponding tmux session
-- Terminal (Alacritty) auto-attaches to workspace-specific tmux session on launch
+- Terminal (Ghostty) auto-attaches to workspace-specific tmux session on launch
 - Prevents session name conflicts and enables workspace-isolated terminal sessions
 
 ## Important Patterns

@@ -1,7 +1,7 @@
 # Dotfiles Theme System
 
 Centralized color definitions for all CLI tools. Each theme has one source file that drives colors across:
-- Terminal (Alacritty)
+- Terminal (Ghostty)
 - Shell prompt (Zsh)
 - Tmux status bar
 - Neovim colorscheme + lualine
@@ -30,7 +30,7 @@ Create `<theme-name>.sh` with the following structure:
 # Mode: dark|light
 # Transparent: 1|0
 
-# Terminal colors (used by Alacritty)
+# Terminal colors (used by Ghostty)
 bg="#..."
 fg="#..."
 
@@ -87,7 +87,7 @@ The first three lines must be:
 
 These are parsed by `theme.zsh` to determine theme metadata:
 - **Mode**: Controls system theme detection fallback
-- **Transparent**: If `1`, enables transparent background in Alacritty/Neovim
+- **Transparent**: If `1`, enables transparent background in Ghostty/Neovim
 
 ## Color Guidelines
 
@@ -133,7 +133,7 @@ Follow standard ANSI color semantics:
 1. `theme.zsh` sources the selected color file
 2. All variables become available in the shell
 3. App-specific configs are generated:
-   - **Alacritty**: `~/.config/alacritty/themes/<theme>.toml`
+   - **Ghostty**: Uses environment variables directly
    - **Tmux**: `~/.config/tmux/themes/<theme>.conf`
 4. Environment variables are exported for apps that read them:
    - `_DOTFILES_THEME_NAME`
