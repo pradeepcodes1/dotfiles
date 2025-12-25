@@ -1,0 +1,81 @@
+# Pre-commit hooks for formatting and linting
+# Install: pre-commit install
+# Run all: pre-commit run --all-files
+# Update hooks: pre-commit autoupdate
+#
+# Note: Uses local tools from nix/config_dev for stylua, shfmt, taplo
+# Run: nix shell ./nix/config_dev
+
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^\.chezmoitemplates/
+      - id: end-of-file-fixer
+        exclude: ^\.chezmoitemplates/
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+
+  # Local hooks using nix-provided tools
+  - repo: local
+    hooks:
+      # Lua - stylua
+      - id: stylua
+        name: stylua
+        entry: stylua
+        language: system
+        types: [lua]
+
+      # Shell - shfmt (excludes .zsh files - zsh syntax not supported)
+      - id: shfmt
+        name: shfmt
+        entry: shfmt -w -i 2 -ci -bn
+        language: system
+        types: [shell]
+        exclude: \.zsh$
+
+      # TOML - taplo
+      - id: taplo
+        name: taplo
+        entry: taplo fmt
+        language: system
+        types: [toml]
+
+  # Markdown, JSON, YAML - prettier
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        types_or: [markdown, json, yaml]
+        exclude: ^\.chezmoitemplates/
+
+  # Go - gofmt/goimports (for future use)
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go fmt
+        entry: gofmt -w
+        language: system
+        types: [go]
+
+  # Python - ruff (for future use)
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff check
+        entry: ruff check --fix
+        language: system
+        types: [python]
+
+      - id: ruff-format
+        name: ruff format
+        entry: ruff format
+        language: system
+        types: [python]

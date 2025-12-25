@@ -1,4 +1,5 @@
 # TODO
+
 - [ ] Learn buffers,windows
 - [ ] CMP completion cancel needs to be a thing, maybe trigger only on key ?
 - [ ] BufferLine + FZF

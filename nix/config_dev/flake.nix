@@ -47,6 +47,15 @@
 
               # Diff and merge tools
               diffutils
+
+              # Pre-commit and formatters
+              pre-commit
+              stylua # Lua
+              shfmt # Shell
+              taplo # TOML
+              nodePackages.prettier # Markdown, JSON, YAML
+              go # Go (gofmt included)
+              ruff # Python
             ];
           };
         }

@@ -101,3 +101,56 @@ map("n", "<leader>Q", "<cmd>qa<CR>", {
 	silent = true,
 	desc = "Quit Neovim",
 })
+
+-- Yazi file manager
+map({ "n", "v" }, "<leader>-", "<cmd>Yazi<cr>", { desc = "Open yazi at current file" })
+map("n", "<leader>e", "<cmd>Yazi cwd<cr>", { desc = "Open yazi in cwd" })
+map("n", "<c-up>", "<cmd>Yazi toggle<cr>", { desc = "Resume last yazi session" })
+
+-- Todo-comments
+map("n", "<leader>ft", "<cmd>TodoTelescope<CR>", { desc = "Find TODOs" })
+map("n", "]t", function()
+	require("todo-comments").jump_next()
+end, { desc = "Next TODO" })
+map("n", "[t", function()
+	require("todo-comments").jump_prev()
+end, { desc = "Previous TODO" })
+
+-- Neoscroll (smooth scrolling)
+local neoscroll_ok, neoscroll = pcall(require, "neoscroll")
+if neoscroll_ok then
+	local scroll_modes = { "n", "v", "x" }
+	map(scroll_modes, "<ScrollWheelUp>", function()
+		neoscroll.scroll(-5, { move_cursor = true, duration = 100 })
+	end)
+	map(scroll_modes, "<ScrollWheelDown>", function()
+		neoscroll.scroll(5, { move_cursor = true, duration = 100 })
+	end)
+	map(scroll_modes, "<C-u>", function()
+		neoscroll.ctrl_u({ duration = 150 })
+	end)
+	map(scroll_modes, "<C-d>", function()
+		neoscroll.ctrl_d({ duration = 150 })
+	end)
+	map(scroll_modes, "<C-b>", function()
+		neoscroll.ctrl_b({ duration = 250 })
+	end)
+	map(scroll_modes, "<C-f>", function()
+		neoscroll.ctrl_f({ duration = 250 })
+	end)
+	map(scroll_modes, "<C-y>", function()
+		neoscroll.scroll(-0.1, { move_cursor = false, duration = 50 })
+	end)
+	map(scroll_modes, "<C-e>", function()
+		neoscroll.scroll(0.1, { move_cursor = false, duration = 50 })
+	end)
+	map(scroll_modes, "zt", function()
+		neoscroll.zt({ half_win_duration = 100 })
+	end)
+	map(scroll_modes, "zz", function()
+		neoscroll.zz({ half_win_duration = 100 })
+	end)
+	map(scroll_modes, "zb", function()
+		neoscroll.zb({ half_win_duration = 100 })
+	end)
+end

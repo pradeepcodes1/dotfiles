@@ -66,16 +66,7 @@ return {
 					pattern = [[\b(KEYWORDS):]], -- ripgrep regex
 				},
 			})
-
-			-- Keybindings for todo-comments
-			local map = vim.keymap.set
-			map("n", "<leader>ft", "<cmd>TodoTelescope<CR>", { desc = "Find TODOs (Telescope)" })
-			map("n", "]t", function()
-				require("todo-comments").jump_next()
-			end, { desc = "Next TODO" })
-			map("n", "[t", function()
-				require("todo-comments").jump_prev()
-			end, { desc = "Previous TODO" })
+			-- Keymaps defined in core/keymaps.lua
 		end,
 	},
 }

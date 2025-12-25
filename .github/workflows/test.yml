@@ -3,7 +3,7 @@ name: Test Chezmoi Config
 on:
   pull_request:
     paths-ignore:
-      - '**.md'
+      - "**.md"
   workflow_dispatch:
 
 env:
