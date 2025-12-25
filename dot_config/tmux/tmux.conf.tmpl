@@ -102,3 +102,9 @@ bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
 
 # Hook to handle session switching (kill old session if 1 window)
 set-hook -g client-session-changed 'run-shell "{{ .chezmoi.targetFile | dir }}/session-cleaner.sh"'
+
+# Make TERM_PROGRAM available from client environment for Ghostty detection
+set-option -ga update-environment " TERM_PROGRAM"
+
+# Auto-exit Ghostty when closing the last window in a session
+set-hook -g pane-exited 'run-shell "{{ .chezmoi.targetFile | dir }}/ghostty-exit-handler.sh"'
