@@ -43,6 +43,9 @@ if command -v tmux &>/dev/null; then
 
         # Show interactive session selector with fzf
         if command -v fzf &>/dev/null; then
+            # Clear screen to hide login message
+            clear
+
             # Get list of existing sessions
             local sessions=$(tmux list-sessions -F "#{session_name}: #{session_windows} windows (#{session_attached} attached)" 2>/dev/null)
 
