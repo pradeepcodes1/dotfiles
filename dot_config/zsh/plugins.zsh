@@ -4,7 +4,7 @@
 # Initialize zoxide
 command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 # Initialize atuin
-command -v atuin &>/dev/null && eval "$(atuin init zsh)"
+command -v atuin &>/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
 export PATH="$HOME/go/bin":$PATH
 
 # Carapace configuration
