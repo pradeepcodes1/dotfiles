@@ -14,67 +14,67 @@ TESTS_FAILED=0
 
 # Test helper functions
 assert_equals() {
-    TESTS_RUN=$((TESTS_RUN + 1))
-    local expected="$1"
-    local actual="$2"
-    local message="$3"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  local expected="$1"
+  local actual="$2"
+  local message="$3"
 
-    if [[ "$expected" == "$actual" ]]; then
-        echo -e "${GREEN}✓${NC} $message"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        echo -e "${RED}✗${NC} $message"
-        echo -e "  Expected: $expected"
-        echo -e "  Got: $actual"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
+  if [[ "$expected" == "$actual" ]]; then
+    echo -e "${GREEN}✓${NC} $message"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    echo -e "${RED}✗${NC} $message"
+    echo -e "  Expected: $expected"
+    echo -e "  Got: $actual"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+  fi
 }
 
 assert_file_exists() {
-    TESTS_RUN=$((TESTS_RUN + 1))
-    local file="$1"
-    local message="$2"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  local file="$1"
+  local message="$2"
 
-    if [[ -f "$file" ]]; then
-        echo -e "${GREEN}✓${NC} $message"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        echo -e "${RED}✗${NC} $message"
-        echo -e "  File not found: $file"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
+  if [[ -f "$file" ]]; then
+    echo -e "${GREEN}✓${NC} $message"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    echo -e "${RED}✗${NC} $message"
+    echo -e "  File not found: $file"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+  fi
 }
 
 assert_dir_exists() {
-    TESTS_RUN=$((TESTS_RUN + 1))
-    local dir="$1"
-    local message="$2"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  local dir="$1"
+  local message="$2"
 
-    if [[ -d "$dir" ]]; then
-        echo -e "${GREEN}✓${NC} $message"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        echo -e "${RED}✗${NC} $message"
-        echo -e "  Directory not found: $dir"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
+  if [[ -d "$dir" ]]; then
+    echo -e "${GREEN}✓${NC} $message"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    echo -e "${RED}✗${NC} $message"
+    echo -e "  Directory not found: $dir"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+  fi
 }
 
 assert_contains() {
-    TESTS_RUN=$((TESTS_RUN + 1))
-    local haystack="$1"
-    local needle="$2"
-    local message="$3"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  local haystack="$1"
+  local needle="$2"
+  local message="$3"
 
-    if [[ "$haystack" == *"$needle"* ]]; then
-        echo -e "${GREEN}✓${NC} $message"
-        TESTS_PASSED=$((TESTS_PASSED + 1))
-    else
-        echo -e "${RED}✗${NC} $message"
-        echo -e "  Expected to contain: $needle"
-        echo -e "  In: $haystack"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-    fi
+  if [[ "$haystack" == *"$needle"* ]]; then
+    echo -e "${GREEN}✓${NC} $message"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+  else
+    echo -e "${RED}✗${NC} $message"
+    echo -e "  Expected to contain: $needle"
+    echo -e "  In: $haystack"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+  fi
 }
 
 # Setup test environment
@@ -89,11 +89,11 @@ echo ""
 
 # Source the nix.zsh file to load functions
 if [[ -f "$HOME/.config/zsh/nix.zsh" ]]; then
-    source "$HOME/.config/zsh/nix.zsh"
+  source "$HOME/.config/zsh/nix.zsh"
 else
-    echo -e "${RED}ERROR: nix.zsh not found at $HOME/.config/zsh/nix.zsh${NC}"
-    echo "Make sure bootstrap.sh has been run first"
-    exit 1
+  echo -e "${RED}ERROR: nix.zsh not found at $HOME/.config/zsh/nix.zsh${NC}"
+  echo "Make sure bootstrap.sh has been run first"
+  exit 1
 fi
 
 # Test 1: _nix_ensure_profiles creates profiles file
@@ -126,13 +126,13 @@ assert_contains "$flakes_list" "test-flake-1" "Should list first flake"
 assert_contains "$flakes_list" "test-flake-2" "Should list second flake"
 
 if [[ "$flakes_list" == *"not-a-flake"* ]]; then
-    TESTS_RUN=$((TESTS_RUN + 1))
-    TESTS_FAILED=$((TESTS_FAILED + 1))
-    echo -e "${RED}✗${NC} Should not list directory without flake.nix"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+  echo -e "${RED}✗${NC} Should not list directory without flake.nix"
 else
-    TESTS_RUN=$((TESTS_RUN + 1))
-    TESTS_PASSED=$((TESTS_PASSED + 1))
-    echo -e "${GREEN}✓${NC} Should not list directory without flake.nix"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+  echo -e "${GREEN}✓${NC} Should not list directory without flake.nix"
 fi
 echo ""
 
@@ -163,20 +163,20 @@ echo ""
 # Test 5: Profile JSON structure
 echo -e "${YELLOW}Test: Profile JSON structure validation${NC}"
 if command -v jq &>/dev/null; then
-    # Validate JSON structure
-    profile_count=$(jq 'length' "$NIX_PROFILES_FILE")
-    assert_equals "1" "$profile_count" "Should have one profile"
+  # Validate JSON structure
+  profile_count=$(jq 'length' "$NIX_PROFILES_FILE")
+  assert_equals "1" "$profile_count" "Should have one profile"
 
-    profile_name=$(jq -r '.[0].name' "$NIX_PROFILES_FILE")
-    assert_equals "test-profile" "$profile_name" "Profile name should match"
+  profile_name=$(jq -r '.[0].name' "$NIX_PROFILES_FILE")
+  assert_equals "test-profile" "$profile_name" "Profile name should match"
 
-    flakes_count=$(jq '.[0].flakes | length' "$NIX_PROFILES_FILE")
-    assert_equals "2" "$flakes_count" "Should have two flakes"
+  flakes_count=$(jq '.[0].flakes | length' "$NIX_PROFILES_FILE")
+  assert_equals "2" "$flakes_count" "Should have two flakes"
 
-    first_flake=$(jq -r '.[0].flakes[0]' "$NIX_PROFILES_FILE")
-    assert_equals "basic" "$first_flake" "First flake should be 'basic'"
+  first_flake=$(jq -r '.[0].flakes[0]' "$NIX_PROFILES_FILE")
+  assert_equals "basic" "$first_flake" "First flake should be 'basic'"
 else
-    echo -e "${YELLOW}⊘${NC} Skipping JSON validation tests (jq not installed)"
+  echo -e "${YELLOW}⊘${NC} Skipping JSON validation tests (jq not installed)"
 fi
 echo ""
 
@@ -190,9 +190,9 @@ echo -e "Tests passed: ${GREEN}$TESTS_PASSED${NC}"
 echo -e "Tests failed: ${RED}$TESTS_FAILED${NC}"
 
 if [[ $TESTS_FAILED -gt 0 ]]; then
-    echo -e "${RED}FAILED${NC}"
-    exit 1
+  echo -e "${RED}FAILED${NC}"
+  exit 1
 else
-    echo -e "${GREEN}SUCCESS${NC}"
-    exit 0
+  echo -e "${GREEN}SUCCESS${NC}"
+  exit 0
 fi

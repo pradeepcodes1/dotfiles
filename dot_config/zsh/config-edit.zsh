@@ -2,32 +2,32 @@
 # Launches a nix shell for editing chezmoi configuration
 
 config-edit() {
-    local chezmoi_source="${HOME}/.local/share/chezmoi"
-    local config_dev_flake="${chezmoi_source}/nix/config_dev"
+  local chezmoi_source="${HOME}/.local/share/chezmoi"
+  local config_dev_flake="${chezmoi_source}/nix/config_dev"
 
-    if [[ ! -d "$chezmoi_source" ]]; then
-        echo "Error: Chezmoi source directory not found at $chezmoi_source"
-        return 1
-    fi
+  if [[ ! -d "$chezmoi_source" ]]; then
+    echo "Error: Chezmoi source directory not found at $chezmoi_source"
+    return 1
+  fi
 
-    if [[ ! -f "${config_dev_flake}/flake.nix" ]]; then
-        echo "Error: config_dev flake not found at $config_dev_flake"
-        return 1
-    fi
+  if [[ ! -f "${config_dev_flake}/flake.nix" ]]; then
+    echo "Error: config_dev flake not found at $config_dev_flake"
+    return 1
+  fi
 
-    echo "🔧 Launching config edit environment..."
-    echo "📁 Working directory: $chezmoi_source"
-    echo ""
-    echo "Available commands:"
-    echo "  - Edit files directly in this directory"
-    echo "  - Run './bootstrap.sh' to apply changes"
-    echo "  - Run 'chezmoi diff' to see what would change"
-    echo "  - Run 'chezmoi status' to check file status"
-    echo "  - Use 'git' for version control"
-    echo "  - Type 'exit' to leave the config edit environment"
-    echo ""
+  echo "🔧 Launching config edit environment..."
+  echo "📁 Working directory: $chezmoi_source"
+  echo ""
+  echo "Available commands:"
+  echo "  - Edit files directly in this directory"
+  echo "  - Run './bootstrap.sh' to apply changes"
+  echo "  - Run 'chezmoi diff' to see what would change"
+  echo "  - Run 'chezmoi status' to check file status"
+  echo "  - Use 'git' for version control"
+  echo "  - Type 'exit' to leave the config edit environment"
+  echo ""
 
-    # Launch nix shell with config_dev tools, cd to chezmoi source
-    cd "$chezmoi_source"
-    exec nix shell "$config_dev_flake" --command zsh
+  # Launch nix shell with config_dev tools, cd to chezmoi source
+  cd "$chezmoi_source"
+  exec nix shell "$config_dev_flake" --command zsh
 }

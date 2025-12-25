@@ -30,20 +30,20 @@
 # Color codes for different log levels
 typeset -A LOG_COLORS
 LOG_COLORS=(
-  DEBUG   "\033[0;36m"  # Cyan
-  INFO    "\033[0;32m"  # Green
-  WARN    "\033[0;33m"  # Yellow
-  ERROR   "\033[0;31m"  # Red
-  RESET   "\033[0m"     # Reset
+  DEBUG "\033[0;36m" # Cyan
+  INFO "\033[0;32m"  # Green
+  WARN "\033[0;33m"  # Yellow
+  ERROR "\033[0;31m" # Red
+  RESET "\033[0m"    # Reset
 )
 
 # Log level prefix mapping
 typeset -A LOG_PREFIX
 LOG_PREFIX=(
-  DEBUG   "🔍"
-  INFO    "ℹ️ "
-  WARN    "⚠️ "
-  ERROR   "❌"
+  DEBUG "🔍"
+  INFO "ℹ️ "
+  WARN "⚠️ "
+  ERROR "❌"
 )
 
 # Internal logging function
@@ -90,7 +90,7 @@ _log() {
     fi
 
     # Append to log file
-    echo "$file_output" >> "$DOTFILES_LOG_FILE" 2>/dev/null || true
+    echo "$file_output" >>"$DOTFILES_LOG_FILE" 2>/dev/null || true
 
     # Rotate log if it exceeds 10MB
     if [[ -f "$DOTFILES_LOG_FILE" ]] && [[ $(stat -f%z "$DOTFILES_LOG_FILE" 2>/dev/null || echo 0) -gt 10485760 ]]; then

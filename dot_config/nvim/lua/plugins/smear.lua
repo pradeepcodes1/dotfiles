@@ -9,8 +9,8 @@ return {
 		legacy_computing_symbols_support = false,
 
 		-- Smoother cursor movement
-		stiffness = 0.8,  -- Higher = less lag, more responsive (0.6-1.0)
-		trailing_stiffness = 0.5,  -- How fast the trail follows
+		stiffness = 0.8, -- Higher = less lag, more responsive (0.6-1.0)
+		trailing_stiffness = 0.5, -- How fast the trail follows
 
 		-- Distance from cursor before smear effect starts
 		distance_stop_animating = 0.5,

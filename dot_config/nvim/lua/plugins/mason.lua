@@ -1,9 +1,10 @@
 return {
-    {
-        "williamboman/mason.nvim",
-        opts = {
-            ensure_installed = {
-                "cpplint", },
-        },
-    },
+	{
+		"williamboman/mason.nvim",
+		opts = {
+			ensure_installed = {
+				"cpplint",
+			},
+		},
+	},
 }

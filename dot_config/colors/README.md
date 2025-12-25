@@ -1,6 +1,7 @@
 # Dotfiles Theme System
 
 Centralized color definitions for all CLI tools. Each theme has one source file that drives colors across:
+
 - Terminal (Ghostty)
 - Shell prompt (Zsh)
 - Tmux status bar
@@ -79,6 +80,7 @@ nvim_background="..."   # "dark" or "light" (only if colorscheme needs it)
 ## Header Comments
 
 The first three lines must be:
+
 ```sh
 # Theme: <name>
 # Mode: dark|light
@@ -86,13 +88,16 @@ The first three lines must be:
 ```
 
 These are parsed by `theme.zsh` to determine theme metadata:
+
 - **Mode**: Controls system theme detection fallback
 - **Transparent**: If `1`, enables transparent background in Ghostty/Neovim
 
 ## Color Guidelines
 
 ### Terminal Colors
+
 Follow standard ANSI color semantics:
+
 - `black/bright_black`: backgrounds, muted text
 - `red/bright_red`: errors, deletions
 - `green/bright_green`: success, additions
@@ -103,30 +108,32 @@ Follow standard ANSI color semantics:
 - `white/bright_white`: primary text
 
 ### Prompt Colors
+
 - Keep `prompt_dir` and `prompt_arrow` visually prominent
 - Use semantic colors: red for unstaged, yellow/green for staged
 - `prompt_path` should be muted (it's secondary info)
 
 ### UI Colors
+
 - `ui_active` should contrast well with `ui_bg`
 - `ui_inactive` should be subtle but visible
 - `ui_border` typically matches `ui_inactive`
 
 ## Available Themes
 
-| Theme | Mode | Transparent |
-|-------|------|-------------|
-| kanagawa-dragon | dark | yes |
-| kanagawa-wave | dark | yes |
-| kanagawa-lotus | light | no |
-| catppuccin-mocha | dark | yes |
-| catppuccin-latte | light | no |
-| gruvbox-dark | dark | yes |
-| gruvbox-light | light | no |
-| everforest-dark | dark | yes |
-| everforest-light | light | no |
-| nightfox | dark | yes |
-| dawnfox | light | no |
+| Theme            | Mode  | Transparent |
+| ---------------- | ----- | ----------- |
+| kanagawa-dragon  | dark  | yes         |
+| kanagawa-wave    | dark  | yes         |
+| kanagawa-lotus   | light | no          |
+| catppuccin-mocha | dark  | yes         |
+| catppuccin-latte | light | no          |
+| gruvbox-dark     | dark  | yes         |
+| gruvbox-light    | light | no          |
+| everforest-dark  | dark  | yes         |
+| everforest-light | light | no          |
+| nightfox         | dark  | yes         |
+| dawnfox          | light | no          |
 
 ## How It Works
 
