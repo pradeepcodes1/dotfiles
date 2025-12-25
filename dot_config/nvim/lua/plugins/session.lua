@@ -34,20 +34,7 @@ return {
     -- Automatically delete sessions with only empty/unnamed buffers
     auto_delete_empty_sessions = true,
     -- Don't auto-save when these file types are the only ones open
-    bypass_save_filetypes = { "alpha", "dashboard", "lazy", "neo-tree" },
-
-    -- Close certain windows before saving session
-    pre_save_cmds = {
-      function()
-        -- Close neo-tree before saving (if it's loaded and open)
-        pcall(function()
-          local neotree_ok, _ = pcall(require, "neo-tree.command")
-          if neotree_ok then
-            vim.cmd("Neotree close")
-          end
-        end)
-      end,
-    },
+    bypass_save_filetypes = { "alpha", "dashboard", "lazy" },
 
     session_lens = {
       mappings = {
