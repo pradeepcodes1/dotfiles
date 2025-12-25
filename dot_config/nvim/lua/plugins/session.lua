@@ -39,8 +39,13 @@ return {
     -- Close certain windows before saving session
     pre_save_cmds = {
       function()
-        -- Close neo-tree before saving
-        vim.cmd("Neotree close")
+        -- Close neo-tree before saving (if it's loaded and open)
+        pcall(function()
+          local neotree_ok, _ = pcall(require, "neo-tree.command")
+          if neotree_ok then
+            vim.cmd("Neotree close")
+          end
+        end)
       end,
     },
 
