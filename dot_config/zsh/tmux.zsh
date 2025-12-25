@@ -62,11 +62,11 @@ if command -v tmux &>/dev/null; then
                 if [[ "$choice" == "+ Create new session"* ]]; then
                     # Recalculate next available number right before creating
                     next_num=$(_find_next_session_num)
-                    tmux new-session -s "$next_num"
+                    exec tmux new-session -s "$next_num"
                 else
                     # Extract session name (everything before the first colon)
                     local session_name="${choice%%:*}"
-                    tmux attach-session -t "$session_name"
+                    exec tmux attach-session -t "$session_name"
                 fi
             else
                 # User cancelled - exit shell
@@ -75,7 +75,7 @@ if command -v tmux &>/dev/null; then
         else
             # Fallback if fzf is not available
             local next_num=$(_find_next_session_num)
-            tmux attach-session 2>/dev/null || tmux new-session -s "$next_num"
+            exec tmux attach-session 2>/dev/null || exec tmux new-session -s "$next_num"
         fi
     fi
 
