@@ -88,7 +88,7 @@ bind h display-popup -E  "{{ .chezmoi.targetFile | dir }}/tmux-fzf-search.sh"
 bind b set-option -g status
 
 # C-k for nvim is being blocked
-set -g terminal-features "alacritty:c-k"
+set -g terminal-features "ghostty:c-k"
 
 # A simpler keybind to kill the current session and switch or create a new one.
 bind-key X confirm-before -p "kill-session '#S'? (y/n)" "\

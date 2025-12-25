@@ -7,7 +7,7 @@ map("v", "jk", "<Esc>", { desc = "Exit visual mode with jk" })
 map("n", "<ScrollWheelRight>", "<Nop>")
 
 -- Telescope
-map("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Explorer" })
+-- Note: <leader>e is mapped to Yazi in plugins/yazi.lua
 map("n", "<leader>ff", function()
 	require("telescope.builtin").find_files({
 		previewer = false,

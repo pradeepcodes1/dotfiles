@@ -12,8 +12,9 @@ return {
   ---@module "auto-session"
   ---@type AutoSession.Config
   opts = {
-    -- Automatically restore session when opening nvim in a directory
-    auto_restore = true,
+    -- Disable auto-restore to prevent unexpected session reloading
+    -- when opening files outside the current folder (issue #129)
+    auto_restore = false,
     -- Automatically create session files for new directories
     auto_create = true,
     -- Automatically save session on exit
