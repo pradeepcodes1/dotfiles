@@ -3,18 +3,39 @@ return {
   lazy = false,
   keys = {
     -- Will use Telescope if installed or a vim.ui.select picker otherwise
-    { "<leader>wr", "<cmd>SessionSearch<CR>", desc = "Session search" },
-    { "<leader>ws", "<cmd>SessionSave<CR>", desc = "Save session" },
-    { "<leader>wa", "<cmd>SessionToggleAutoSave<CR>", desc = "Toggle autosave" },
+    { "<leader>sr", "<cmd>AutoSession search<CR>", desc = "Session search" },
+    { "<leader>ss", "<cmd>AutoSession save<CR>", desc = "Save session" },
+    { "<leader>sa", "<cmd>AutoSession autosave toggle<CR>", desc = "Toggle autosave" },
   },
 
   ---enables autocomplete for opts
   ---@module "auto-session"
   ---@type AutoSession.Config
   opts = {
+    -- Automatically restore session when opening nvim in a directory
+    auto_restore = true,
+    -- Automatically create session files for new directories
+    auto_create = true,
+    -- Automatically save session on exit
+    auto_save = true,
+    -- Use git branch name in session file name
     git_use_branch_name = true,
-    auto_create = false,
-    -- The following are already the default values, no need to provide them if these are already the settings you want.
+    -- Suppress session creation/restoration in these directories
+    suppressed_dirs = {
+      "~/",
+      "~/Downloads",
+      "~/Desktop",
+      "~/Documents",
+      "/tmp",
+      "/",
+    },
+    -- Handle cwd changes by updating session
+    cwd_change_handling = true,
+    -- Automatically delete sessions with only empty/unnamed buffers
+    auto_delete_empty_sessions = true,
+    -- Don't auto-save when these file types are the only ones open
+    bypass_save_filetypes = { "alpha", "dashboard", "lazy" },
+
     session_lens = {
       mappings = {
         -- Mode can be a string or a table, e.g. {"i", "n"} for both insert and normal mode
