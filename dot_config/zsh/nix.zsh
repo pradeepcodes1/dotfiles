@@ -1,10 +1,10 @@
 # Nix flake environment switcher
 # Uses fzf to select profiles (home + flake) and opens a tmux pane
 
-# Base directories
-FLAKES_DIR="${HOME}/nix"
-NIX_HOMES_DIR="${HOME}/.nix-homes"
-NIX_PROFILES_FILE="${HOME}/.config/nix-profiles.json"
+# Base directories (can be overridden for testing)
+FLAKES_DIR="${FLAKES_DIR:-${HOME}/nix}"
+NIX_HOMES_DIR="${NIX_HOMES_DIR:-${HOME}/.nix-homes}"
+NIX_PROFILES_FILE="${NIX_PROFILES_FILE:-${HOME}/.config/nix-profiles.json}"
 
 # Config files/directories to symlink from real home
 NIX_CONFIG_SYMLINKS=(
