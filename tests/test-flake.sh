@@ -154,9 +154,9 @@ assert_equals "0" "$setup_result" "Setup should return 0 on first run"
 assert_file_exists "$TEST_HOME/.zshrc" "Should create .zshrc symlink"
 assert_dir_exists "$TEST_HOME/.config" "Should create .config symlink"
 
-# Run setup again on non-empty home
-_nix_setup_home "$TEST_HOME" "$REAL_HOME"
-setup_result_2=$?
+# Run setup again on non-empty home (use || true to prevent set -e from exiting)
+_nix_setup_home "$TEST_HOME" "$REAL_HOME" || setup_result_2=$?
+setup_result_2=${setup_result_2:-0}
 assert_equals "1" "$setup_result_2" "Setup should return 1 when home is not empty"
 echo ""
 
