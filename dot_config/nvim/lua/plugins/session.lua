@@ -12,9 +12,38 @@ return {
   ---@module "auto-session"
   ---@type AutoSession.Config
   opts = {
+    -- Automatically restore session when opening nvim in a directory
+    auto_restore = true,
+    -- Automatically create session files for new directories
+    auto_create = true,
+    -- Automatically save session on exit
+    auto_save = true,
+    -- Use git branch name in session file name
     git_use_branch_name = true,
-    auto_create = false,
-    -- The following are already the default values, no need to provide them if these are already the settings you want.
+    -- Suppress session creation/restoration in these directories
+    suppressed_dirs = {
+      "~/",
+      "~/Downloads",
+      "~/Desktop",
+      "~/Documents",
+      "/tmp",
+      "/",
+    },
+    -- Handle cwd changes by updating session
+    cwd_change_handling = true,
+    -- Automatically delete sessions with only empty/unnamed buffers
+    auto_delete_empty_sessions = true,
+    -- Don't auto-save when these file types are the only ones open
+    bypass_save_filetypes = { "alpha", "dashboard", "lazy", "neo-tree" },
+
+    -- Close certain windows before saving session
+    pre_save_cmds = {
+      function()
+        -- Close neo-tree before saving
+        vim.cmd("Neotree close")
+      end,
+    },
+
     session_lens = {
       mappings = {
         -- Mode can be a string or a table, e.g. {"i", "n"} for both insert and normal mode
