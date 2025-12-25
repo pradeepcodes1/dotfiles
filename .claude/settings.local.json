@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm:*)",
+      "Bash(gh issue view:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nrefactor: cleanup unused files and simplify configs\n\n- Remove unused files: music.zsh, tmux-fzf-search.sh, tmux-spinner.sh, README files\n- Remove y\\(\\) yazi wrapper from basics.zsh\n- Simplify comments throughout tmux.conf.tmpl\n- Rename and simplify CI pass setup script for clarity\n- Auto-cd to /Volumes/dev when available \\(fixes #134\\)\n- Update CLAUDE.md to reflect removed files\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  }
+}
