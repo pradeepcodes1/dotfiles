@@ -41,42 +41,47 @@ if command -v tmux &>/dev/null; then
             echo "$next_num"
         }
 
-        # Show interactive session selector with fzf
-        if command -v fzf &>/dev/null; then
-            # Clear screen to hide login message
-            clear
+        # Loop to show session selector when tmux exits
+        while true; do
+            # Show interactive session selector with fzf
+            if command -v fzf &>/dev/null; then
+                # Clear screen to hide login message
+                clear
 
-            # Get list of existing sessions sorted by last used (most recent first)
-            local sessions=$(tmux list-sessions -F "#{session_last_attached} #{session_name}: #{session_windows} windows (#{session_attached} attached)" 2>/dev/null | sort -rn | cut -d' ' -f2-)
+                # Get list of existing sessions sorted by last used (most recent first)
+                local sessions=$(tmux list-sessions -F "#{session_last_attached} #{session_name}: #{session_windows} windows (#{session_attached} attached)" 2>/dev/null | sort -rn | cut -d' ' -f2-)
 
-            # Create fzf options with existing sessions + new session option
-            local choice=$(
-                {
-                    echo "+ Create new session"
-                    [[ -n "$sessions" ]] && echo "$sessions"
-                } | fzf --height=40% --border --prompt="Select tmux session: " \
-                       --reverse --no-info --margin=0,25%
-            )
+                # Create fzf options with existing sessions + new session option
+                local choice=$(
+                    {
+                        echo "+ Create new session"
+                        [[ -n "$sessions" ]] && echo "$sessions"
+                    } | fzf --height=40% --border --prompt="Select tmux session: " \
+                           --reverse --no-info --margin=0,25%
+                )
 
-            if [[ -n "$choice" ]]; then
-                if [[ "$choice" == "+ Create new session"* ]]; then
-                    # Recalculate next available number right before creating
-                    next_num=$(_find_next_session_num)
-                    exec tmux new-session -s "$next_num"
+                if [[ -n "$choice" ]]; then
+                    if [[ "$choice" == "+ Create new session"* ]]; then
+                        # Recalculate next available number right before creating
+                        next_num=$(_find_next_session_num)
+                        tmux new-session -s "$next_num"
+                    else
+                        # Extract session name (everything before the first colon)
+                        local session_name="${choice%%:*}"
+                        tmux attach-session -t "$session_name"
+                    fi
+                    # After tmux exits, loop back to show selector again
                 else
-                    # Extract session name (everything before the first colon)
-                    local session_name="${choice%%:*}"
-                    exec tmux attach-session -t "$session_name"
+                    # User cancelled - exit shell
+                    exit 0
                 fi
             else
-                # User cancelled - exit shell
-                exit 0
+                # Fallback if fzf is not available
+                local next_num=$(_find_next_session_num)
+                tmux attach-session 2>/dev/null || tmux new-session -s "$next_num"
+                # After tmux exits, loop back to show selector again
             fi
-        else
-            # Fallback if fzf is not available
-            local next_num=$(_find_next_session_num)
-            exec tmux attach-session 2>/dev/null || exec tmux new-session -s "$next_num"
-        fi
+        done
     fi
 
     # Store HOME in pane-specific option so status bar can read it
