@@ -51,13 +51,21 @@ if command -v tmux &>/dev/null; then
                 # Get list of existing sessions sorted by last used (most recent first)
                 local sessions=$(tmux list-sessions -F "#{session_last_attached} #{session_name}: #{session_windows} windows (#{session_attached} attached)" 2>/dev/null | sort -rn | cut -d' ' -f2-)
 
-                # Create fzf options with existing sessions + new session option
+                # Create fzf options with existing sessions + special options
                 local choice=$(
                     {
                         echo "+ Create new session"
+                        [[ -n "$sessions" ]] && echo "× Kill all sessions"
                         [[ -n "$sessions" ]] && echo "$sessions"
-                    } | fzf --height=40% --border --prompt="Select tmux session: " \
-                           --reverse --no-info --margin=0,25%
+                    } | fzf --height=40% --border --prompt="Select tmux session (Ctrl-d to delete): " \
+                           --reverse --no-info --margin=0,25% \
+                           --header="Enter: attach | Ctrl-d: kill session | ESC: exit" \
+                           --bind="ctrl-d:execute-silent(echo {1} | grep -q '^×$' || tmux kill-session -t {1} 2>/dev/null)+reload({
+                               echo '+ Create new session'
+                               sessions=\$(tmux list-sessions -F '#{session_last_attached} #{session_name}: #{session_windows} windows (#{session_attached} attached)' 2>/dev/null | sort -rn | cut -d' ' -f2-)
+                               [[ -n \"\$sessions\" ]] && echo '× Kill all sessions'
+                               [[ -n \"\$sessions\" ]] && echo \"\$sessions\"
+                           })"
                 )
 
                 if [[ -n "$choice" ]]; then
@@ -65,6 +73,12 @@ if command -v tmux &>/dev/null; then
                         # Recalculate next available number right before creating
                         next_num=$(_find_next_session_num)
                         tmux new-session -s "$next_num"
+                    elif [[ "$choice" == "× Kill all sessions"* ]]; then
+                        # Kill all sessions and continue loop
+                        tmux list-sessions -F "#{session_name}" 2>/dev/null | while read -r sess; do
+                            tmux kill-session -t "$sess" 2>/dev/null
+                        done
+                        continue
                     else
                         # Extract session name (everything before the first colon)
                         local session_name="${choice%%:*}"
