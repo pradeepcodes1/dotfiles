@@ -46,8 +46,8 @@ if command -v tmux &>/dev/null; then
             # Clear screen to hide login message
             clear
 
-            # Get list of existing sessions
-            local sessions=$(tmux list-sessions -F "#{session_name}: #{session_windows} windows (#{session_attached} attached)" 2>/dev/null)
+            # Get list of existing sessions sorted by last used (most recent first)
+            local sessions=$(tmux list-sessions -F "#{session_last_attached} #{session_name}: #{session_windows} windows (#{session_attached} attached)" 2>/dev/null | sort -rn | cut -d' ' -f2-)
 
             # Create fzf options with existing sessions + new session option
             local choice=$(
@@ -55,8 +55,7 @@ if command -v tmux &>/dev/null; then
                     echo "+ Create new session"
                     [[ -n "$sessions" ]] && echo "$sessions"
                 } | fzf --height=40% --border --prompt="Select tmux session: " \
-                       --header="↑/↓: navigate | Enter: select | Esc: cancel" \
-                       --reverse --no-info
+                       --reverse --no-info --margin=0,25%
             )
 
             if [[ -n "$choice" ]]; then
