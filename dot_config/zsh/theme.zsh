@@ -41,6 +41,23 @@ _DOTFILES_BAT_THEMES=(
   [dawnfox]="Catppuccin Latte"
 )
 
+# Eza theme mapping (theme name -> eza theme file name without .yml)
+# Themes from: https://github.com/eza-community/eza-themes
+typeset -A _DOTFILES_EZA_THEMES
+_DOTFILES_EZA_THEMES=(
+  [kanagawa-dragon]="tokyonight"
+  [kanagawa-wave]="tokyonight"
+  [kanagawa-lotus]="rose-pine-dawn"
+  [catppuccin-mocha]="catppuccin-mocha"
+  [catppuccin-latte]="catppuccin-latte"
+  [gruvbox-dark]="gruvbox-dark"
+  [gruvbox-light]="gruvbox-light"
+  [everforest-dark]="gruvbox-dark"
+  [everforest-light]="gruvbox-light"
+  [nightfox]="dracula"
+  [dawnfox]="rose-pine-dawn"
+)
+
 # Detect macOS appearance
 _detect_macos_theme() {
   if defaults read -g AppleInterfaceStyle &>/dev/null; then
@@ -241,6 +258,9 @@ _apply_theme() {
   debug_log "theme" "_apply_theme: updating bat..."
   _update_bat_theme
 
+  debug_log "theme" "_apply_theme: updating eza..."
+  _update_eza_theme
+
   debug_log "theme" "_apply_theme: complete"
 }
 
@@ -259,6 +279,34 @@ _update_bat_theme() {
     debug_log "theme" "_update_bat_theme: wrote to $bat_config"
   else
     error_log "theme" "_update_bat_theme: failed to write $bat_config"
+  fi
+}
+
+# Update eza theme
+_update_eza_theme() {
+  local eza_config_dir="$HOME/.config/eza"
+  # Themes from eza-themes submodule: https://github.com/eza-community/eza-themes
+  local eza_themes_dir="$eza_config_dir/eza-themes/themes"
+  local eza_theme_file="$eza_config_dir/theme.yml"
+  local eza_theme="${_DOTFILES_EZA_THEMES[$_DOTFILES_THEME_NAME]}"
+
+  debug_log "theme" "_update_eza_theme: theme='$_DOTFILES_THEME_NAME' eza_theme='$eza_theme'"
+
+  # Default to 'default' if not mapped
+  [[ -z "$eza_theme" ]] && eza_theme="default"
+
+  local source_theme="$eza_themes_dir/${eza_theme}.yml"
+
+  if [[ ! -f "$source_theme" ]]; then
+    warn_log "theme" "Eza theme not found: $source_theme"
+    return
+  fi
+
+  # Copy the theme file to theme.yml (eza reads from this location)
+  if cp "$source_theme" "$eza_theme_file"; then
+    debug_log "theme" "_update_eza_theme: copied $source_theme to $eza_theme_file"
+  else
+    error_log "theme" "_update_eza_theme: failed to copy theme file"
   fi
 }
 
