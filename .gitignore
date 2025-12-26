@@ -4,3 +4,4 @@ bin/
 # Nix result symlinks
 result
 result-*
+.claude/
