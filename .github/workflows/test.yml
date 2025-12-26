@@ -85,6 +85,12 @@ jobs:
         id: start
         run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
 
+      # --- Set up chezmoi config for CI (must happen before template evaluation) ---
+      - name: Set up chezmoi config
+        run: |
+          mkdir -p ~/.config/chezmoi
+          printf '[data.git]\nname = "CI Test"\nemail = "ci@test.local"\n' > ~/.config/chezmoi/chezmoi.toml
+
       # --- Run bootstrap (installs nix, runs chezmoi apply in nix shell) ---
       - name: Run bootstrap
         id: apply
@@ -164,6 +170,12 @@ jobs:
       - name: Record start time
         id: start
         run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
+
+      # --- Set up chezmoi config for CI (must happen before template evaluation) ---
+      - name: Set up chezmoi config
+        run: |
+          mkdir -p ~/.config/chezmoi
+          printf '[data.git]\nname = "CI Test"\nemail = "ci@test.local"\n' > ~/.config/chezmoi/chezmoi.toml
 
       # --- Run bootstrap (required for integration tests) ---
       - name: Run bootstrap
