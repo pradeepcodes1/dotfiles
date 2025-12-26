@@ -86,7 +86,13 @@ _build_json_log() {
 _rotate_logs() {
   [[ ! -f "$DOTFILES_LOG_FILE" ]] && return 0
 
-  local size_bytes=$(stat -f%z "$DOTFILES_LOG_FILE" 2>/dev/null || echo 0)
+  # Cross-platform file size (macOS uses -f%z, Linux uses -c%s)
+  local size_bytes
+  if [[ "$OSTYPE" == darwin* ]]; then
+    size_bytes=$(stat -f%z "$DOTFILES_LOG_FILE" 2>/dev/null || echo 0)
+  else
+    size_bytes=$(stat -c%s "$DOTFILES_LOG_FILE" 2>/dev/null || echo 0)
+  fi
   local max_bytes=$((DOTFILES_LOG_MAX_SIZE_MB * 1024 * 1024))
 
   if [[ $size_bytes -gt $max_bytes ]]; then

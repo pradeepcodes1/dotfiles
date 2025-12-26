@@ -107,8 +107,6 @@ return {
 		"hrsh7th/nvim-cmp",
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp",
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip",
 		},
 	},
 
@@ -131,16 +129,14 @@ return {
 					"help",
 					"lazy",
 					"mason",
-					"neo-tree", -- good to add this one too
+					"neo-tree",
 				},
 			},
 		},
-		-- Remove the config function entirely
 	},
 	{
 		"MeanderingProgrammer/render-markdown.nvim",
-		dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" }, -- if you use the mini.nvim suite
-		opts = {},
+		dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" },
 	},
 	{
 		"folke/snacks.nvim",
@@ -182,11 +178,8 @@ return {
 				},
 			},
 			input = { enabled = true },
-			picker = { enabled = false },
-			notifier = { enabled = false },
 			quickfile = { enabled = true },
 			scope = { enabled = true },
-			--scroll = { enabled = true },
 			statuscolumn = { enabled = true },
 			words = { enabled = true },
 		},

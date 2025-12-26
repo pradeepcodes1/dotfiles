@@ -138,18 +138,3 @@ dotlog-clean() {
   find "$log_dir" -name "*.jsonl*" -mtime +"$days" -delete -print 2>/dev/null
   echo "Done."
 }
-
-# Export to CSV
-dotlog-export() {
-  local log_file="${1:-$_DOTFILES_JSONL}"
-  local output="${2:-dotfiles-logs.csv}"
-
-  echo "timestamp,level,component,source,message" > "$output"
-  jq -r '[.ts, .level, .component, (.source // "unknown"), .msg] | @csv' "$log_file" >> "$output" 2>/dev/null
-  echo "Exported to: $output"
-}
-
-# Aliases
-alias dlog='dotlog'
-alias dlog-f='dotlog -f'
-alias dlog-e='dotlog --errors'

@@ -5,7 +5,6 @@
 command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 # Initialize atuin
 command -v atuin &>/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
-export PATH="$HOME/go/bin":$PATH
 
 # Carapace configuration
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'
@@ -29,8 +28,6 @@ fi
 # Default is 'prefix input first', but 'input' causes 'folder/' to be used as search query
 # With carapace, using only 'prefix' prevents the typed path from filtering results
 zstyle ':fzf-tab:*' query-string prefix
-# Alternative: completely disable initial query (uncomment if prefix alone doesn't work)
-# zstyle ':fzf-tab:*' query-string ''
 
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false

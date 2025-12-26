@@ -1,5 +1,4 @@
 export MallocNanoZone='0'
-PATH="/Applications/CMake.app/Contents/bin":"$PATH"
 
 # ==============================================================================
 #           Competitive Programming Toolkit (cpt)

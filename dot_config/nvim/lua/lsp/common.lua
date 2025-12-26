@@ -30,21 +30,7 @@ function M.on_attach(client, bufnr)
 	nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame symbol")
 	nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
 
-	-- Auto-format on save (only if the server supports it)
-	if client.server_capabilities.documentFormattingProvider then
-		vim.api.nvim_create_autocmd("BufWritePre", {
-			buffer = bufnr,
-			callback = function()
-				vim.lsp.buf.format({ bufnr = bufnr })
-			end,
-		})
-	end
-
-	-- Example: attach nvim-navic for breadcrumbs (if installed & supported)
-	local ok_navic, navic = pcall(require, "nvim-navic")
-	if ok_navic and client.server_capabilities.documentSymbolProvider then
-		navic.attach(client, bufnr)
-	end
+	-- Format on save is handled by conform in core/options.lua
 end
 
 return M

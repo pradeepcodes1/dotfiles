@@ -10,7 +10,6 @@ opt.clipboard = "unnamedplus"
 opt.updatetime = 300
 opt.splitright = true
 opt.splitbelow = true
-opt.termguicolors = true
 opt.ignorecase = true
 opt.cursorline = true
 opt.wrap = false
