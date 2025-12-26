@@ -10,7 +10,65 @@ env:
   CI: true
 
 jobs:
+  # Unit tests run first - fast, no bootstrap needed
+  unit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: Unit tests on ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install test dependencies
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y zsh jq
+          else
+            brew install jq
+          fi
+
+      - name: Run unit tests
+        id: unit_tests
+        run: |
+          ./tests/run_tests.sh 2>&1 | tee /tmp/unit-tests.log
+          exit ${PIPESTATUS[0]}
+
+      - name: Print summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## Unit Test Results (${{ matrix.os }})
+
+          | Metric | Value |
+          |--------|-------|
+          | OS | \`${{ matrix.os }}\` |
+          | Branch | \`${{ github.ref_name }}\` |
+          | Status | \`${{ steps.unit_tests.outcome }}\` |
+
+          ### Test Output
+          \`\`\`
+          $(cat /tmp/unit-tests.log)
+          \`\`\`
+          EOF
+
+      - name: Upload logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-logs-${{ matrix.os }}
+          path: /tmp/unit-tests.log
+          retention-days: 7
+
   bootstrap:
+    needs: unit-tests
     strategy:
       fail-fast: false
       matrix:
@@ -87,7 +145,7 @@ jobs:
           path: /tmp/chezmoi-apply.log
           retention-days: 7
 
-  flake:
+  integration-tests:
     needs: bootstrap
     strategy:
       fail-fast: false
@@ -95,28 +153,40 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
-    name: Flake tests on ${{ matrix.os }}
+    name: Integration tests on ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Record start time
         id: start
         run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
 
-      # --- Run bootstrap (required for flake function to work) ---
+      # --- Run bootstrap (required for integration tests) ---
       - name: Run bootstrap
         id: apply
         run: |
           ./bootstrap.sh 2>&1 | tee /tmp/chezmoi-apply.log
           exit ${PIPESTATUS[0]}
 
-      # --- Run flake tests ---
-      - name: Run flake tests
-        id: flake_tests
+      # --- Install integration test dependencies ---
+      - name: Install test dependencies
         run: |
-          ./tests/test-flake.sh 2>&1 | tee /tmp/flake-tests.log
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y zsh zoxide fzf fd-find jq
+          else
+            brew install zoxide fzf fd jq
+          fi
+
+      # --- Run integration tests via bats ---
+      - name: Run integration tests
+        id: integration_tests
+        run: |
+          ./tests/run_tests.sh -v 2>&1 | tee /tmp/integration-tests.log
           exit ${PIPESTATUS[0]}
 
       # --- Summary ---
@@ -135,7 +205,7 @@ jobs:
         if: always()
         run: |
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          ## Flake Test Results (${{ matrix.os }})
+          ## Integration Test Results (${{ matrix.os }})
 
           | Metric | Value |
           |--------|-------|
@@ -144,14 +214,14 @@ jobs:
           | Branch | \`${{ github.ref_name }}\` |
           | Commit | \`${{ github.sha }}\` |
           | Bootstrap | \`${{ steps.apply.outcome }}\` |
-          | Flake Tests | \`${{ steps.flake_tests.outcome }}\` |
+          | Tests | \`${{ steps.integration_tests.outcome }}\` |
           EOF
 
-          if [ -f /tmp/flake-tests.log ]; then
+          if [ -f /tmp/integration-tests.log ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### Flake Test Log" >> $GITHUB_STEP_SUMMARY
+            echo "### Test Output" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            cat /tmp/flake-tests.log >> $GITHUB_STEP_SUMMARY
+            cat /tmp/integration-tests.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           fi
 
@@ -159,8 +229,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: flake-logs-${{ matrix.os }}
+          name: integration-logs-${{ matrix.os }}
           path: |
             /tmp/chezmoi-apply.log
-            /tmp/flake-tests.log
+            /tmp/integration-tests.log
           retention-days: 7

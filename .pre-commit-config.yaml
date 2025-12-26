@@ -41,6 +41,13 @@ repos:
         types: [shell]
         exclude: \.zsh$
 
+      # Bats test files - shfmt
+      - id: shfmt-bats
+        name: shfmt (bats)
+        entry: shfmt -w -i 2 -ci -bn
+        language: system
+        files: \.bats$
+
       # TOML - taplo
       - id: taplo
         name: taplo
