@@ -27,6 +27,7 @@ run_zsh_function() {
   local args=("$@")
 
   local full_path="${ZSH_CONFIG_DIR}/${source_file}"
+  local logging_path="${ZSH_CONFIG_DIR}/00-logging.zsh"
 
   if [[ ! -f "$full_path" ]]; then
     echo "ERROR: ZSH file not found: $full_path" >&2
@@ -38,8 +39,14 @@ run_zsh_function() {
     args_str=$(printf '%q ' "${args[@]}")
   fi
 
+  # Always source logging first (unless we're testing logging itself)
+  local source_cmd=""
+  if [[ "$source_file" != "00-logging.zsh" && -f "$logging_path" ]]; then
+    source_cmd="source '$logging_path'; "
+  fi
+
   zsh -c "$(_build_zsh_env)
-source '$full_path'
+${source_cmd}source '$full_path'
 $func_name $args_str"
 }
 
@@ -50,14 +57,21 @@ run_zsh_code() {
   local code="$2"
 
   local full_path="${ZSH_CONFIG_DIR}/${source_file}"
+  local logging_path="${ZSH_CONFIG_DIR}/00-logging.zsh"
 
   if [[ ! -f "$full_path" ]]; then
     echo "ERROR: ZSH file not found: $full_path" >&2
     return 1
   fi
 
+  # Always source logging first (unless we're testing logging itself)
+  local source_cmd=""
+  if [[ "$source_file" != "00-logging.zsh" && -f "$logging_path" ]]; then
+    source_cmd="source '$logging_path'; "
+  fi
+
   zsh -c "$(_build_zsh_env)
-source '$full_path'
+${source_cmd}source '$full_path'
 $code"
 }
 

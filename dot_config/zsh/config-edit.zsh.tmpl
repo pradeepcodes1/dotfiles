@@ -6,17 +6,17 @@ config-edit() {
   local config_dev_flake="${chezmoi_source}/nix/config_dev"
 
   if [[ ! -d "$chezmoi_source" ]]; then
-    echo "Error: Chezmoi source directory not found at $chezmoi_source"
+    error_log "config-edit" "Chezmoi source directory not found at $chezmoi_source"
     return 1
   fi
 
   if [[ ! -f "${config_dev_flake}/flake.nix" ]]; then
-    echo "Error: config_dev flake not found at $config_dev_flake"
+    error_log "config-edit" "config_dev flake not found at $config_dev_flake"
     return 1
   fi
 
-  echo "🔧 Launching config edit environment..."
-  echo "📁 Working directory: $chezmoi_source"
+  info_log "config-edit" "Launching config edit environment..."
+  info_log "config-edit" "Working directory: $chezmoi_source"
   echo ""
   echo "Available commands:"
   echo "  - Edit files directly in this directory"

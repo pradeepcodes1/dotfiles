@@ -43,6 +43,7 @@
               # Basic tools
               git
               curl
+              zsh
             ];
           };
         }
