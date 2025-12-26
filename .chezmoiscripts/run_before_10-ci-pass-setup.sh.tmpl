@@ -1,0 +1,38 @@
+#!/bin/bash
+# Sets up dummy pass (password-store) for CI environments.
+# Required because chezmoi templates use `pass` for secrets.
+set -e
+
+[ -z "$CI" ] && exit 0
+[ -d "$HOME/.password-store" ] && exit 0
+
+BOOTSTRAP_FLAKE="{{ .chezmoi.sourceDir }}/nix/bootstrap"
+echo "Setting up dummy pass for CI..."
+
+nix shell "$BOOTSTRAP_FLAKE" --command bash -c '
+  set -e
+  cat > /tmp/gpg-key-config <<EOF
+%no-protection
+Key-Type: RSA
+Key-Length: 2048
+Name-Real: CI Test
+Name-Email: ci@test.local
+Expire-Date: 0
+%commit
+EOF
+  gpg --batch --gen-key /tmp/gpg-key-config
+  rm /tmp/gpg-key-config
+
+  KEY_ID=$(gpg --list-keys --keyid-format LONG ci@test.local | grep pub | awk "{print \$2}" | cut -d"/" -f2)
+  pass init "$KEY_ID"
+
+  # Insert dummy secrets for template rendering
+  echo "dummy-gemini-key" | pass insert -e api/ai/gemini
+  echo "dummy-openrouter-key" | pass insert -e api/ai/openrouter
+  echo "dummy-aws-secret" | pass insert -e aws/secret_key
+  echo "dummy-aws-access" | pass insert -e aws/access_key
+  echo "/tmp/dummy-restic-repo" | pass insert -e backups/restic-repo
+  echo "/tmp/dummy-obsidian" | pass insert -e backups/obsidian
+  echo "/tmp/dummy-yamtrack" | pass insert -e backups/yamtrack-db
+'
+echo "Dummy pass initialized for CI"

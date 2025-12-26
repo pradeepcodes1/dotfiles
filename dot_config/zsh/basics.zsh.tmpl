@@ -1,17 +1,7 @@
 alias vi=nvim
 alias dev="cd /Volumes/dev"
 
-# Eza aliases for better file browsing with icons
+# Eza aliases
 alias ls='eza --icons -la'
 alias lt='eza --icons --tree'
 export EDITOR="nvim"
-
-# Yazi wrapper to change directory on exit
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}

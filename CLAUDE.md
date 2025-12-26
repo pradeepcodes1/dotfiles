@@ -80,7 +80,6 @@ Chezmoi uses special prefixes to determine how files are processed:
   - `theme.zsh` - Theme management system
   - `tmux.zsh` - Auto-attaches tmux sessions per Aerospace workspace
   - `cp.zsh` - Competitive programming toolkit (`cpt` command)
-  - `music.zsh` - Music player shortcuts
 
 #### 2. Tool Version Management (mise)
 
@@ -118,9 +117,6 @@ Chezmoi uses special prefixes to determine how files are processed:
 
 - **Config**: `dot_config/tmux/tmux.conf.tmpl`
 - **Prefix**: Changed to `C-l` (not default `C-b`)
-- **Scripts**:
-  - `tmux-fzf-search.sh` - FZF-based scrollback search
-  - `tmux-spinner.sh` - Status bar spinner
 - **Integration**: Auto-attaches to Aerospace workspace-named sessions (see `dot_config/zsh/tmux.zsh`)
 
 #### 6. Secret Management

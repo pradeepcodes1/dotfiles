@@ -44,3 +44,6 @@ precmd() { vcs_info }
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
+
+# Default to dev volume if available and at home
+[[ "$PWD" == "$HOME" && -d "/Volumes/dev" ]] && cd /Volumes/dev
