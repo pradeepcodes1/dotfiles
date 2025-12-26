@@ -1,55 +1,120 @@
 #!/usr/bin/env zsh
-# Centralized logging utility for all dotfiles scripts
+# Centralized logging for dotfiles
 #
-# USAGE:
-#   Set DEBUG_DOTFILES=1 to enable debug logging
-#   Set DEBUG_DOTFILES=2 to enable verbose debug logging (includes timestamps)
-#   Set DOTFILES_LOG_FILE=/path/to/file.log to also write logs to a file
+# Console: Set DEBUG_DOTFILES=1 for debug output, =2 for timestamps
+# JSON:    Set DOTFILES_JSON_LOG=1 to enable JSON file logging
 #
-# FUNCTIONS:
-#   debug_log "component" "message"  - Only shows if DEBUG_DOTFILES >= 1
-#   info_log "component" "message"   - Only shows if DEBUG_DOTFILES >= 1
-#   warn_log "component" "message"   - Always shows (warnings)
-#   error_log "component" "message"  - Always shows (errors)
-#   log_command "component" "description" command args...  - Logs command execution with timing
-#
-# EXAMPLES:
-#   debug_log "backup" "Starting backup process..."
-#   info_log "theme" "Theme switched to dark mode"
-#   warn_log "brew" "Package not found in Brewfile"
-#   error_log "nvim" "Failed to load plugin"
-#   log_command "backup" "Creating backup" restic backup /home/user
-#
-#   # With file logging
-#   export DOTFILES_LOG_FILE="$HOME/.local/state/dotfiles/debug.log"
-#   debug_log "theme" "This goes to both console and file"
-#
-# This file is sourced first (alphabetically) to ensure logging is available
-# to all other zsh configuration files.
+# Functions:
+#   debug_log "component" "message"
+#   info_log "component" "message"
+#   warn_log "component" "message"
+#   error_log "component" "message"
+#   log_command "component" "description" command args...
 
-# Color codes for different log levels
+# Source shared config
+_DOTFILES_LOG_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/logging.conf"
+[[ -f "$_DOTFILES_LOG_CONF" ]] && source "$_DOTFILES_LOG_CONF"
+
+# Defaults
+: ${DOTFILES_LOG_DIR:="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/logs"}
+: ${DOTFILES_LOG_FILE:="${DOTFILES_LOG_DIR}/dotfiles.jsonl"}
+: ${DOTFILES_LOG_MAX_SIZE_MB:=10}
+: ${DOTFILES_LOG_MAX_FILES:=5}
+: ${DOTFILES_LOG_MAX_AGE_DAYS:=30}
+: ${DOTFILES_JSON_LOG:=0}
+
+# Colors for console
 typeset -A LOG_COLORS
 LOG_COLORS=(
-  DEBUG "\033[0;36m" # Cyan
-  INFO "\033[0;32m"  # Green
-  WARN "\033[0;33m"  # Yellow
-  ERROR "\033[0;31m" # Red
-  RESET "\033[0m"    # Reset
+  DEBUG "\033[0;36m"
+  INFO "\033[0;32m"
+  WARN "\033[0;33m"
+  ERROR "\033[0;31m"
+  RESET "\033[0m"
 )
 
-# Log level prefix mapping
 typeset -A LOG_PREFIX
 LOG_PREFIX=(
-  DEBUG "🔍"
-  INFO "ℹ️ "
-  WARN "⚠️ "
-  ERROR "❌"
+  DEBUG "D"
+  INFO "I"
+  WARN "W"
+  ERROR "E"
 )
 
-# Internal logging function
+# ISO 8601 timestamp
+_log_timestamp() {
+  date -u '+%Y-%m-%dT%H:%M:%S.000Z'
+}
+
+# Escape string for JSON
+_json_escape() {
+  local str="$1"
+  str="${str//\\/\\\\}"
+  str="${str//\"/\\\"}"
+  str="${str//$'\n'/\\n}"
+  str="${str//$'\r'/\\r}"
+  str="${str//$'\t'/\\t}"
+  printf '%s' "$str"
+}
+
+# Build JSON log entry
+_build_json_log() {
+  local level="$1" component="$2" message="$3"
+  shift 3
+
+  local ts="$(_log_timestamp)"
+  local escaped_msg="$(_json_escape "$message")"
+  local escaped_comp="$(_json_escape "$component")"
+
+  local json="{\"ts\":\"$ts\",\"level\":\"$level\",\"component\":\"$escaped_comp\",\"msg\":\"$escaped_msg\",\"source\":\"shell\",\"pid\":$$"
+
+  # Add extra key=value fields
+  for kv in "$@"; do
+    local key="${kv%%=*}"
+    local value="${kv#*=}"
+    if [[ "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+      json="$json,\"$key\":$value"
+    else
+      json="$json,\"$key\":\"$(_json_escape "$value")\""
+    fi
+  done
+
+  printf '%s}' "$json"
+}
+
+# Rotate log files if needed
+_rotate_logs() {
+  [[ ! -f "$DOTFILES_LOG_FILE" ]] && return 0
+
+  local size_bytes=$(stat -f%z "$DOTFILES_LOG_FILE" 2>/dev/null || echo 0)
+  local max_bytes=$((DOTFILES_LOG_MAX_SIZE_MB * 1024 * 1024))
+
+  if [[ $size_bytes -gt $max_bytes ]]; then
+    for i in $(seq $((DOTFILES_LOG_MAX_FILES - 1)) -1 1); do
+      [[ -f "${DOTFILES_LOG_FILE}.$i" ]] && mv "${DOTFILES_LOG_FILE}.$i" "${DOTFILES_LOG_FILE}.$((i+1))" 2>/dev/null
+    done
+    mv "$DOTFILES_LOG_FILE" "${DOTFILES_LOG_FILE}.1" 2>/dev/null || true
+  fi
+}
+
+# Cleanup old rotated logs (runs on shell start)
+_cleanup_old_logs() {
+  [[ ! -d "$DOTFILES_LOG_DIR" ]] && return 0
+  find "$DOTFILES_LOG_DIR" -name "*.jsonl.*" -mtime +"$DOTFILES_LOG_MAX_AGE_DAYS" -delete 2>/dev/null || true
+}
+
+# Write JSON to log file
+_write_json_log() {
+  [[ "${DOTFILES_JSON_LOG:-0}" != "1" ]] && return 0
+
+  mkdir -p "$DOTFILES_LOG_DIR" 2>/dev/null || return 0
+  _rotate_logs
+  printf '%s\n' "$1" >> "$DOTFILES_LOG_FILE" 2>/dev/null || true
+}
+
+# Internal log function
 _log() {
-  local level="$1"
-  local component="$2"
+  local level="$1" component="$2"
   shift 2
   local message="$*"
 
@@ -57,58 +122,37 @@ _log() {
   local reset="${LOG_COLORS[RESET]}"
   local prefix="${LOG_PREFIX[$level]}"
 
-  # Build console output with colors
-  local console_output=""
-  local file_output=""
-  local timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+  # Console output
+  local console=""
+  [[ "${DEBUG_DOTFILES:-0}" -ge 2 ]] && console="[$(date '+%H:%M:%S')] "
+  console="${console}${color}${prefix} [${component}]${reset} ${message}"
 
-  # Add timestamp if verbose mode (DEBUG_DOTFILES=2)
-  if [[ "${DEBUG_DOTFILES:-0}" -ge 2 ]]; then
-    console_output="[$(date '+%H:%M:%S')] "
-  fi
-
-  # Console output with colors
-  console_output="${console_output}${color}${prefix} [${component}]${reset} ${message}"
-
-  # File output without colors (plain text with full timestamp)
-  file_output="[${timestamp}] [${level}] [${component}] ${message}"
-
-  # Print to console (stderr for errors/warnings, stdout otherwise)
   if [[ "$level" == "ERROR" || "$level" == "WARN" ]]; then
-    echo "$console_output" >&2
+    echo "$console" >&2
   else
-    echo "$console_output"
+    echo "$console"
   fi
 
-  # Write to log file if DOTFILES_LOG_FILE is set
-  if [[ -n "$DOTFILES_LOG_FILE" ]]; then
-    local log_dir="$(dirname "$DOTFILES_LOG_FILE")"
-
-    # Create log directory if it doesn't exist
-    if [[ ! -d "$log_dir" ]]; then
-      mkdir -p "$log_dir" 2>/dev/null || return 0
-    fi
-
-    # Append to log file
-    echo "$file_output" >>"$DOTFILES_LOG_FILE" 2>/dev/null || true
-
-    # Rotate log if it exceeds 10MB
-    if [[ -f "$DOTFILES_LOG_FILE" ]] && [[ $(stat -f%z "$DOTFILES_LOG_FILE" 2>/dev/null || echo 0) -gt 10485760 ]]; then
-      mv "$DOTFILES_LOG_FILE" "${DOTFILES_LOG_FILE}.old" 2>/dev/null || true
-    fi
-  fi
+  # JSON file output
+  _write_json_log "$(_build_json_log "$level" "$component" "$message")"
 }
 
-# Debug log - only shows if DEBUG_DOTFILES is set
+# Debug log
 debug_log() {
-  [[ "${DEBUG_DOTFILES:-0}" -ge 1 ]] || return 0
-  _log "DEBUG" "$@"
+  if [[ "${DEBUG_DOTFILES:-0}" -ge 1 ]]; then
+    _log "DEBUG" "$@"
+  elif [[ "${DOTFILES_JSON_LOG:-0}" == "1" ]]; then
+    _write_json_log "$(_build_json_log "DEBUG" "$1" "${@:2}")"
+  fi
 }
 
-# Info log - only shows if DEBUG_DOTFILES is set
+# Info log
 info_log() {
-  [[ "${DEBUG_DOTFILES:-0}" -ge 1 ]] || return 0
-  _log "INFO" "$@"
+  if [[ "${DEBUG_DOTFILES:-0}" -ge 1 ]]; then
+    _log "INFO" "$@"
+  elif [[ "${DOTFILES_JSON_LOG:-0}" == "1" ]]; then
+    _write_json_log "$(_build_json_log "INFO" "$1" "${@:2}")"
+  fi
 }
 
 # Warning log - always shows
@@ -121,37 +165,35 @@ error_log() {
   _log "ERROR" "$@"
 }
 
-# Utility to log command execution with timing
-# Usage: log_command "component" "description" command args...
+# Log command with timing
 log_command() {
-  local component="$1"
-  local description="$2"
+  local component="$1" description="$2"
   shift 2
 
   debug_log "$component" "Running: $description"
 
-  if [[ "${DEBUG_DOTFILES:-0}" -ge 2 ]]; then
-    local start_time=$(date +%s)
-    "$@"
-    local exit_code=$?
-    local end_time=$(date +%s)
-    local duration=$((end_time - start_time))
+  local start_ms=$(($(date +%s) * 1000))
+  "$@"
+  local exit_code=$?
+  local end_ms=$(($(date +%s) * 1000))
+  local duration_ms=$((end_ms - start_ms))
 
-    if [[ $exit_code -eq 0 ]]; then
-      debug_log "$component" "✓ $description (${duration}s)"
-    else
-      error_log "$component" "✗ $description failed with exit code $exit_code (${duration}s)"
+  if [[ $exit_code -eq 0 ]]; then
+    if [[ "${DOTFILES_JSON_LOG:-0}" == "1" ]]; then
+      _write_json_log "$(_build_json_log "INFO" "$component" "$description completed" "duration_ms=$duration_ms" "exit_code=$exit_code")"
     fi
-
-    return $exit_code
+    [[ "${DEBUG_DOTFILES:-0}" -ge 2 ]] && debug_log "$component" "Completed: $description (${duration_ms}ms)"
   else
-    "$@"
+    if [[ "${DOTFILES_JSON_LOG:-0}" == "1" ]]; then
+      _write_json_log "$(_build_json_log "ERROR" "$component" "$description failed" "duration_ms=$duration_ms" "exit_code=$exit_code")"
+    fi
+    error_log "$component" "Failed: $description (exit $exit_code, ${duration_ms}ms)"
   fi
+
+  return $exit_code
 }
 
-# Note: In zsh, functions are automatically available throughout the shell session.
-# Unlike bash, zsh doesn't need 'export -f' and doesn't support it.
-# Functions defined here are available to all zsh configuration files.
+# Run cleanup on shell start (lightweight)
+_cleanup_old_logs
 
-# Log that logging system is initialized (only in verbose mode)
-debug_log "logging" "Logging system initialized (DEBUG_DOTFILES=${DEBUG_DOTFILES:-0})"
+debug_log "logging" "Logging initialized (console=${DEBUG_DOTFILES:-0}, json=${DOTFILES_JSON_LOG:-0})"

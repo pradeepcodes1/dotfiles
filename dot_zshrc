@@ -26,6 +26,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 source $ZSH/oh-my-zsh.sh
 
+# Enable JSON logging
+export DOTFILES_JSON_LOG=1
+
 # Source all custom zsh files
 for file in "$HOME/.config/zsh/"*.zsh; do
   [ -f "$file" ] && source "$file"
