@@ -38,6 +38,10 @@ elif [ -f "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
   . "$HOME/.nix-profile/etc/profile.d/nix.sh"
 fi
 
+# --- Update git submodules ---
+echo "📥 Updating git submodules..."
+git -C "${SCRIPT_DIR}" submodule update --init --recursive
+
 # --- Run chezmoi apply in nix shell ---
 echo "🚀 Running chezmoi apply in nix shell..."
 

@@ -10,3 +10,6 @@
 [submodule "tests/bats/bats-file"]
 	path = tests/bats/bats-file
 	url = https://github.com/bats-core/bats-file.git
+[submodule "dot_config/eza/eza-themes"]
+	path = dot_config/eza/eza-themes
+	url = https://github.com/eza-community/eza-themes.git
