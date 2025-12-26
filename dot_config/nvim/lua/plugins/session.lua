@@ -45,27 +45,7 @@ return {
 				copy_session = { "i", "<C-Y>" },
 			},
 
-			picker_opts = {
-				-- For Telescope, you can set theme options here, see:
-				-- https://github.com/nvim-telescope/telescope.nvim/blob/master/doc/telescope.txt#L112
-				-- https://github.com/nvim-telescope/telescope.nvim/blob/master/lua/telescope/themes.lua
-				--
-				-- border = true,
-				-- layout_config = {
-				--   width = 0.8, -- Can set width and height as percent of window
-				--   height = 0.5,
-				-- },
-
-				-- For Snacks, you can set layout options here, see:
-				-- https://github.com/folke/snacks.nvim/blob/main/docs/picker.md#%EF%B8%8F-layouts
-				--
-				-- preset = "dropdown",
-				-- preview = false,
-				-- layout = {
-				--   width = 0.4,
-				--   height = 0.4,
-				-- },
-			},
+			picker_opts = {},
 
 			-- Telescope only: If load_on_setup is false, make sure you use `:SessionSearch` to open the picker as it will initialize everything first
 			load_on_setup = true,

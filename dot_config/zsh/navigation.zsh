@@ -45,10 +45,6 @@ function zi() {
     fi
 }
 
-# zz - Quick jump to frequently used directories
-# This is an alias for zoxide's interactive mode
-alias zz='zi'
-
 # cdf - cd to the directory of a file
 # Usage: cdf path/to/file.txt
 function cdf() {
@@ -91,9 +87,6 @@ function fcd() {
     fi
 }
 
-# Alias for quick access
-alias fzcd='fcd'
-
 # cdls - cd and ls in one command
 # Usage: cdls directory
 function cdls() {
@@ -134,22 +127,9 @@ function bd() {
 # Show zoxide stats
 alias zstats='zoxide query -l -s'
 
-# Common directory shortcuts (customize these to your needs)
-# Uncomment and modify as needed:
-# alias dev='cd /Volumes/dev'
-# alias repos='cd ~/repos'
-# alias dotfiles='cd ~/.local/share/chezmoi'
-# alias downloads='cd ~/Downloads'
-
 # Enhanced cd completion with zoxide
-# This provides better autocomplete using zoxide's database
 function _zoxide_cd_completion() {
     local -a matches
     matches=(${(f)"$(zoxide query -l)"})
     _describe 'directory' matches
 }
-
-# Note: The standard zoxide initialization in plugins.zsh already provides:
-# - z <query>     : Jump to directory matching query
-# - zi            : Interactive directory picker (if fzf is available)
-# This file enhances cd to use zoxide under the hood while maintaining familiar syntax

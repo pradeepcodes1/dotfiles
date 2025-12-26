@@ -40,7 +40,7 @@ if theme_transparent then
 	})
 end
 
--- Whe n Neovim starts with a single argument that is a directory,
+-- When Neovim starts with a single argument that is a directory,
 vim.api.nvim_create_autocmd("VimEnter", {
 	desc = "Change CWD to dir if it's the only argument",
 	pattern = "*",

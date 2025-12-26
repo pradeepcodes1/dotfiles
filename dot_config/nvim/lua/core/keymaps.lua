@@ -17,16 +17,12 @@ map("n", "<leader>ff", function()
 	})
 end, { desc = "Find Files (no preview)" })
 map("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Grep" })
---map("n", "<leader>/", "/", { desc = "Remapping normal text search" })
 map("n", "<leader>/", ":Telescope current_buffer_fuzzy_find<CR>", { desc = "Smart buffer search (symbols/fuzzy)" })
 map("n", "<leader>fs", ":Telescope lsp_document_symbols<CR>", { desc = "Find symbols in file" })
 map("n", "<leader>fw", ":Telescope lsp_workspace_symbols<CR>", { desc = "Find symbols in workspace" })
 map("n", "<leader>fr", ":Telescope oldfiles<CR>", { desc = "Recent files" })
--- LSP
-map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "LSP Rename" })
-map("n", "<leader>la", vim.lsp.buf.code_action, { desc = "Code Action" })
+-- LSP (gd, rename, code_action are in lsp/common.lua on_attach)
 map("n", "<leader>lc", "<Cmd>cclose<CR>", { desc = "Clear quickfix" })
-map("n", "gd", vim.lsp.buf.definition, { desc = "Goto Definition" })
 map("n", "?", vim.diagnostic.open_float, { desc = "Open diagnostic float" })
 
 -- BarBar keymaps
