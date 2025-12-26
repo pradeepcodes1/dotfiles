@@ -1,0 +1,22 @@
+# Bat theme integration
+
+typeset -A _DOTFILES_BAT_THEMES
+_DOTFILES_BAT_THEMES=(
+  [kanagawa-dragon]="TwoDark"
+  [kanagawa-wave]="TwoDark"
+  [kanagawa-lotus]="OneHalfLight"
+  [catppuccin-mocha]="Catppuccin Mocha"
+  [catppuccin-latte]="Catppuccin Latte"
+  [gruvbox-dark]="gruvbox-dark"
+  [gruvbox-light]="gruvbox-light"
+  [everforest-dark]="TwoDark"
+  [everforest-light]="OneHalfLight"
+  [nightfox]="Catppuccin Mocha"
+  [dawnfox]="Catppuccin Latte"
+)
+
+local bat_config="{{ .chezmoi.homeDir }}/.config/bat/config"
+local bat_theme="${_DOTFILES_BAT_THEMES[$_DOTFILES_THEME_NAME]:-TwoDark}"
+
+mkdir -p "$(dirname "$bat_config")"
+echo "--theme=\"$bat_theme\"" > "$bat_config"

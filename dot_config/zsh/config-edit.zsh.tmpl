@@ -2,7 +2,7 @@
 # Launches a nix shell for editing chezmoi configuration
 
 config-edit() {
-  local chezmoi_source="${HOME}/.local/share/chezmoi"
+  local chezmoi_source="{{ .chezmoi.sourceDir }}"
   local config_dev_flake="${chezmoi_source}/nix/config_dev"
 
   if [[ ! -d "$chezmoi_source" ]]; then

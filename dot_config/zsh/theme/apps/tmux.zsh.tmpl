@@ -1,0 +1,20 @@
+# Tmux theme integration
+
+local theme_file="{{ .chezmoi.homeDir }}/.config/tmux/themes/${_DOTFILES_THEME_NAME}.conf"
+local current_file="{{ .chezmoi.homeDir }}/.config/tmux/themes/current.conf"
+
+mkdir -p "$(dirname "$theme_file")"
+
+cat > "$theme_file" <<EOF
+# Tmux theme: $_DOTFILES_THEME_NAME
+set -g status-style "fg=$ui_fg,bg=$ui_inactive"
+set -g window-status-format "#[bg=$ui_border,fg=$ui_fg]  #I#F  "
+set -g window-status-current-format "#[bg=$ui_active,fg=$ui_bg,bold]  #I#F  "
+set -g pane-border-style "fg=$ui_border"
+set -g pane-active-border-style "fg=$ui_active"
+set -g message-style "fg=$ui_fg,bg=$ui_inactive"
+set -g mode-style "fg=$ui_bg,bg=$ui_active"
+EOF
+
+cp "$theme_file" "$current_file"
+[[ -n "$TMUX" ]] && tmux source-file "$theme_file" 2>/dev/null

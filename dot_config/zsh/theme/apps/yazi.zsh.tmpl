@@ -1,0 +1,28 @@
+# Yazi theme integration
+
+typeset -A _DOTFILES_YAZI_FLAVORS
+_DOTFILES_YAZI_FLAVORS=(
+  [kanagawa-dragon]="kanagawa-dragon"
+  [kanagawa-wave]="kanagawa"
+  [kanagawa-lotus]="kanagawa-lotus"
+  [catppuccin-mocha]="catppuccin-mocha"
+  [catppuccin-latte]="catppuccin-latte"
+  [gruvbox-dark]="gruvbox-dark"
+  [gruvbox-light]="gruvbox-dark"
+  [everforest-dark]="everforest-medium"
+  [everforest-light]="everforest-medium"
+  [nightfox]="catppuccin-mocha"
+  [dawnfox]="catppuccin-latte"
+)
+
+local yazi_config="{{ .chezmoi.homeDir }}/.config/yazi/theme.toml"
+local flavor="${_DOTFILES_YAZI_FLAVORS[$_DOTFILES_THEME_NAME]}"
+
+[[ -z "$flavor" ]] && return
+[[ ! -d "{{ .chezmoi.homeDir }}/.config/yazi/flavors/${flavor}.yazi" ]] && return
+
+if [[ "$_DOTFILES_THEME_MODE" == "dark" ]]; then
+  print "[flavor]\ndark = \"$flavor\"" > "$yazi_config"
+else
+  print "[flavor]\nlight = \"$flavor\"" > "$yazi_config"
+fi

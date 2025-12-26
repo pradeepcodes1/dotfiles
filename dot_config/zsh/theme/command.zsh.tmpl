@@ -1,0 +1,74 @@
+# Theme command and apply orchestration
+
+_apply_theme() {
+  for f in "$_theme_dir/apps"/*.zsh; do
+    [[ -f "$f" ]] && source "$f"
+  done
+}
+
+theme() {
+  local arg="${1:-}"
+  local theme_name
+
+  case "$arg" in
+    "")
+      theme_name="$(_theme_fzf_pick all)"
+      [[ -z "$theme_name" ]] && return 0
+      ;;
+    toggle)
+      if [[ "$_DOTFILES_THEME_MODE" == "dark" ]]; then
+        theme_name="$_DOTFILES_LIGHT_THEME"
+      else
+        theme_name="$_DOTFILES_DARK_THEME"
+      fi
+      ;;
+    light)
+      theme_name="$(_theme_fzf_pick light)"
+      [[ -z "$theme_name" ]] && return 0
+      ;;
+    dark)
+      theme_name="$(_theme_fzf_pick dark)"
+      [[ -z "$theme_name" ]] && return 0
+      ;;
+    list)
+      echo "Available themes:"
+      for t in $(_get_available_themes); do
+        local color_file="$_DOTFILES_COLORS_DIR/${t}.sh"
+        local mode=$(grep '^# Mode:' "$color_file" | cut -d: -f2 | tr -d ' ')
+        local current=""
+        [[ "$t" == "$_DOTFILES_THEME_NAME" ]] && current=" (current)"
+        echo "  $t [$mode]$current"
+      done
+      return 0
+      ;;
+    status)
+      echo "Theme: $_DOTFILES_THEME_NAME"
+      echo "Mode: $_DOTFILES_THEME_MODE"
+      echo "Transparent: $_DOTFILES_THEME_TRANSPARENT"
+      [[ -f "$_DOTFILES_THEME_FILE" ]] && echo "Persisted: yes" || echo "Persisted: no (using system)"
+      return 0
+      ;;
+    reset)
+      rm -f "$_DOTFILES_THEME_FILE"
+      _init_theme
+      echo "Reset to system theme: $_DOTFILES_THEME_NAME ($_DOTFILES_THEME_MODE mode)"
+      return 0
+      ;;
+    *)
+      theme_name="$arg"
+      ;;
+  esac
+
+  if ! _load_theme_colors "$theme_name"; then
+    echo "Failed to load theme '$theme_name'" >&2
+    return 1
+  fi
+
+  mkdir -p "$(dirname "$_DOTFILES_THEME_FILE")"
+  echo "$theme_name" > "$_DOTFILES_THEME_FILE"
+
+  _apply_theme
+
+  echo "Switched to: $_DOTFILES_THEME_NAME ($_DOTFILES_THEME_MODE mode)"
+  echo "Note: Restart nvim/yazi for full effect."
+}
