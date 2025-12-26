@@ -1,24 +1,15 @@
 #!/bin/sh
 set -e
 
-# Function: Initialize brew environment
-setup_brew_env() {
-  if [ -x "/opt/homebrew/bin/brew" ]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-  fi
-}
-
-setup_brew_env
-
-# Check if brew is available
-if command -v brew >/dev/null 2>&1; then
-  echo "✅ Running brew bundle..."
-  brew bundle --file="$HOME/.config/brew/packages"
-elif [ -x "/opt/homebrew/bin/brew" ]; then
-  echo "✅ Running brew bundle..."
-  /opt/homebrew/bin/brew bundle --file="$HOME/.config/brew/packages"
+# Determine brew path
+if [ -x "/opt/homebrew/bin/brew" ]; then
+  BREW="/opt/homebrew/bin/brew"
+elif [ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+  BREW="/home/linuxbrew/.linuxbrew/bin/brew"
 else
-  echo "⚠️  Homebrew not found, skipping brew bundle"
+  echo "Homebrew not found, skipping brew bundle"
+  exit 0
 fi
+
+eval "$($BREW shellenv)"
+brew bundle --file="$HOME/.config/brew/packages"

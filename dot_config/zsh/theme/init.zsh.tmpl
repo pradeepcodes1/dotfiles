@@ -1,0 +1,28 @@
+# Theme initialization
+
+_init_theme() {
+  local theme_name
+
+  # Check for persisted theme
+  if [[ -f "$_DOTFILES_THEME_FILE" ]]; then
+    theme_name="$(< "$_DOTFILES_THEME_FILE")"
+    if [[ -f "$_DOTFILES_COLORS_DIR/${theme_name}.sh" ]]; then
+      _load_theme_colors "$theme_name"
+      _apply_theme
+      return
+    fi
+  fi
+
+  # Fall back to system detection
+  local system_mode="$(_detect_macos_theme)"
+  if [[ "$system_mode" == "dark" ]]; then
+    theme_name="$_DOTFILES_DARK_THEME"
+  else
+    theme_name="$_DOTFILES_LIGHT_THEME"
+  fi
+
+  _load_theme_colors "$theme_name"
+  _apply_theme
+}
+
+_init_theme
