@@ -75,6 +75,7 @@ Chezmoi uses special prefixes to determine how files are processed:
 - **Custom modules** in `dot_config/zsh/`:
   - `00-logging.zsh` - Centralized logging system (sourced first alphabetically)
   - `basics.zsh.tmpl` - Basic environment setup and eza aliases
+  - `log-viewer.zsh` - Log viewing utilities (dotlog, dotlog-stats)
   - `navigation.zsh` - Smart directory navigation with zoxide integration
   - `plugins.zsh` - Zsh plugin configuration (autosuggestions, zoxide)
   - `theme.zsh` - Theme management system
@@ -106,6 +107,7 @@ Chezmoi uses special prefixes to determine how files are processed:
   - `core/options.lua` - Editor options
   - `core/cmp.lua` - Autocompletion setup
   - `core/notes.lua` - Note-taking setup
+  - `core/logging.lua` - JSON logging to shared dotfiles log
 - **LSP**: Configured via `lua/lsp/` and `lua/plugins/masonlsp.lua`
 - **Special features**:
   - Transparent background support
@@ -196,73 +198,67 @@ All cd operations are automatically tracked in zoxide for intelligent fuzzy matc
 
 ### Debugging & Logging
 
-The repository includes a centralized logging system for all scripts:
+Centralized JSON logging across shell, Go, and Neovim.
 
-**Console Logging:**
-
-```bash
-# Enable debug logging
-export DEBUG_DOTFILES=1
-
-# Enable verbose debug logging with timestamps
-export DEBUG_DOTFILES=2
-
-# Run commands to see debug output
-theme toggle
-```
-
-**File Logging:**
+**Enable Logging:**
 
 ```bash
-# Log to file in addition to console
-export DOTFILES_LOG_FILE="$HOME/.local/state/dotfiles/debug.log"
+# Console output (colors)
+export DEBUG_DOTFILES=1      # Enable debug/info
+export DEBUG_DOTFILES=2      # Add timestamps
 
-# Combine with debug mode
-export DEBUG_DOTFILES=1
-export DOTFILES_LOG_FILE="$HOME/.local/state/dotfiles/debug.log"
-theme toggle
-
-# View the log file
-tail -f ~/.local/state/dotfiles/debug.log
-
-# Note: Logs are automatically rotated when they exceed 10MB
-# Old logs are saved as debug.log.old
+# JSON file logging (enabled by default in .zshrc)
+# Logs to: ~/.local/state/dotfiles/logs/dotfiles.jsonl
 ```
 
-**In Scripts:**
+**Shell Functions:**
 
 ```bash
-# Available logging functions (automatically loaded from 00-logging.zsh)
-debug_log "component" "Debug message"     # Only shows if DEBUG_DOTFILES >= 1
-info_log "component" "Info message"       # Only shows if DEBUG_DOTFILES >= 1
-warn_log "component" "Warning message"    # Always shows
-error_log "component" "Error message"     # Always shows
-
-# Log command execution with timing
-log_command "component" "description" command args...
+debug_log "component" "message"   # DEBUG level
+info_log "component" "message"    # INFO level
+warn_log "component" "message"    # WARN (always shown)
+error_log "component" "message"   # ERROR (always shown)
+log_command "comp" "desc" cmd...  # Timed command execution
 ```
 
-**Log Levels:**
+**Neovim (Lua):**
 
-- **DEBUG** 🔍 (cyan) - Detailed execution flow, only when `DEBUG_DOTFILES >= 1`
-- **INFO** ℹ️ (green) - Informational messages, only when `DEBUG_DOTFILES >= 1`
-- **WARN** ⚠️ (yellow) - Warnings, always shown
-- **ERROR** ❌ (red) - Errors, always shown
-
-**File Format:**
-Console logs use colors and emojis. File logs are plain text with full timestamps:
-
-```
-[2025-12-24 14:40:32] [DEBUG] [theme] Loading colors: 'kanagawa-dragon'
-[2025-12-24 14:40:33] [INFO] [theme] Theme applied successfully
-[2025-12-24 14:40:34] [WARN] [theme] Yazi flavor not installed
-[2025-12-24 14:40:35] [ERROR] [theme] Failed to write config file
+```lua
+local log = require("core.logging")
+log.debug("lsp", "Server starting")
+log.info("theme", "Applied", { scheme = "kanagawa" })
+log.warn("plugin", "Deprecated API")
+log.error("treesitter", "Parse failed", { error = err })
+log.timed("treesitter", "Parsing", function() ... end)
 ```
 
-**Components using logging:**
+**Log Viewer (requires jq):**
 
-- `theme.zsh` - Theme switching and application
-- Add logging to your custom scripts for better debugging
+```bash
+dotlog              # Last 50 entries, colorized
+dotlog -f           # Follow mode (tail)
+dotlog -l ERROR     # Filter by level
+dotlog -c theme     # Filter by component
+dotlog -s nvim      # Filter by source (shell/nvim/go)
+dotlog --today      # Today only
+dotlog-stats        # Statistics
+dotlog-search "pattern"  # Search logs
+```
+
+**JSON Schema:**
+
+```json
+{
+  "ts": "2025-12-26T10:30:45.000Z",
+  "level": "INFO",
+  "component": "theme",
+  "msg": "Applied",
+  "source": "shell",
+  "pid": 12345
+}
+```
+
+**Config:** `~/.config/dotfiles/logging.conf`
 
 ### Nvim Plugin Management
 
