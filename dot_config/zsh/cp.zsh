@@ -65,7 +65,7 @@ _cpt_compile() {
   local exe_path="$2"
 
   if [ ! -f "$source_file" ]; then
-    echo "Error: Source file not found: '$source_file'"
+    error_log "cpt" "Source file not found: '$source_file'"
     return 1
   fi
   g++ -std=c++20 -O2 -g -fsanitize=address -DLOCAL_TEST $source_file -o $exe_path
@@ -123,11 +123,11 @@ _cpt_stress() {
   local gen_exe="$CP_HOME/build/${gen_file%.cpp}"
 
   # Compile all three files once at the beginning.
-  echo "--- Preparing for Stress Test ---"
+  info_log "cpt" "Preparing for Stress Test..."
   if ! _cpt_compile "$sol_path" "$sol_exe"; then return 1; fi
   if ! _cpt_compile "$brute_path" "$brute_exe"; then return 1; fi
   if ! _cpt_compile "$gen_path" "$gen_exe"; then return 1; fi
-  echo "--- All files compiled successfully ---"
+  info_log "cpt" "All files compiled successfully"
 
   for i in {1..1000}; do
     echo -ne "--- Running Test #$i ---\r"
@@ -146,7 +146,7 @@ _cpt_stress() {
       continue # If they match, continue to the next test case
     else
       # If they differ, report the failure and stop
-      echo -e "\n\n--- WA on Test #$i ---"
+      error_log "cpt" "WA on Test #$i"
       echo "Input:"
       cat "$CP_HOME/io/in"
       echo "--------------------"
@@ -159,5 +159,5 @@ _cpt_stress() {
       return 1
     fi
   done
-  echo -e "\n--- Passed 1000 tests successfully! ---"
+  info_log "cpt" "Passed 1000 tests successfully!"
 }

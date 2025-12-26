@@ -152,13 +152,9 @@ debug_log() {
   fi
 }
 
-# Info log
+# Info log - always shows console output (user-facing messages)
 info_log() {
-  if [[ "${DEBUG_DOTFILES:-0}" -ge 1 ]]; then
-    _log "INFO" "$@"
-  elif [[ "${DOTFILES_JSON_LOG:-0}" == "1" ]]; then
-    _write_json_log "$(_build_json_log "INFO" "$1" "${@:2}")"
-  fi
+  _log "INFO" "$@"
 }
 
 # Warning log - always shows

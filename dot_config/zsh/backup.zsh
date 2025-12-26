@@ -2,15 +2,15 @@
 function backup-system() {
   # Check dependencies
   if ! command -v restic >/dev/null; then
-    echo "❌ restic not found in PATH"
+    error_log "backup" "restic not found in PATH"
     return 1
   fi
   if ! command -v pass >/dev/null; then
-    echo "❌ pass not found in PATH"
+    error_log "backup" "pass not found in PATH"
     return 1
   fi
 
-  echo "🔑 Fetching configuration from pass..."
+  info_log "backup" "Fetching configuration from pass..."
 
   # Fetch configuration from pass
   export RESTIC_REPOSITORY="$(pass backups/restic-repo)"
@@ -21,26 +21,26 @@ function backup-system() {
 
   # Check if repo is initialized
   if ! restic snapshots --insecure-no-password >/dev/null 2>&1; then
-    echo "✨ Initializing restic repository..."
+    info_log "backup" "Initializing restic repository..."
     if ! restic init --insecure-no-password; then
-      echo "❌ Failed to initialize repository."
+      error_log "backup" "Failed to initialize repository."
       return 1
     fi
   fi
 
-  echo "===== Backup started at $(date) ====="
-  echo "Sources: ${sources[*]}"
+  info_log "backup" "Backup started at $(date)"
+  info_log "backup" "Sources: ${sources[*]}"
 
   for src in "${sources[@]}"; do
     if [[ ! -e "$src" ]]; then
-      echo "⚠️  Source does not exist: $src"
+      warn_log "backup" "Source does not exist: $src"
       # We don't return here to allow partial backups if one source is missing,
       # but you can change this to 'return 1' if you want strict failure.
     fi
   done
 
   # Backup
-  echo "🚀 Running restic backup..."
+  info_log "backup" "Running restic backup..."
   restic backup "${sources[@]}" \
     --insecure-no-password \
     --exclude ".DS_Store" \
@@ -48,7 +48,7 @@ function backup-system() {
     --exclude ".Trashes"
 
   # Retention
-  echo "🧹 Applying retention policy..."
+  info_log "backup" "Applying retention policy..."
   restic forget \
     --insecure-no-password \
     --keep-daily 7 \
@@ -57,8 +57,8 @@ function backup-system() {
     --prune
 
   # Check
-  echo "🔍 Running restic check..."
+  info_log "backup" "Running restic check..."
   restic check --insecure-no-password
 
-  echo "===== Backup finished at $(date) ====="
+  info_log "backup" "Backup finished at $(date)"
 }

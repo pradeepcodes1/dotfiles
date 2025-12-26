@@ -1,20 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 set -e
+
+# Source logging (deployed by chezmoi before run_after scripts)
+source "${HOME}/.config/zsh/00-logging.zsh"
 
 # uv tool setup
 if command -v uv >/dev/null 2>&1; then
+  info_log "uv" "Updating uv tool shell..."
   uv tool update-shell 2>/dev/null || true
 fi
 
 # mise setup
 if command -v mise >/dev/null 2>&1; then
+  info_log "mise" "Installing and upgrading mise tools..."
   mise install 2>/dev/null || true
   mise upgrade 2>/dev/null || true
 fi
 
 # Yazi flavors for theme system
 if command -v ya >/dev/null 2>&1; then
-  echo "Installing yazi flavors..."
+  info_log "yazi" "Installing yazi flavors..."
   ya pkg add yazi-rs/flavors:catppuccin-mocha 2>/dev/null || true
   ya pkg add yazi-rs/flavors:catppuccin-latte 2>/dev/null || true
   ya pkg add marcosvnmelo/kanagawa-dragon 2>/dev/null || true
@@ -22,4 +27,5 @@ if command -v ya >/dev/null 2>&1; then
   ya pkg add muratoffalex/kanagawa-lotus 2>/dev/null || true
   ya pkg add bennyyip/gruvbox-dark 2>/dev/null || true
   ya pkg add Chromium-3-Oxide/everforest-medium 2>/dev/null || true
+  info_log "yazi" "Yazi flavors installed"
 fi

@@ -54,21 +54,23 @@ teardown() {
 
 # === info_log tests ===
 
-@test "info_log is silent when DEBUG_DOTFILES=0" {
+@test "info_log always outputs regardless of DEBUG_DOTFILES" {
   export DEBUG_DOTFILES=0
 
   run run_zsh_function "00-logging.zsh" "info_log" "info" "Info message"
 
   assert_success
-  refute_output --partial "Info message"
+  # info_log always shows console output (user-facing messages)
+  assert_output --partial "Info message"
 }
 
-@test "info_log outputs when DEBUG_DOTFILES>=1" {
-  export DEBUG_DOTFILES=1
+@test "info_log includes component name" {
+  export DEBUG_DOTFILES=0
 
-  run run_zsh_function "00-logging.zsh" "info_log" "info" "Info message"
+  run run_zsh_function "00-logging.zsh" "info_log" "my-info" "Info message"
 
   assert_success
+  assert_output --partial "my-info"
   assert_output --partial "Info message"
 }
 

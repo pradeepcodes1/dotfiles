@@ -51,7 +51,7 @@ function cdf() {
     if [ -f "$1" ]; then
         builtin cd "$(dirname "$1")"
     else
-        echo "Error: '$1' is not a file"
+        error_log "nav" "'$1' is not a file"
         return 1
     fi
 }
@@ -119,7 +119,7 @@ function bd() {
         return 0
     else
         builtin cd "$old_dir"
-        echo "Error: No parent directory named '$1' found"
+        error_log "nav" "No parent directory named '$1' found"
         return 1
     fi
 }

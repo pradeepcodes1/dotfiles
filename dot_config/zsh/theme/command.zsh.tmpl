@@ -51,7 +51,7 @@ theme() {
     reset)
       rm -f "$_DOTFILES_THEME_FILE"
       _init_theme
-      echo "Reset to system theme: $_DOTFILES_THEME_NAME ($_DOTFILES_THEME_MODE mode)"
+      info_log "theme" "Reset to system theme: $_DOTFILES_THEME_NAME ($_DOTFILES_THEME_MODE mode)"
       return 0
       ;;
     *)
@@ -60,7 +60,7 @@ theme() {
   esac
 
   if ! _load_theme_colors "$theme_name"; then
-    echo "Failed to load theme '$theme_name'" >&2
+    error_log "theme" "Failed to load theme '$theme_name'"
     return 1
   fi
 
@@ -69,6 +69,6 @@ theme() {
 
   _apply_theme
 
-  echo "Switched to: $_DOTFILES_THEME_NAME ($_DOTFILES_THEME_MODE mode)"
-  echo "Note: Restart nvim/yazi for full effect."
+  info_log "theme" "Switched to: $_DOTFILES_THEME_NAME ($_DOTFILES_THEME_MODE mode)"
+  info_log "theme" "Note: Restart nvim/yazi for full effect."
 }
