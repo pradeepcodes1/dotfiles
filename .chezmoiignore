@@ -27,6 +27,7 @@ node_modules/
 .gitignore
 bootstrap.sh
 bin/
+docs/
 tests/
 scripts/
 
