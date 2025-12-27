@@ -1,0 +1,28 @@
+#!/bin/zsh
+# Build Go tools after mise installs Go
+
+{{ if eq .chezmoi.os "darwin" -}}
+source "${HOME}/.config/zsh/00-logging.zsh"
+
+# Ensure ~/.local/bin exists
+mkdir -p "${HOME}/.local/bin"
+
+# Build nix-tui if Go is available
+if command -v mise &>/dev/null; then
+    NIX_TUI_SRC="{{ .chezmoi.sourceDir }}/cmd/nix-tui"
+    NIX_TUI_BIN="${HOME}/.local/bin/nix-tui"
+
+    if [[ -d "$NIX_TUI_SRC" ]]; then
+        info_log "build" "Building nix-tui..."
+
+        cd "$NIX_TUI_SRC"
+
+        # Use mise to run go build
+        if mise exec go -- go build -o "$NIX_TUI_BIN" . 2>&1; then
+            info_log "build" "Built nix-tui successfully"
+        else
+            error_log "build" "Failed to build nix-tui"
+        fi
+    fi
+fi
+{{ end -}}
