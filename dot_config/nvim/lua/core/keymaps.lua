@@ -89,7 +89,7 @@ _G.diffview_close = function()
 end
 
 map("n", "<leader>gr", "<cmd>lua diffview_review()<CR>")
-map("n", "<leader>gd", "<cmd>lua diffview_file()<CR>")
+map("n", "<leader>df", "<cmd>lua diffview_file()<CR>", { desc = "Diffview current file" })
 map("n", "<leader>gc", "<cmd>lua diffview_close()<CR>")
 
 map("n", "<leader>Q", "<cmd>qa<CR>", {

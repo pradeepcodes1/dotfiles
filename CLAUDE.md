@@ -113,7 +113,7 @@ Chezmoi uses special prefixes to determine how files are processed:
   - Transparent background support
   - Auto-readonly for library files (node_modules, site-packages, etc.)
   - Workspace-aware session management
-  - Custom diffview workflow (`<leader>gr`, `<leader>gd`, `<leader>gc`)
+  - Custom diffview workflow (`<leader>gr`, `<leader>df`, `<leader>gc`)
 
 #### 5. Tmux Configuration
 

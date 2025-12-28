@@ -66,7 +66,7 @@ return {
 			},
 			pickers = {
 				find_files = {
-					find_command = { "fd", "--type", "f", "--hidden", "--exclude", ".git", "--max-results", "1000" },
+					find_command = { "fd", "--type", "f", "--hidden", "--exclude", ".git" },
 				},
 			},
 		},
