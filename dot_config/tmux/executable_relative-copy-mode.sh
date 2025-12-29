@@ -4,8 +4,8 @@
 
 set -euo pipefail
 
-# Get the pane ID that triggered this popup (passed as argument or use last pane)
-target_pane="${1:-\{last\}}"
+# Get the pane ID that triggered this popup (passed as argument)
+target_pane="${1:?Pane ID required}"
 
 # Get pane height to limit capture to visible + reasonable scrollback
 pane_height=$(tmux display-message -t "$target_pane" -p '#{pane_height}')
