@@ -351,6 +351,17 @@
                     "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
                   }
                 ],
+                "from": { "key_code": "slash", "modifiers": { "mandatory": ["right_option"] } },
+                "to": [{ "key_code": "l", "modifiers": ["control"] }, { "key_code": "slash" }],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
                 "from": {
                   "key_code": "right_arrow",
                   "modifiers": { "mandatory": ["right_option"] }
