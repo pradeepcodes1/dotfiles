@@ -48,16 +48,11 @@ selected=$(echo "$numbered_content" | fzf --ansi --no-sort --tac \
 rel_line=$(echo "$selected" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $1}')
 
 # Enter copy mode on the target pane and jump to the selected line
+# Copy mode starts at the bottom of visible area (our line 0)
 tmux copy-mode -t "$target_pane"
 
-# Go to bottom first, then move up by the absolute value of relative line
+# Move up by the absolute value of relative line
 if [[ $rel_line -lt 0 ]]; then
-  # Negative means go up from bottom
   lines_up=$((rel_line * -1))
-  # Go to end of history first
-  tmux send-keys -t "$target_pane" -X history-bottom
-  # Then go up the required number of lines
-  if [[ $lines_up -gt 0 ]]; then
-    tmux send-keys -t "$target_pane" -X -N "$lines_up" cursor-up
-  fi
+  tmux send-keys -t "$target_pane" -X -N "$lines_up" cursor-up
 fi
