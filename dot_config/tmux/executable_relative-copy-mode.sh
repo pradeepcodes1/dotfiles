@@ -17,13 +17,19 @@ pane_height=$(tmux display-message -p '#{pane_height}')
 # Lines above are negative (going back in history)
 # We'll show: -N for lines N above current, and the line content
 
-# Create numbered content with relative line numbers
+# ANSI color codes
+YELLOW='\033[33m'
+DIM='\033[2m'
+RESET='\033[0m'
+
+# Create numbered content with relative line numbers and colors
 # Line 0 is the most recent (bottom), negative numbers go up
-numbered_content=$(echo "$pane_content" | awk -v total="$total_lines" '
+numbered_content=$(echo "$pane_content" | awk -v total="$total_lines" \
+  -v yellow="$YELLOW" -v dim="$DIM" -v reset="$RESET" '
 {
     # Calculate relative line number (0 = bottom/most recent, negative = older)
     rel = NR - total
-    printf "%+5d │ %s\n", rel, $0
+    printf "%s%+5d%s %s│%s %s\n", yellow, rel, reset, dim, reset, $0
 }')
 
 # Use fzf to select a line, starting from bottom (most recent)
