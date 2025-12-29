@@ -4,8 +4,8 @@
 
 set -euo pipefail
 
-# Get pane content (visible + scrollback)
-pane_content=$(tmux capture-pane -p -S -1000)
+# Get pane content (visible + scrollback) with ANSI colors
+pane_content=$(tmux capture-pane -e -p -S -1000)
 
 # Count total lines
 total_lines=$(echo "$pane_content" | wc -l)
