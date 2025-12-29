@@ -29,6 +29,7 @@ bind s choose-session                                                # ROpt+s: c
 
 # Copy mode
 bind [ copy-mode                                                     # ROpt+[: copy mode
+bind g display-popup -E -w 80% -h 80% "{{ .chezmoi.targetFile | dir }}/relative-copy-mode.sh"  # ROpt+g: copy mode with relative line numbers
 
 set -g mouse on
 set-window-option -g mode-keys vi
