@@ -4,6 +4,19 @@
       "complex_modifications": {
         "rules": [
           {
+            "description": "Launch Ghostty terminal",
+            "manipulators": [
+              {
+                "from": {
+                  "key_code": "return_or_enter",
+                  "modifiers": { "mandatory": ["right_option"] }
+                },
+                "to": [{ "shell_command": "open -n -a Ghostty" }],
+                "type": "basic"
+              }
+            ]
+          },
+          {
             "description": "Right Option + Arrow keys for tab switching (Zen Browser)",
             "manipulators": [
               {
