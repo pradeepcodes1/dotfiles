@@ -10,9 +10,6 @@ pane_content=$(tmux capture-pane -e -p -S -1000)
 # Count total lines
 total_lines=$(echo "$pane_content" | wc -l)
 
-# Get pane height to calculate cursor position (bottom of visible area)
-pane_height=$(tmux display-message -p '#{pane_height}')
-
 # Current line is at the bottom (line 0 in relative terms)
 # Lines above are negative (going back in history)
 # We'll show: -N for lines N above current, and the line content
@@ -40,8 +37,8 @@ selected=$(echo "$numbered_content" | fzf --ansi --no-sort --tac \
   --bind="ctrl-u:half-page-up,ctrl-d:half-page-down" \
   2>/dev/null) || exit 0
 
-# Extract the relative line number from selection
-rel_line=$(echo "$selected" | awk '{print $1}')
+# Extract the relative line number from selection (strip ANSI codes first)
+rel_line=$(echo "$selected" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $1}')
 
 # Enter copy mode and jump to the selected line
 # The relative number tells us how many lines to go up from bottom
