@@ -4,8 +4,15 @@
 
 set -euo pipefail
 
-# Get pane content (visible + scrollback) with ANSI colors
-pane_content=$(tmux capture-pane -e -p -S -1000)
+# Get the pane ID that triggered this popup (passed as argument or use last pane)
+target_pane="${1:-\{last\}}"
+
+# Get pane height to limit capture to visible + reasonable scrollback
+pane_height=$(tmux display-message -t "$target_pane" -p '#{pane_height}')
+scroll_limit=$((pane_height * 3)) # Capture 3x the visible height
+
+# Get pane content with ANSI colors (limited to recent history)
+pane_content=$(tmux capture-pane -t "$target_pane" -e -p -S -"$scroll_limit")
 
 # Count total lines
 total_lines=$(echo "$pane_content" | wc -l)
@@ -40,18 +47,17 @@ selected=$(echo "$numbered_content" | fzf --ansi --no-sort --tac \
 # Extract the relative line number from selection (strip ANSI codes first)
 rel_line=$(echo "$selected" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $1}')
 
-# Enter copy mode and jump to the selected line
-# The relative number tells us how many lines to go up from bottom
-tmux copy-mode
+# Enter copy mode on the target pane and jump to the selected line
+tmux copy-mode -t "$target_pane"
 
 # Go to bottom first, then move up by the absolute value of relative line
 if [[ $rel_line -lt 0 ]]; then
   # Negative means go up from bottom
   lines_up=$((rel_line * -1))
   # Go to end of history first
-  tmux send-keys -X history-bottom
+  tmux send-keys -t "$target_pane" -X history-bottom
   # Then go up the required number of lines
   if [[ $lines_up -gt 0 ]]; then
-    tmux send-keys -X -N "$lines_up" cursor-up
+    tmux send-keys -t "$target_pane" -X -N "$lines_up" cursor-up
   fi
 fi
