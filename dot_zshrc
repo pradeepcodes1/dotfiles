@@ -30,10 +30,29 @@ source $ZSH/oh-my-zsh.sh
 # Enable JSON logging
 export DOTFILES_JSON_LOG=1
 
-# Source all custom zsh files
+# Source custom zsh files (lazy-load rarely used modules)
+_lazy_modules=(cp.zsh backup.zsh log-viewer.zsh)
 for file in "$HOME/.config/zsh/"*.zsh; do
-  [ -f "$file" ] && source "$file"
+  [ -f "$file" ] || continue
+  local basename="${file:t}"
+  if (( ${_lazy_modules[(Ie)$basename]} )); then
+    continue  # skip, loaded via stubs below
+  fi
+  source "$file"
 done
+unset _lazy_modules
+
+# Lazy-load stubs: source on first invocation
+_lazy_source() {
+  local file="$1"; shift
+  for cmd in "$@"; do
+    eval "${cmd}() { unfunction ${cmd} 2>/dev/null; source \"$file\"; ${cmd} \"\$@\" }"
+  done
+}
+_lazy_source "$HOME/.config/zsh/cp.zsh" cpt
+_lazy_source "$HOME/.config/zsh/backup.zsh" backup-system
+_lazy_source "$HOME/.config/zsh/log-viewer.zsh" dotlog dotlog-stats dotlog-search dotlog-clean
+unfunction _lazy_source
 
 source "$HOME/.env"
 

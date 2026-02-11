@@ -34,6 +34,19 @@ return {
 				},
 				options = {
 					theme = lualine_theme,
+					disabled_filetypes = {
+						statusline = {
+							"dap-repl",
+							"dapui_console",
+							"dapui_scopes",
+							"dapui_breakpoints",
+							"dapui_stacks",
+							"dapui_watches",
+							"aerial",
+							"neotest-summary",
+							"neotest-output-panel",
+						},
+					},
 				},
 			})
 		end,

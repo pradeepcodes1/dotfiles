@@ -102,34 +102,20 @@ function bd() {
         return 1
     fi
 
-    local old_dir="$PWD"
-    local new_dir=""
-
-    # Walk up the directory tree looking for matching parent
-    while [ "$PWD" != "/" ]; do
-        builtin cd ..
-        if [ "$(basename "$PWD")" = "$1" ]; then
-            new_dir="$PWD"
-            break
+    # Build target path by walking up the string, not mutating PWD
+    local target="$PWD"
+    while [ "$target" != "/" ]; do
+        target="${target%/*}"
+        [ -z "$target" ] && target="/"
+        if [ "$(basename "$target")" = "$1" ]; then
+            builtin cd "$target" && zoxide add "$target"
+            return 0
         fi
     done
 
-    if [ -n "$new_dir" ]; then
-        zoxide add "$new_dir"
-        return 0
-    else
-        builtin cd "$old_dir"
-        error_log "nav" "No parent directory named '$1' found"
-        return 1
-    fi
+    error_log "nav" "No parent directory named '$1' found"
+    return 1
 }
 
 # Show zoxide stats
 alias zstats='zoxide query -l -s'
-
-# Enhanced cd completion with zoxide
-function _zoxide_cd_completion() {
-    local -a matches
-    matches=(${(f)"$(zoxide query -l)"})
-    _describe 'directory' matches
-}
