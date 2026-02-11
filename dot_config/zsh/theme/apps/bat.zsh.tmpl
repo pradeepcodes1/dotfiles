@@ -17,6 +17,9 @@ _DOTFILES_BAT_THEMES=(
 
 local bat_config="{{ .chezmoi.homeDir }}/.config/bat/config"
 local bat_theme="${_DOTFILES_BAT_THEMES[$_DOTFILES_THEME_NAME]:-TwoDark}"
+local bat_content="--theme=\"$bat_theme\""
 
 mkdir -p "$(dirname "$bat_config")"
-echo "--theme=\"$bat_theme\"" > "$bat_config"
+if [[ ! -f "$bat_config" ]] || [[ "$(< "$bat_config")" != "$bat_content" ]]; then
+  echo "$bat_content" > "$bat_config"
+fi

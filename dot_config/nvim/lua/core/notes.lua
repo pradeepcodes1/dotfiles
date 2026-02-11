@@ -5,7 +5,7 @@ end
 local function create_and_open_in_new_tab(file_path, content)
 	-- Create parent directories if they don't exist
 	local dir = vim.fs.dirname(file_path)
-	if dir and vim.loop.fs_stat(dir) == nil then
+	if dir and vim.uv.fs_stat(dir) == nil then
 		vim.fn.mkdir(dir, "p")
 	end
 

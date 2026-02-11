@@ -12,7 +12,6 @@ NIX_CONFIG_SYMLINKS=(
     ".zshrc"
     ".zprofile"
     ".env"
-    ".oh-my-zsh"
     ".gnupg"
     "nix"
     "Library/Keychains"

@@ -5,8 +5,7 @@
 local theme_dir="{{ .chezmoi.homeDir }}/.config/ghostty/themes"
 mkdir -p "$theme_dir"
 
-cat > "$theme_dir/current.conf" <<EOF
-# Ghostty theme: $_DOTFILES_THEME_NAME
+local ghostty_content="# Ghostty theme: $_DOTFILES_THEME_NAME
 background = ${bg#\#}
 foreground = ${fg#\#}
 
@@ -28,5 +27,8 @@ palette = 11=$bright_yellow
 palette = 12=$bright_blue
 palette = 13=$bright_magenta
 palette = 14=$bright_cyan
-palette = 15=$bright_white
-EOF
+palette = 15=$bright_white"
+
+if [[ ! -f "$theme_dir/current.conf" ]] || [[ "$(< "$theme_dir/current.conf")" != "$ghostty_content" ]]; then
+  print -r -- "$ghostty_content" > "$theme_dir/current.conf"
+fi

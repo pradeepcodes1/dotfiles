@@ -32,6 +32,7 @@ bind [ copy-mode                                                     # ROpt+[: c
 bind / run-shell 'tmux display-popup -E -w 80% -h 80% "{{ .chezmoi.targetFile | dir }}/relative-copy-mode.sh #{pane_id}"'  # ROpt+/: copy mode with relative line numbers
 
 set -g mouse on
+set -g focus-events on
 set-window-option -g mode-keys vi
 set -g default-terminal "screen-256color"
 set -g status-position bottom
@@ -39,7 +40,7 @@ set -g status-justify right
 set -g status-right ""
 
 set -g status-left-length 100
-set -g status-interval 1
+set -g status-interval 15
 set -g status-left ' #S | #{b:@pane_home}#{?@ssh_host, | #{@ssh_host},} '
 set -g display-time 1000
 

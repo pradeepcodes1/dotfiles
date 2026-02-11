@@ -1,5 +1,4 @@
 # Plugin initialization
-# Note: zsh-autosuggestions is configured in .zshrc before oh-my-zsh loads
 
 # Initialize zoxide
 command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"

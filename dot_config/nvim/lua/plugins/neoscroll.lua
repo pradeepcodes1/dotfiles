@@ -1,18 +1,51 @@
 return {
 	"karb94/neoscroll.nvim",
+	event = "VeryLazy",
 	config = function()
-		require("neoscroll").setup({
-			-- All these keys will be mapped to their corresponding default scrolling animation
+		local neoscroll = require("neoscroll")
+		neoscroll.setup({
 			mappings = {},
-			hide_cursor = true, -- Hide cursor while scrolling
-			stop_eof = true, -- Stop at <EOF> when scrolling downwards
-			respect_scrolloff = false, -- Stop scrolling when the cursor reaches the scrolloff margin of the file
-			cursor_scrolls_alone = false, -- Don't allow cursor to scroll past window boundaries
-			easing_function = "quadratic", -- Default easing function (sine, circular, quadratic, cubic, quartic)
-			pre_hook = nil, -- Function to run before the scrolling animation starts
-			post_hook = nil, -- Function to run after the scrolling animation ends
-			performance_mode = false, -- Disable "Performance Mode" on all buffers.
+			hide_cursor = true,
+			stop_eof = true,
+			respect_scrolloff = false,
+			cursor_scrolls_alone = false,
+			easing_function = "quadratic",
 		})
-		-- Keymaps defined in core/keymaps.lua
+
+		local modes = { "n", "v", "x" }
+		local map = vim.keymap.set
+		map(modes, "<ScrollWheelUp>", function()
+			neoscroll.scroll(-5, { move_cursor = true, duration = 100 })
+		end)
+		map(modes, "<ScrollWheelDown>", function()
+			neoscroll.scroll(5, { move_cursor = true, duration = 100 })
+		end)
+		map(modes, "<C-u>", function()
+			neoscroll.ctrl_u({ duration = 150 })
+		end)
+		map(modes, "<C-d>", function()
+			neoscroll.ctrl_d({ duration = 150 })
+		end)
+		map(modes, "<C-b>", function()
+			neoscroll.ctrl_b({ duration = 250 })
+		end)
+		map(modes, "<C-f>", function()
+			neoscroll.ctrl_f({ duration = 250 })
+		end)
+		map(modes, "<C-y>", function()
+			neoscroll.scroll(-0.1, { move_cursor = false, duration = 50 })
+		end)
+		map(modes, "<C-e>", function()
+			neoscroll.scroll(0.1, { move_cursor = false, duration = 50 })
+		end)
+		map(modes, "zt", function()
+			neoscroll.zt({ half_win_duration = 100 })
+		end)
+		map(modes, "zz", function()
+			neoscroll.zz({ half_win_duration = 100 })
+		end)
+		map(modes, "zb", function()
+			neoscroll.zb({ half_win_duration = 100 })
+		end)
 	end,
 }

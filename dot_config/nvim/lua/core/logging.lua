@@ -92,9 +92,9 @@ end
 
 -- Log with timing measurement
 function M.timed(component, description, fn)
-	local start = vim.loop.hrtime()
+	local start = vim.uv.hrtime()
 	local ok, result = pcall(fn)
-	local duration_ms = (vim.loop.hrtime() - start) / 1000000
+	local duration_ms = (vim.uv.hrtime() - start) / 1000000
 
 	if ok then
 		M.log("DEBUG", component, description .. " completed", { duration_ms = math.floor(duration_ms) })

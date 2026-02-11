@@ -9,7 +9,7 @@ return {
 			local min_width_for_side_buffers = nnp_width + 40
 
 			-- Track whether a sidebar suppressed no-neck-pain
-			_G._nnp_suppressed = false
+			local nnp_suppressed = false
 
 			local function is_window_too_small()
 				return vim.o.columns < min_width_for_side_buffers
@@ -74,13 +74,13 @@ return {
 				callback = function()
 					vim.schedule(function()
 						if has_sidebar_open() then
-							if not _G._nnp_suppressed then
-								_G._nnp_suppressed = true
+							if not nnp_suppressed then
+								nnp_suppressed = true
 								disable()
 							end
 						else
-							if _G._nnp_suppressed then
-								_G._nnp_suppressed = false
+							if nnp_suppressed then
+								nnp_suppressed = false
 								enable()
 							end
 						end
@@ -99,7 +99,7 @@ return {
 			-- Enable when switching tabs
 			vim.api.nvim_create_autocmd("TabEnter", {
 				callback = function()
-					if not _G._nnp_suppressed then
+					if not nnp_suppressed then
 						enable()
 					end
 				end,
@@ -108,7 +108,7 @@ return {
 			-- Handle window resize
 			vim.api.nvim_create_autocmd("VimResized", {
 				callback = function()
-					if _G._nnp_suppressed then
+					if nnp_suppressed then
 						return
 					end
 					if is_window_too_small() then
