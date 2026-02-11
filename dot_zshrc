@@ -8,24 +8,14 @@ if [ -e "$HOME/.nix-profile/bin" ]; then
   export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 fi
 
-export ZSH="$HOME/.oh-my-zsh"
-
-# Theme is handled by ~/.config/zsh/theme.zsh
-ZSH_THEME=""
-
-zstyle ':omz:update' mode auto
-
-zstyle ':omz:update' frequency 1
-
-plugins=(
-git
-)
-
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-source $ZSH/oh-my-zsh.sh
+# Initialize completion system
+autoload -Uz compinit
+compinit -C
+setopt PROMPT_SUBST
 
 # Enable JSON logging
 export DOTFILES_JSON_LOG=1
@@ -54,7 +44,7 @@ _lazy_source "$HOME/.config/zsh/backup.zsh" backup-system
 _lazy_source "$HOME/.config/zsh/log-viewer.zsh" dotlog dotlog-stats dotlog-search dotlog-clean
 unfunction _lazy_source
 
-source "$HOME/.env"
+[[ -f "$HOME/.env" ]] && source "$HOME/.env"
 
 command -v mise &>/dev/null && eval "$(mise activate zsh)"
 

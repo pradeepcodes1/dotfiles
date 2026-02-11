@@ -3,6 +3,10 @@
 yes = true
 
 [tools]
+bun = "latest"
 go = "latest"
+java = "latest"
 node = "25"
+protobuf = "latest"
 python = "3.14"
+zig = "latest"

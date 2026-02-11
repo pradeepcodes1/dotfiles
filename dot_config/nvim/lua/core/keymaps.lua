@@ -24,6 +24,15 @@ map("n", "<leader>fr", ":Telescope oldfiles<CR>", { desc = "Recent files" })
 -- LSP (gd, rename, code_action are in lsp/common.lua on_attach)
 map("n", "<leader>lc", "<Cmd>cclose<CR>", { desc = "Clear quickfix" })
 map("n", "?", vim.diagnostic.open_float, { desc = "Open diagnostic float" })
+map("n", "]d", function()
+	vim.diagnostic.jump({ count = 1 })
+end, { desc = "Next diagnostic" })
+map("n", "[d", function()
+	vim.diagnostic.jump({ count = -1 })
+end, { desc = "Previous diagnostic" })
+map("n", "<leader>lh", function()
+	vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { desc = "Toggle inlay hints" })
 
 -- BarBar keymaps
 local opts = { noremap = true, silent = true }
@@ -73,24 +82,24 @@ local function is_diffview_open()
 	return false
 end
 
-_G.diffview_review = function()
+local function diffview_review()
 	vim.cmd("DiffviewOpen")
 end
 
-_G.diffview_file = function()
+local function diffview_file()
 	vim.cmd("DiffviewOpen -- %")
 	vim.cmd("DiffviewToggleFiles")
 end
 
-_G.diffview_close = function()
+local function diffview_close()
 	if is_diffview_open() then
 		vim.cmd("DiffviewClose")
 	end
 end
 
-map("n", "<leader>gr", "<cmd>lua diffview_review()<CR>")
-map("n", "<leader>df", "<cmd>lua diffview_file()<CR>", { desc = "Diffview current file" })
-map("n", "<leader>gc", "<cmd>lua diffview_close()<CR>")
+map("n", "<leader>gr", diffview_review, { desc = "Diffview review" })
+map("n", "<leader>df", diffview_file, { desc = "Diffview current file" })
+map("n", "<leader>gc", diffview_close, { desc = "Diffview close" })
 
 map("n", "<leader>Q", "<cmd>qa<CR>", {
 	noremap = true,
@@ -111,42 +120,3 @@ end, { desc = "Next TODO" })
 map("n", "[t", function()
 	require("todo-comments").jump_prev()
 end, { desc = "Previous TODO" })
-
--- Neoscroll (smooth scrolling)
-local neoscroll_ok, neoscroll = pcall(require, "neoscroll")
-if neoscroll_ok then
-	local scroll_modes = { "n", "v", "x" }
-	map(scroll_modes, "<ScrollWheelUp>", function()
-		neoscroll.scroll(-5, { move_cursor = true, duration = 100 })
-	end)
-	map(scroll_modes, "<ScrollWheelDown>", function()
-		neoscroll.scroll(5, { move_cursor = true, duration = 100 })
-	end)
-	map(scroll_modes, "<C-u>", function()
-		neoscroll.ctrl_u({ duration = 150 })
-	end)
-	map(scroll_modes, "<C-d>", function()
-		neoscroll.ctrl_d({ duration = 150 })
-	end)
-	map(scroll_modes, "<C-b>", function()
-		neoscroll.ctrl_b({ duration = 250 })
-	end)
-	map(scroll_modes, "<C-f>", function()
-		neoscroll.ctrl_f({ duration = 250 })
-	end)
-	map(scroll_modes, "<C-y>", function()
-		neoscroll.scroll(-0.1, { move_cursor = false, duration = 50 })
-	end)
-	map(scroll_modes, "<C-e>", function()
-		neoscroll.scroll(0.1, { move_cursor = false, duration = 50 })
-	end)
-	map(scroll_modes, "zt", function()
-		neoscroll.zt({ half_win_duration = 100 })
-	end)
-	map(scroll_modes, "zz", function()
-		neoscroll.zz({ half_win_duration = 100 })
-	end)
-	map(scroll_modes, "zb", function()
-		neoscroll.zb({ half_win_duration = 100 })
-	end)
-end

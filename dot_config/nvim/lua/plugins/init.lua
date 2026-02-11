@@ -116,25 +116,6 @@ return {
 	{ "linux-cultist/venv-selector.nvim", cmd = "VenvSelect", opts = { search_venv_managers = false } },
 
 	{
-		"lukas-reineke/indent-blankline.nvim",
-		main = "ibl",
-		opts = {
-			-- Put all settings here
-			indent = { char = "┊" },
-			scope = { enabled = false },
-			whitespace = { remove_blankline_trail = false },
-			exclude = {
-				filetypes = {
-					"dashboard",
-					"help",
-					"lazy",
-					"mason",
-					"neo-tree",
-				},
-			},
-		},
-	},
-	{
 		"MeanderingProgrammer/render-markdown.nvim",
 		dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" },
 	},

@@ -20,11 +20,19 @@ return {
 					markdown = { "prettier" },
 					toml = { "taplo" },
 				},
-				format_on_save = {
-					-- These options will be passed to conform.format()
-					timeout_ms = 500,
-					lsp_format = "fallback",
-				},
+				format_on_save = function(bufnr)
+					local bufname = vim.api.nvim_buf_get_name(bufnr)
+					-- Skip files larger than 1MB
+					local ok, stats = pcall(vim.uv.fs_stat, bufname)
+					if ok and stats and stats.size > 1024 * 1024 then
+						return
+					end
+					-- Skip generated/minified files
+					if bufname:match("%.min%.") or bufname:match("/generated/") or bufname:match("%.lock$") then
+						return
+					end
+					return { timeout_ms = 500, lsp_format = "fallback" }
+				end,
 			})
 		end,
 	},
