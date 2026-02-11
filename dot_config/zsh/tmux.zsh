@@ -82,20 +82,21 @@ if command -v tmux &>/dev/null; then
     tmux set-option -p @pane_home "$HOME"
   fi
 
-  # Garbage collect unattached tmux sessions (keep threshold sessions max)
-  # Sort by creation time (oldest first) to remove old sessions before new ones
+  # Garbage collect unattached tmux sessions (keep threshold total max)
+  # Collect unattached sessions first, then kill oldest ones until under threshold
   local threshold=3
-  local sessions=$(tmux list-sessions -F "#{session_created}:#{session_name}:#{session_attached}" 2>/dev/null | sort -n)
-  local total=$(echo "$sessions" | wc -l | tr -d ' ')
+  local total=$(tmux list-sessions 2>/dev/null | wc -l | tr -d ' ')
 
   if [[ $total -gt $threshold ]]; then
-    echo "$sessions" | while IFS=: read -r created name attached; do
-      # Skip attached sessions
-      [[ "$attached" == "1" ]] && continue
-      # Delete unattached session
-      tmux kill-session -t "$name" 2>/dev/null
-      total=$((total - 1))
-      [[ $total -le $threshold ]] && break
-    done
+    local kill_count=$((total - threshold))
+    # Get unattached sessions sorted oldest first
+    tmux list-sessions -F "#{session_created}:#{session_name}:#{session_attached}" 2>/dev/null \
+      | sort -n \
+      | while IFS=: read -r created name attached; do
+          [[ "$attached" == "1" ]] && continue
+          tmux kill-session -t "$name" 2>/dev/null
+          kill_count=$((kill_count - 1))
+          [[ $kill_count -le 0 ]] && break
+        done
   fi
 fi

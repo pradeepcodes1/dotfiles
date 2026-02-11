@@ -6,10 +6,10 @@ return {
 		config = function()
 			local log = require("core.logging")
 			local nnp_width = 140
-			-- Minimum width needed: main buffer + some space for side buffers
-			-- If window is smaller than this, side buffers can't render properly
-			-- Need extra space for side buffers: at least 10 cols each side + some padding
 			local min_width_for_side_buffers = nnp_width + 40
+
+			-- Track whether a sidebar suppressed no-neck-pain
+			_G._nnp_suppressed = false
 
 			local function is_window_too_small()
 				return vim.o.columns < min_width_for_side_buffers
@@ -24,65 +24,97 @@ return {
 				},
 			})
 
-			local function ensure_enabled()
-				if is_window_too_small() then
-					log.debug("no-neck-pain", "window too small, skipping enable", {
-						columns = vim.o.columns,
-						min_required = min_width_for_side_buffers,
-					})
-					return
-				end
+			local function is_enabled()
 				local nnp = require("no-neck-pain")
-				if not nnp.state or not nnp.state.enabled then
-					log.debug("no-neck-pain", "enabling", { columns = vim.o.columns })
-					-- Defer to let any pending window operations complete (e.g., yazi closing)
-					vim.defer_fn(function()
-						-- Re-check size in case window changed
-						if not is_window_too_small() then
-							local state = require("no-neck-pain").state
-							if not state or not state.enabled then
-								vim.cmd("NoNeckPain")
-							end
-						end
-					end, 10)
-				end
+				return nnp.state and nnp.state.enabled
 			end
 
-			local function disable_if_enabled()
-				local nnp = require("no-neck-pain")
-				if nnp.state and nnp.state.enabled then
-					log.debug("no-neck-pain", "disabling due to small window", {
-						columns = vim.o.columns,
-						min_required = min_width_for_side_buffers,
-					})
+			local function enable()
+				if is_window_too_small() or is_enabled() then
+					return
+				end
+				log.debug("no-neck-pain", "enabling", { columns = vim.o.columns })
+				vim.defer_fn(function()
+					if not is_window_too_small() and not is_enabled() then
+						vim.cmd("NoNeckPain")
+					end
+				end, 10)
+			end
+
+			local function disable()
+				if is_enabled() then
+					log.debug("no-neck-pain", "disabling", { columns = vim.o.columns })
 					vim.cmd("NoNeckPain")
 				end
 			end
+
+			-- Left/right sidebar filetypes that conflict with centering
+			local sidebar_fts = {
+				aerial = true,
+				["neotest-summary"] = true,
+				dapui_scopes = true,
+				dapui_breakpoints = true,
+				dapui_stacks = true,
+				dapui_watches = true,
+			}
+
+			local function has_sidebar_open()
+				for _, win in ipairs(vim.api.nvim_list_wins()) do
+					local buf = vim.api.nvim_win_get_buf(win)
+					local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
+					if sidebar_fts[ft] then
+						return true
+					end
+				end
+				return false
+			end
+
+			-- React to windows opening/closing
+			vim.api.nvim_create_autocmd({ "BufWinEnter", "WinClosed" }, {
+				callback = function()
+					vim.schedule(function()
+						if has_sidebar_open() then
+							if not _G._nnp_suppressed then
+								_G._nnp_suppressed = true
+								disable()
+							end
+						else
+							if _G._nnp_suppressed then
+								_G._nnp_suppressed = false
+								enable()
+							end
+						end
+					end)
+				end,
+			})
 
 			-- Enable on startup
 			vim.api.nvim_create_autocmd("VimEnter", {
 				callback = function()
 					log.debug("no-neck-pain", "VimEnter triggered")
-					ensure_enabled()
+					enable()
 				end,
 			})
 
-			-- Enable when switching tabs/buffers
+			-- Enable when switching tabs
 			vim.api.nvim_create_autocmd("TabEnter", {
 				callback = function()
-					log.debug("no-neck-pain", "TabEnter triggered")
-					ensure_enabled()
+					if not _G._nnp_suppressed then
+						enable()
+					end
 				end,
 			})
 
-			-- Handle window resize events
+			-- Handle window resize
 			vim.api.nvim_create_autocmd("VimResized", {
 				callback = function()
-					log.debug("no-neck-pain", "VimResized triggered", { columns = vim.o.columns })
+					if _G._nnp_suppressed then
+						return
+					end
 					if is_window_too_small() then
-						disable_if_enabled()
+						disable()
 					else
-						ensure_enabled()
+						enable()
 					end
 				end,
 			})

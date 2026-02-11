@@ -14,38 +14,21 @@ local config = {
 
 local levels = { DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3 }
 
-local function json_escape(str)
-	if type(str) ~= "string" then
-		str = tostring(str)
-	end
-	return str:gsub("\\", "\\\\"):gsub('"', '\\"'):gsub("\n", "\\n"):gsub("\r", "\\r"):gsub("\t", "\\t")
-end
-
 local function build_json(level, component, message, extra)
-	local ts = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
-	local parts = {
-		string.format(
-			'{"ts":"%s","level":"%s","component":"%s","msg":"%s","source":"nvim","pid":%d',
-			ts,
-			level,
-			json_escape(component),
-			json_escape(message),
-			vim.fn.getpid()
-		),
+	local entry = {
+		ts = os.date("!%Y-%m-%dT%H:%M:%S.000Z"),
+		level = level,
+		component = component,
+		msg = message,
+		source = "nvim",
+		pid = vim.fn.getpid(),
 	}
-
 	if extra then
 		for k, v in pairs(extra) do
-			if type(v) == "number" then
-				table.insert(parts, string.format(',"%s":%s', k, v))
-			else
-				table.insert(parts, string.format(',"%s":"%s"', k, json_escape(v)))
-			end
+			entry[k] = v
 		end
 	end
-
-	table.insert(parts, "}")
-	return table.concat(parts)
+	return vim.json.encode(entry)
 end
 
 local function write_log(json_entry)

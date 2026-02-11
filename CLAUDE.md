@@ -71,7 +71,7 @@ Chezmoi uses special prefixes to determine how files are processed:
 
 #### 1. Shell Configuration (Zsh)
 
-- **Entry point**: `dot_zshrc` sources modular configs from `~/.config/zsh/*.zsh`
+- **Entry point**: `dot_zshrc` sources modular configs from `~/.config/zsh/*.zsh` (lazy-loads `cp.zsh`, `backup.zsh`, `log-viewer.zsh` via stub functions)
 - **Custom modules** in `dot_config/zsh/`:
   - `00-logging.zsh` - Centralized logging system (sourced first alphabetically)
   - `basics.zsh.tmpl` - Basic environment setup and eza aliases
@@ -109,6 +109,30 @@ Chezmoi uses special prefixes to determine how files are processed:
   - `core/notes.lua` - Note-taking setup
   - `core/logging.lua` - JSON logging to shared dotfiles log
 - **LSP**: Configured via `lua/lsp/` and `lua/plugins/masonlsp.lua`
+- **Layout management**: `edgy.nvim` orchestrates sidebars/panels:
+  - `aerial.lua` - LSP symbol outline (left sidebar)
+  - `edgy.lua` - Layout orchestrator (manages all panel positions)
+  - `dapui.lua` - Debug adapter UI (right sidebar + bottom panels)
+  - `neotest.lua` - Test runner (neotest + neotest-java for JUnit)
+  - `neck-pain.lua` - Centers editor, auto-disables when sidebars open
+- **View keybinds** (`<leader>v*`):
+  - `<leader>vs` - Toggle symbol outline
+  - `<leader>vd` - Toggle debug UI
+  - `<leader>vt` - Toggle test summary
+  - `<leader>vc` - Close all sidebars
+- **Test keybinds** (`<leader>t*`):
+  - `<leader>tt` - Run nearest test
+  - `<leader>tf` - Run file tests
+  - `<leader>td` - Debug nearest test (via DAP)
+  - `<leader>ts` - Test summary
+  - `<leader>to` / `<leader>tO` - Test output / output panel
+- **Debug keybinds** (`<leader>d*`):
+  - `<leader>db` - Toggle breakpoint
+  - `<leader>dc` - Continue/start
+  - `<leader>do` / `<leader>di` / `<leader>dO` - Step over/into/out
+  - `<leader>dx` - Terminate session
+  - `<leader>du` - Toggle DAP UI
+  - `<leader>de` - Eval expression
 - **Special features**:
   - Transparent background support
   - Auto-readonly for library files (node_modules, site-packages, etc.)

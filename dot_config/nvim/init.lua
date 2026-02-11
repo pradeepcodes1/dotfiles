@@ -46,13 +46,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	pattern = "*",
 	once = true, -- Run only once on startup
 	callback = function()
-		-- Get the arguments passed to nvim
-		local args = vim.v.argv
-		-- Check if there is exactly one argument and it's a directory
-		if #args == 1 and vim.fn.isdirectory(args[1]) == 1 then
-			-- Change Neovim's current working directory
-			vim.cmd.cd(args[1])
-			-- Open the file explorer (netrw) in the new CWD
+		-- Check if there is exactly one file argument and it's a directory
+		if vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
+			vim.cmd.cd(vim.fn.argv(0))
 			vim.cmd.edit(".")
 		end
 	end,
@@ -81,19 +77,3 @@ if nvim_background then
 	vim.o.background = nvim_background
 end
 vim.cmd.colorscheme(nvim_colorscheme)
-
--- Suppress specific deprecation warnings
--- TODO: Remove once plugins are updated
-local original_deprecate = vim.deprecate
-vim.deprecate = function(name, alternative, version, plugin, backtrace)
-	if
-		name == "vim.lsp.buf_get_clients()"
-		or name == "client.is_stopped"
-		or name == "vim.tbl_flatten"
-		or name == "vim.tbl_islist"
-		or name == "vim.validate"
-	then
-		return
-	end
-	original_deprecate(name, alternative, version, plugin, backtrace)
-end

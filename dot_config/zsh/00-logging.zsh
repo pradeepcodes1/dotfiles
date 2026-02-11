@@ -46,40 +46,55 @@ _log_timestamp() {
   date -u '+%Y-%m-%dT%H:%M:%S.000Z'
 }
 
-# Escape string for JSON
-_json_escape() {
-  local str="$1"
-  str="${str//\\/\\\\}"
-  str="${str//\"/\\\"}"
-  str="${str//$'\n'/\\n}"
-  str="${str//$'\r'/\\r}"
-  str="${str//$'\t'/\\t}"
-  printf '%s' "$str"
-}
-
-# Build JSON log entry
+# Build JSON log entry using jq (single call) with shell fallback
 _build_json_log() {
   local level="$1" component="$2" message="$3"
   shift 3
 
   local ts="$(_log_timestamp)"
-  local escaped_msg="$(_json_escape "$message")"
-  local escaped_comp="$(_json_escape "$component")"
 
-  local json="{\"ts\":\"$ts\",\"level\":\"$level\",\"component\":\"$escaped_comp\",\"msg\":\"$escaped_msg\",\"source\":\"shell\",\"pid\":$$"
+  if command -v jq &>/dev/null; then
+    local -a jq_args=(--arg ts "$ts" --arg level "$level" --arg component "$component" --arg msg "$message" --argjson pid $$)
+    local jq_filter='{ts: $ts, level: $level, component: $component, msg: $msg, source: "shell", pid: $pid}'
 
-  # Add extra key=value fields
-  for kv in "$@"; do
-    local key="${kv%%=*}"
-    local value="${kv#*=}"
-    if [[ "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
-      json="$json,\"$key\":$value"
-    else
-      json="$json,\"$key\":\"$(_json_escape "$value")\""
-    fi
-  done
+    local i=0
+    for kv in "$@"; do
+      local key="${kv%%=*}"
+      local value="${kv#*=}"
+      if [[ "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+        jq_args+=(--argjson "e$i" "$value")
+      else
+        jq_args+=(--arg "e$i" "$value")
+      fi
+      jq_args+=(--arg "k$i" "$key")
+      jq_filter+=" + {(\$k$i): \$e$i}"
+      ((i++))
+    done
 
-  printf '%s}' "$json"
+    jq -n -c "${jq_args[@]}" "$jq_filter"
+  else
+    # Fallback: basic escaping when jq is not available
+    local escaped_msg="${message//\\/\\\\}"
+    escaped_msg="${escaped_msg//\"/\\\"}"
+    local escaped_comp="${component//\\/\\\\}"
+    escaped_comp="${escaped_comp//\"/\\\"}"
+
+    local json="{\"ts\":\"$ts\",\"level\":\"$level\",\"component\":\"$escaped_comp\",\"msg\":\"$escaped_msg\",\"source\":\"shell\",\"pid\":$$"
+
+    for kv in "$@"; do
+      local key="${kv%%=*}"
+      local value="${kv#*=}"
+      if [[ "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+        json="$json,\"$key\":$value"
+      else
+        local escaped_val="${value//\\/\\\\}"
+        escaped_val="${escaped_val//\"/\\\"}"
+        json="$json,\"$key\":\"$escaped_val\""
+      fi
+    done
+
+    printf '%s}' "$json"
+  fi
 }
 
 # Rotate log files if needed
@@ -103,10 +118,23 @@ _rotate_logs() {
   fi
 }
 
-# Cleanup old rotated logs (runs on shell start)
+# Cleanup old rotated logs (runs at most once per day)
 _cleanup_old_logs() {
   [[ ! -d "$DOTFILES_LOG_DIR" ]] && return 0
+  local stamp_file="${DOTFILES_LOG_DIR}/.last-cleanup"
+  # Skip if cleanup ran in the last 24 hours
+  if [[ -f "$stamp_file" ]]; then
+    local last_cleanup
+    if [[ "$OSTYPE" == darwin* ]]; then
+      last_cleanup=$(stat -f%m "$stamp_file" 2>/dev/null || echo 0)
+    else
+      last_cleanup=$(stat -c%Y "$stamp_file" 2>/dev/null || echo 0)
+    fi
+    local now=$(date +%s)
+    (( now - last_cleanup < 86400 )) && return 0
+  fi
   find "$DOTFILES_LOG_DIR" -name "*.jsonl.*" -mtime +"$DOTFILES_LOG_MAX_AGE_DAYS" -delete 2>/dev/null || true
+  touch "$stamp_file" 2>/dev/null
 }
 
 # Write JSON to log file
