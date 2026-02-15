@@ -12,7 +12,7 @@ return {
 			icons = {
 				buffer_index = true,
 				modified = { button = "" }, -- button to close modified buffers
-				pinned = { button = "車" }, -- button to pin/unpin buffers
+				pinned = { button = "車", filename = true }, -- button to pin/unpin buffers
 				separator_at_end = false,
 			},
 		},
