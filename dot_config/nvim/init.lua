@@ -74,18 +74,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
 			local buf = vim.api.nvim_get_current_buf()
 			vim.schedule(function()
 				vim.api.nvim_buf_delete(buf, { force = true })
-				if Snacks and Snacks.dashboard then
-					local saved_tabline = vim.o.showtabline
-					Snacks.dashboard()
-					vim.api.nvim_create_autocmd("BufEnter", {
-						once = true,
-						callback = function()
-							if vim.bo.filetype ~= "snacks_dashboard" then
-								vim.o.showtabline = saved_tabline
-							end
-						end,
-					})
-				end
+				_show_dashboard()
 			end)
 		end
 	end,

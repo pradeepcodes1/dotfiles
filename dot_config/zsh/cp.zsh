@@ -1,3 +1,4 @@
+# Disable MallocNanoZone to avoid ASan false positives on macOS
 export MallocNanoZone='0'
 
 # ==============================================================================
@@ -11,7 +12,7 @@ export MallocNanoZone='0'
 # Set your Competitive Programming home directory.
 # The `:-` syntax uses the value of the environment variable if it exists,
 # otherwise it falls back to the default provided here.
-export CP_HOME=$HOME/Documents/Competitve-Programming
+export CP_HOME=$HOME/Documents/Competitive-Programming
 
 # Default compiler and flags. You can override these by setting them in your shell.
 # -fsanitize=address: Excellent for finding memory bugs like out-of-bounds access.
@@ -68,7 +69,7 @@ _cpt_compile() {
     error_log "cpt" "Source file not found: '$source_file'"
     return 1
   fi
-  g++ -std=c++20 -O2 -g -fsanitize=address -DLOCAL_TEST $source_file -o $exe_path
+  $CP_CXX ${=CP_CXXFLAGS} "$source_file" -o "$exe_path"
 
   return 0
 }

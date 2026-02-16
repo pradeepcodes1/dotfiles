@@ -8,6 +8,12 @@ _detect_macos_theme() {
   fi
 }
 
+# Extract a metadata field from a theme color file header comment
+# Usage: _get_theme_field "color_file_path" "Field"
+_get_theme_field() {
+  grep "^# $2:" "$1" | cut -d: -f2 | tr -d ' '
+}
+
 _load_theme_colors() {
   local theme_name="$1"
   local color_file="$_DOTFILES_COLORS_DIR/${theme_name}.sh"
@@ -17,8 +23,8 @@ _load_theme_colors() {
   source "$color_file"
 
   export _DOTFILES_THEME_NAME="$theme_name"
-  export _DOTFILES_THEME_MODE=$(grep '^# Mode:' "$color_file" | cut -d: -f2 | tr -d ' ')
-  export _DOTFILES_THEME_TRANSPARENT=$(grep '^# Transparent:' "$color_file" | cut -d: -f2 | tr -d ' ')
+  export _DOTFILES_THEME_MODE=$(_get_theme_field "$color_file" "Mode")
+  export _DOTFILES_THEME_TRANSPARENT=$(_get_theme_field "$color_file" "Transparent")
 
   [[ -n "$nvim_colorscheme" ]] && export _DOTFILES_NVIM_COLORSCHEME="$nvim_colorscheme"
   [[ -n "$nvim_lualine" ]] && export _DOTFILES_NVIM_LUALINE="$nvim_lualine"
@@ -38,7 +44,7 @@ _theme_fzf_pick() {
 
   for theme in $(_get_available_themes); do
     local color_file="$_DOTFILES_COLORS_DIR/${theme}.sh"
-    local mode=$(grep '^# Mode:' "$color_file" | cut -d: -f2 | tr -d ' ')
+    local mode=$(_get_theme_field "$color_file" "Mode")
     local current=""
     [[ "$theme" == "$_DOTFILES_THEME_NAME" ]] && current="*"
 

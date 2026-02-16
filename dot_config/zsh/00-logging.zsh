@@ -46,55 +46,31 @@ _log_timestamp() {
   date -u '+%Y-%m-%dT%H:%M:%S.000Z'
 }
 
-# Build JSON log entry using jq (single call) with shell fallback
+# Build JSON log entry using jq (single call)
 _build_json_log() {
   local level="$1" component="$2" message="$3"
   shift 3
 
   local ts="$(_log_timestamp)"
 
-  if command -v jq &>/dev/null; then
-    local -a jq_args=(--arg ts "$ts" --arg level "$level" --arg component "$component" --arg msg "$message" --argjson pid $$)
-    local jq_filter='{ts: $ts, level: $level, component: $component, msg: $msg, source: "shell", pid: $pid}'
+  local -a jq_args=(--arg ts "$ts" --arg level "$level" --arg component "$component" --arg msg "$message" --argjson pid $$)
+  local jq_filter='{ts: $ts, level: $level, component: $component, msg: $msg, source: "shell", pid: $pid}'
 
-    local i=0
-    for kv in "$@"; do
-      local key="${kv%%=*}"
-      local value="${kv#*=}"
-      if [[ "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
-        jq_args+=(--argjson "e$i" "$value")
-      else
-        jq_args+=(--arg "e$i" "$value")
-      fi
-      jq_args+=(--arg "k$i" "$key")
-      jq_filter+=" + {(\$k$i): \$e$i}"
-      ((i++))
-    done
+  local i=0
+  for kv in "$@"; do
+    local key="${kv%%=*}"
+    local value="${kv#*=}"
+    if [[ "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+      jq_args+=(--argjson "e$i" "$value")
+    else
+      jq_args+=(--arg "e$i" "$value")
+    fi
+    jq_args+=(--arg "k$i" "$key")
+    jq_filter+=" + {(\$k$i): \$e$i}"
+    ((i++))
+  done
 
-    jq -n -c "${jq_args[@]}" "$jq_filter"
-  else
-    # Fallback: basic escaping when jq is not available
-    local escaped_msg="${message//\\/\\\\}"
-    escaped_msg="${escaped_msg//\"/\\\"}"
-    local escaped_comp="${component//\\/\\\\}"
-    escaped_comp="${escaped_comp//\"/\\\"}"
-
-    local json="{\"ts\":\"$ts\",\"level\":\"$level\",\"component\":\"$escaped_comp\",\"msg\":\"$escaped_msg\",\"source\":\"shell\",\"pid\":$$"
-
-    for kv in "$@"; do
-      local key="${kv%%=*}"
-      local value="${kv#*=}"
-      if [[ "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
-        json="$json,\"$key\":$value"
-      else
-        local escaped_val="${value//\\/\\\\}"
-        escaped_val="${escaped_val//\"/\\\"}"
-        json="$json,\"$key\":\"$escaped_val\""
-      fi
-    done
-
-    printf '%s}' "$json"
-  fi
+  jq -n -c "${jq_args[@]}" "$jq_filter"
 }
 
 # Rotate log files if needed

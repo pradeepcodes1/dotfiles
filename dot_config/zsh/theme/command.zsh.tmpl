@@ -34,7 +34,7 @@ theme() {
       echo "Available themes:"
       for t in $(_get_available_themes); do
         local color_file="$_DOTFILES_COLORS_DIR/${t}.sh"
-        local mode=$(grep '^# Mode:' "$color_file" | cut -d: -f2 | tr -d ' ')
+        local mode=$(_get_theme_field "$color_file" "Mode")
         local current=""
         [[ "$t" == "$_DOTFILES_THEME_NAME" ]] && current=" (current)"
         echo "  $t [$mode]$current"

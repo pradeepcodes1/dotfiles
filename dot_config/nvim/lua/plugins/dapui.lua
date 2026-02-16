@@ -63,14 +63,8 @@ return {
 	{
 		"rcarriga/nvim-dap-ui",
 		dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
+		-- <leader>vd toggle is in edgy.lua (View: Debug)
 		keys = {
-			{
-				"<leader>du",
-				function()
-					require("dapui").toggle()
-				end,
-				desc = "Toggle DAP UI",
-			},
 			{
 				"<leader>de",
 				function()
