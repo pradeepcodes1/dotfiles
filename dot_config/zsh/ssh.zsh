@@ -1,7 +1,9 @@
 # Simple SSH wrapper to show hostname in tmux status bar
 ssh() {
-  # Extract full user@hostname (last argument)
-  local host="${@: -1}"
+  # Resolve actual hostname via ssh config parsing
+  local host
+  host=$(command ssh -G "$@" 2>/dev/null | awk '/^hostname /{print $2}')
+  [[ -z "$host" ]] && host="${@: -1}"
 
   # Set pane-specific option if in tmux
   [[ -n "$TMUX" ]] && tmux set -p @ssh_host "$host"

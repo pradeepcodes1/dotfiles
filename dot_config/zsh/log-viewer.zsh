@@ -20,15 +20,39 @@ dotlog() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -n) num="$2"; shift 2 ;;
-      -l) level="${2:u}"; shift 2 ;;
-      -c) component="$2"; shift 2 ;;
-      -s) source="$2"; shift 2 ;;
-      -f) follow=true; shift ;;
-      --errors) errors_only=true; shift ;;
-      --today) today_only=true; shift ;;
-      --file) log_file="$2"; shift 2 ;;
-      -h|--help)
+      -n)
+        num="$2"
+        shift 2
+        ;;
+      -l)
+        level="${2:u}"
+        shift 2
+        ;;
+      -c)
+        component="$2"
+        shift 2
+        ;;
+      -s)
+        source="$2"
+        shift 2
+        ;;
+      -f)
+        follow=true
+        shift
+        ;;
+      --errors)
+        errors_only=true
+        shift
+        ;;
+      --today)
+        today_only=true
+        shift
+        ;;
+      --file)
+        log_file="$2"
+        shift 2
+        ;;
+      -h | --help)
         echo "Usage: dotlog [options]"
         echo "  -n NUM     Last N entries (default: 50)"
         echo "  -l LEVEL   Filter: DEBUG, INFO, WARN, ERROR"
@@ -37,8 +61,12 @@ dotlog() {
         echo "  -f         Follow mode"
         echo "  --errors   Only errors"
         echo "  --today    Today only"
-        return 0 ;;
-      *) echo "Unknown: $1"; return 1 ;;
+        return 0
+        ;;
+      *)
+        echo "Unknown: $1"
+        return 1
+        ;;
     esac
   done
 
@@ -52,17 +80,33 @@ dotlog() {
     return 1
   fi
 
-  # Build jq filter
+  # Build jq filter - use --arg for user input to prevent injection
   local conditions=()
-  [[ -n "$level" ]] && conditions+=(".level == \"$level\"")
-  [[ -n "$component" ]] && conditions+=("(.component | test(\"$component\"; \"i\"))")
-  [[ -n "$source" ]] && conditions+=(".source == \"$source\"")
-  [[ "$errors_only" == true ]] && conditions+=(".level == \"ERROR\"")
-  [[ "$today_only" == true ]] && conditions+=("(.ts | startswith(\"$(date +%Y-%m-%d)\"))")
+  local -a jq_args=()
+  [[ -n "$level" ]] && {
+    jq_args+=(--arg _level "$level")
+    conditions+=('.level == $_level')
+  }
+  [[ -n "$component" ]] && {
+    jq_args+=(--arg _comp "$component")
+    conditions+=('(.component | test($_comp; "i"))')
+  }
+  [[ -n "$source" ]] && {
+    jq_args+=(--arg _src "$source")
+    conditions+=('.source == $_src')
+  }
+  [[ "$errors_only" == true ]] && conditions+=('.level == "ERROR"')
+  [[ "$today_only" == true ]] && {
+    jq_args+=(--arg _today "$(date +%Y-%m-%d)")
+    conditions+=('(.ts | startswith($_today))')
+  }
 
   local jq_filter="."
   if [[ ${#conditions[@]} -gt 0 ]]; then
-    jq_filter="select($(IFS=" and "; echo "${conditions[*]}"))"
+    jq_filter="select($(
+      IFS=" and "
+      echo "${conditions[*]}"
+    ))"
   fi
 
   # Format output with colors
@@ -81,10 +125,10 @@ dotlog() {
 
   if [[ "$follow" == true ]]; then
     tail -f "$log_file" | while read -r line; do
-      echo "$line" | jq -r "$jq_filter | $format_jq" 2>/dev/null
+      echo "$line" | jq -r "${jq_args[@]}" "$jq_filter | $format_jq" 2>/dev/null
     done
   else
-    tail -n "$num" "$log_file" | jq -r "$jq_filter | $format_jq" 2>/dev/null
+    tail -n "$num" "$log_file" | jq -r "${jq_args[@]}" "$jq_filter | $format_jq" 2>/dev/null
   fi
 }
 
@@ -126,7 +170,7 @@ dotlog-search() {
     return 1
   fi
 
-  jq -r "select(.msg | test(\"$pattern\"; \"i\")) | \"[\(.ts | split(\"T\")[1] | split(\".\")[0])] \(.level) [\(.component)] \(.msg)\"" "$log_file" 2>/dev/null
+  jq -r --arg _pat "$pattern" 'select(.msg | test($_pat; "i")) | "[\(.ts | split("T")[1] | split(".")[0])] \(.level) [\(.component)] \(.msg)"' "$log_file" 2>/dev/null
 }
 
 # Clean old logs

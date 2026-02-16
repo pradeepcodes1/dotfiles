@@ -199,7 +199,7 @@ log_command() {
   return $exit_code
 }
 
-# Run cleanup on shell start (lightweight)
-_cleanup_old_logs
+# Run cleanup on shell start (in background to avoid blocking)
+_cleanup_old_logs &!
 
 debug_log "logging" "Logging initialized (console=${DEBUG_DOTFILES:-0}, json=${DOTFILES_JSON_LOG:-0})"

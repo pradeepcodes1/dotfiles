@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 if command -v tmux &>/dev/null; then
   if [[ -z "$TMUX" && "$TERM_PROGRAM" == "ghostty" ]]; then
@@ -90,13 +90,11 @@ if command -v tmux &>/dev/null; then
   if [[ $total -gt $threshold ]]; then
     local kill_count=$((total - threshold))
     # Get unattached sessions sorted oldest first
-    tmux list-sessions -F "#{session_created}:#{session_name}:#{session_attached}" 2>/dev/null \
-      | sort -n \
-      | while IFS=: read -r created name attached; do
-          [[ "$attached" == "1" ]] && continue
-          tmux kill-session -t "$name" 2>/dev/null
-          kill_count=$((kill_count - 1))
-          [[ $kill_count -le 0 ]] && break
-        done
+    while IFS=: read -r created name attached; do
+      [[ "$attached" == "1" ]] && continue
+      tmux kill-session -t "$name" 2>/dev/null
+      kill_count=$((kill_count - 1))
+      [[ $kill_count -le 0 ]] && break
+    done < <(tmux list-sessions -F "#{session_created}:#{session_name}:#{session_attached}" 2>/dev/null | sort -n)
   fi
 fi
