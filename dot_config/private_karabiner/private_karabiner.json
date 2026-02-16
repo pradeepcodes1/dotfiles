@@ -401,6 +401,40 @@
                     "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
                   }
                 ],
+                "from": {
+                  "key_code": "equal_sign",
+                  "modifiers": { "mandatory": ["right_option", "shift"] }
+                },
+                "to": [
+                  { "key_code": "l", "modifiers": ["control"] },
+                  { "key_code": "equal_sign", "modifiers": ["shift"] }
+                ],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
+                "from": {
+                  "key_code": "hyphen",
+                  "modifiers": { "mandatory": ["right_option", "shift"] }
+                },
+                "to": [
+                  { "key_code": "l", "modifiers": ["control"] },
+                  { "key_code": "hyphen", "modifiers": ["shift"] }
+                ],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
                 "from": { "key_code": "t", "modifiers": { "mandatory": ["right_option"] } },
                 "to": [
                   {

@@ -72,6 +72,10 @@ bind j select-pane -D
 bind k select-pane -U
 bind l select-pane -R
 
+# Resize panes (+/= to grow, _ to shrink)
+bind + resize-pane -U 5 \; resize-pane -R 5
+bind _ resize-pane -D 5 \; resize-pane -L 5
+
 # Initialize TMUX plugin manager (keep at bottom)
 run '~/.tmux/plugins/tpm/tpm'
 bind b set-option -g status
