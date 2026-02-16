@@ -2,14 +2,21 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		config = function()
-			local function smart_path()
-				if vim.fn.winwidth(0) < 80 then
-					return vim.fn.expand("%:t")
-				end
+			local jdt = require("core.jdt")
 
+			local function smart_path()
 				local path = vim.fn.expand("%:p")
 				if path == "" then
 					return ""
+				end
+
+				if jdt.is_jdt(path) then
+					local fqcn = jdt.fqcn(path)
+					return jdt.JAVA_ICON .. " " .. (fqcn or path) .. " (decompiled)"
+				end
+
+				if vim.fn.winwidth(0) < 80 then
+					return vim.fn.expand("%:t")
 				end
 
 				local home = vim.fn.expand("$HOME")
