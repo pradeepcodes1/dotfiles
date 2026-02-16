@@ -21,7 +21,7 @@ local function create_and_open_in_new_tab(file_path, content)
 	file:close()
 
 	-- Open the file in a new tab
-	vim.api.nvim_command("tabnew " .. file_path)
+	vim.cmd.tabnew(file_path)
 
 	return true
 end

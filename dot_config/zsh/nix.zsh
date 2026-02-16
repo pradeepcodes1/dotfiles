@@ -41,7 +41,7 @@ _nix_setup_home() {
     for item in "${NIX_CONFIG_SYMLINKS[@]}"; do
         local src="${real_home}/${item}"
         local dst="${new_home}/${item}"
-        if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
+        if [[ -e "$src" ]] && [[ ! -e "$dst" ]] && [[ ! -L "$dst" ]]; then
             mkdir -p "$(dirname "$dst")"
             ln -s "$src" "$dst"
             debug_log "nix" "Linked: $item"
@@ -96,11 +96,13 @@ _nix_add_profile() {
 
     # Add profile using jq
     local tmp=$(mktemp)
+    trap "rm -f '$tmp'" EXIT INT TERM
     jq --arg name "$profile_name" \
        --arg home "$home_path" \
        --argjson flakes "$flakes_json" \
        '. += [{"name": $name, "home": $home, "flakes": $flakes}]' \
        "$NIX_PROFILES_FILE" > "$tmp" && mv "$tmp" "$NIX_PROFILES_FILE"
+    trap - EXIT INT TERM
 }
 
 # Create a new profile interactively
@@ -264,6 +266,10 @@ flake() {
     fi
 
     # Set environment and exec new shell with new HOME
+    if [[ ! -d "$home_path" ]]; then
+        error_log "nix" "Home directory does not exist: $home_path"
+        return 1
+    fi
     export REAL_HOME="$real_home"
     export FLAKE_ENV="${flakes_array[*]}"
     export HOME="$home_path"
@@ -292,8 +298,10 @@ flake-rm() {
     fi
 
     local tmp=$(mktemp)
+    trap "rm -f '$tmp'" EXIT INT TERM
     jq --arg name "$selected" 'del(.[] | select(.name == $name))' \
         "$NIX_PROFILES_FILE" > "$tmp" && mv "$tmp" "$NIX_PROFILES_FILE"
+    trap - EXIT INT TERM
 
     info_log "nix" "Profile '$selected' removed"
 }

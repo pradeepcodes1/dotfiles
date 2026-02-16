@@ -11,7 +11,7 @@ _detect_macos_theme() {
 # Extract a metadata field from a theme color file header comment
 # Usage: _get_theme_field "color_file_path" "Field"
 _get_theme_field() {
-  grep "^# $2:" "$1" | cut -d: -f2 | tr -d ' '
+  grep "^# $2:" "$1" | cut -d: -f2- | tr -d ' '
 }
 
 _load_theme_colors() {

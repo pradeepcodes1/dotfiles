@@ -83,26 +83,15 @@ map("n", "<Esc><Esc>", ":nohlsearch<CR><Esc>", { desc = "Clear search highlighti
 map("i", "<A-Left>", "<C-o>b", opts) -- back one word
 map("i", "<A-Right>", "<C-o>w", opts) -- forward one word
 
-map("n", "<leader>1", "<Cmd>BufferGoto 1<CR>", opts)
-map("n", "<leader>2", "<Cmd>BufferGoto 2<CR>", opts)
-map("n", "<leader>3", "<Cmd>BufferGoto 3<CR>", opts)
-map("n", "<leader>4", "<Cmd>BufferGoto 4<CR>", opts)
-map("n", "<leader>5", "<Cmd>BufferGoto 5<CR>", opts)
-map("n", "<leader>6", "<Cmd>BufferGoto 6<CR>", opts)
-map("n", "<leader>7", "<Cmd>BufferGoto 7<CR>", opts)
-map("n", "<leader>8", "<Cmd>BufferGoto 8<CR>", opts)
-map("n", "<leader>9", "<Cmd>BufferGoto 9<CR>", opts)
+for i = 1, 9 do
+	map("n", "<leader>" .. i, "<Cmd>BufferGoto " .. i .. "<CR>", opts)
+end
 map("n", "<leader>0", "<Cmd>BufferPin<CR>", opts)
 
-map("n", "<leader>!", "<Cmd>BufferMove 1<CR>", opts)
-map("n", "<leader>@", "<Cmd>BufferMove 2<CR>", opts)
-map("n", "<leader>#", "<Cmd>BufferMove 3<CR>", opts)
-map("n", "<leader>$", "<Cmd>BufferMove 4<CR>", opts)
-map("n", "<leader>%", "<Cmd>BufferMove 5<CR>", opts)
-map("n", "<leader>^", "<Cmd>BufferMove 6<CR>", opts)
-map("n", "<leader>&", "<Cmd>BufferMove 7<CR>", opts)
-map("n", "<leader>*", "<Cmd>BufferMove 8<CR>", opts)
-map("n", "<leader>(", "<Cmd>BufferMove 9<CR>", opts)
+local move_keys = { "!", "@", "#", "$", "%", "^", "&", "*", "(" }
+for i, key in ipairs(move_keys) do
+	map("n", "<leader>" .. key, "<Cmd>BufferMove " .. i .. "<CR>", opts)
+end
 
 local function is_diffview_open()
 	for _, win in ipairs(vim.api.nvim_list_wins()) do

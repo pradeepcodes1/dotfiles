@@ -38,9 +38,9 @@ prompt_path="#8f8f8f"
 ui_bg="#141414"
 ui_fg="#c6c6c6"
 ui_accent="#78dce8"
-ui_border="#040404"
+ui_border="#1e1e1e"
 ui_active="#78dce8"
-ui_inactive="#040404"
+ui_inactive="#1e1e1e"
 
 # Neovim
 nvim_colorscheme="bearded-monokai-black"

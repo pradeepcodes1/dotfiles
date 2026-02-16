@@ -3,118 +3,118 @@
 
 # Ensure zoxide is available
 if ! command -v zoxide &>/dev/null; then
-    return
+  return
 fi
 
 # Override cd to use zoxide for tracking
 # This makes cd smart while maintaining familiar behavior
 function cd() {
-    if [ $# -eq 0 ]; then
-        # cd with no args goes to home
-        builtin cd ~ && zoxide add "$(pwd)"
-    elif [ -d "$1" ]; then
-        # If argument is a valid directory, use builtin cd
-        builtin cd "$1" && zoxide add "$(pwd)"
+  if [ $# -eq 0 ]; then
+    # cd with no args goes to home
+    builtin cd ~ && zoxide add "$(pwd)"
+  elif [ -d "$1" ]; then
+    # If argument is a valid directory, use builtin cd
+    builtin cd "$1" && zoxide add "$(pwd)"
+  else
+    # Otherwise, try zoxide query (fuzzy matching)
+    local result
+    result=$(zoxide query "$@" 2>/dev/null)
+    if [ -n "$result" ]; then
+      builtin cd "$result"
     else
-        # Otherwise, try zoxide query (fuzzy matching)
-        local result
-        result=$(zoxide query "$@" 2>/dev/null)
-        if [ -n "$result" ]; then
-            builtin cd "$result"
-        else
-            # Fallback to builtin cd (will show error if path invalid)
-            builtin cd "$@"
-        fi
+      # Fallback to builtin cd (will show error if path invalid)
+      builtin cd "$@"
     fi
+  fi
 }
 
 # zi - Interactive directory jump using fzf
 # Usage: zi [query]
 function zi() {
-    local result
-    if [ $# -eq 0 ]; then
-        # No arguments - show interactive picker
-        result=$(zoxide query -l | fzf --height 40% --reverse --header "Jump to directory")
-    else
-        # With arguments - fuzzy search zoxide database
-        result=$(zoxide query -l | grep -i "$*" | fzf --height 40% --reverse --header "Jump to: $*")
-    fi
+  local result
+  if [ $# -eq 0 ]; then
+    # No arguments - show interactive picker
+    result=$(zoxide query -l | fzf --height 40% --reverse --header "Jump to directory")
+  else
+    # With arguments - fuzzy search zoxide database
+    result=$(zoxide query -l | grep -iF "$*" | fzf --height 40% --reverse --header "Jump to: $*")
+  fi
 
-    if [ -n "$result" ]; then
-        builtin cd "$result"
-    fi
+  if [ -n "$result" ]; then
+    builtin cd "$result"
+  fi
 }
 
 # cdf - cd to the directory of a file
 # Usage: cdf path/to/file.txt
 function cdf() {
-    if [ -f "$1" ]; then
-        builtin cd "$(dirname "$1")"
-    else
-        error_log "nav" "'$1' is not a file"
-        return 1
-    fi
+  if [ -f "$1" ]; then
+    builtin cd "$(dirname "$1")"
+  else
+    error_log "nav" "'$1' is not a file"
+    return 1
+  fi
 }
 
 # up - Go up N directories
 # Usage: up [N] (default: 1)
 function up() {
-    local levels=${1:-1}
-    local path=""
-    for ((i=0; i<levels; i++)); do
-        path="../$path"
-    done
-    builtin cd "$path"
+  local levels=${1:-1}
+  local path=""
+  for ((i = 0; i < levels; i++)); do
+    path="../$path"
+  done
+  builtin cd "$path"
 }
 
 # mkcd - Create directory and cd into it
 # Usage: mkcd path/to/new/dir
 function mkcd() {
-    if [ $# -ne 1 ]; then
-        echo "Usage: mkcd <directory>"
-        return 1
-    fi
-    mkdir -p "$1" && builtin cd "$1"
+  if [ $# -ne 1 ]; then
+    echo "Usage: mkcd <directory>"
+    return 1
+  fi
+  mkdir -p "$1" && builtin cd "$1"
 }
 
 # fzf-cd - Browse and cd using fzf (searches from current directory)
 # Usage: fcd [starting_directory]
 function fcd() {
-    local dir
-    dir=$(fd --type d --hidden --follow --exclude .git ${1:-.} 2>/dev/null | fzf --height 40% --reverse --header "Browse directories")
-    if [ -n "$dir" ]; then
-        builtin cd "$dir"
-    fi
+  local dir
+  dir=$(fd --type d --hidden --follow --exclude .git ${1:-.} 2>/dev/null | fzf --height 40% --reverse --header "Browse directories")
+  if [ -n "$dir" ]; then
+    builtin cd "$dir"
+  fi
 }
 
 # cdls - cd and ls in one command
 # Usage: cdls directory
 function cdls() {
-    builtin cd "$@" && ls
+  builtin cd "$@" && ls
 }
 
 # bd - Go back to a specific parent directory by name
 # Usage: bd dirname
 # Example: If in /a/b/c/d, 'bd b' takes you to /a/b
 function bd() {
-    if [ $# -eq 0 ]; then
-        echo "Usage: bd <parent_directory_name>"
-        return 1
-    fi
-
-    # Build target path by walking up the string, not mutating PWD
-    local target="$PWD"
-    while [ "$target" != "/" ]; do
-        target="${target%/*}"
-        [ -z "$target" ] && target="/"
-        if [ "$(basename "$target")" = "$1" ]; then
-            builtin cd "$target" && zoxide add "$target"
-            return 0
-        fi
-    done
-
-    error_log "nav" "No parent directory named '$1' found"
+  if [ $# -eq 0 ]; then
+    echo "Usage: bd <parent_directory_name>"
     return 1
+  fi
+
+  # Build target path by walking up the string, not mutating PWD
+  local target="$PWD"
+  while [ "$target" != "/" ]; do
+    target="${target%/*}"
+    [ -z "$target" ] && target="/"
+    if [ "$(basename "$target")" = "$1" ]; then
+      builtin cd "$target" && zoxide add "$target"
+      return 0
+    fi
+  done
+
+  error_log "nav" "No parent directory named '$1' found"
+  return 1
 }
 
 # Show zoxide stats

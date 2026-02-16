@@ -33,7 +33,11 @@
 	autoSquash = true
 
 [credential]
+{{ if eq .chezmoi.os "darwin" }}
 	helper = osxkeychain
+{{ else }}
+	helper = store
+{{ end }}
 
 [push]
 	default = simple
