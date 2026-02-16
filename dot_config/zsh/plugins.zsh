@@ -15,13 +15,16 @@ fi
 # This allows fzf-tab to correctly identify path prefixes (like 'dir/') vs search queries
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
+# Source a zsh plugin from Nix profile paths
+_source_nix_plugin() {
+  local name=$1 file=$2
+  for prefix in "$HOME/.nix-profile" "/nix/var/nix/profiles/default"; do
+    [[ -f "$prefix/share/$name/$file" ]] && { source "$prefix/share/$name/$file"; return; }
+  done
+}
+
 # fzf-tab configuration
-# Source fzf-tab from Nix profile
-if [ -f "$HOME/.nix-profile/share/fzf-tab/fzf-tab.plugin.zsh" ]; then
-  source "$HOME/.nix-profile/share/fzf-tab/fzf-tab.plugin.zsh"
-elif [ -f "/nix/var/nix/profiles/default/share/fzf-tab/fzf-tab.plugin.zsh" ]; then
-  source "/nix/var/nix/profiles/default/share/fzf-tab/fzf-tab.plugin.zsh"
-fi
+_source_nix_plugin fzf-tab fzf-tab.plugin.zsh
 
 # Configure fzf-tab query-string to use only 'prefix' (fixes carapace subdirectory issue)
 # Default is 'prefix input first', but 'input' causes 'folder/' to be used as search query
@@ -60,15 +63,7 @@ zstyle ':fzf-tab:complete:*:*' fzf-flags --height=60% --preview-window=down:30%:
 zstyle ':fzf-tab:*' switch-group '<' '>'
 
 # zsh-autosuggestions configuration
-if [ -f "$HOME/.nix-profile/share/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh" ]; then
-  source "$HOME/.nix-profile/share/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
-elif [ -f "/nix/var/nix/profiles/default/share/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh" ]; then
-  source "/nix/var/nix/profiles/default/share/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
-fi
+_source_nix_plugin zsh-autosuggestions zsh-autosuggestions.plugin.zsh
 
 # zsh-syntax-highlighting configuration (must be last)
-if [ -f "$HOME/.nix-profile/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-  source "$HOME/.nix-profile/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-elif [ -f "/nix/var/nix/profiles/default/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-  source "/nix/var/nix/profiles/default/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-fi
+_source_nix_plugin zsh-syntax-highlighting zsh-syntax-highlighting.zsh

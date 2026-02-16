@@ -2,7 +2,6 @@ return {
 	{
 		"stevearc/conform.nvim",
 		opts = {},
-		enabled = true,
 		config = function()
 			require("conform").setup({
 				formatters_by_ft = {

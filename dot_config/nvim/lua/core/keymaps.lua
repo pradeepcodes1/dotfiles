@@ -41,6 +41,22 @@ map("n", "<leader>lh", function()
 	vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
 end, { desc = "Toggle inlay hints" })
 
+-- Show dashboard and restore tabline when leaving it
+function _G._show_dashboard()
+	if Snacks and Snacks.dashboard then
+		local saved_tabline = vim.o.showtabline
+		Snacks.dashboard()
+		vim.api.nvim_create_autocmd("BufEnter", {
+			once = true,
+			callback = function()
+				if vim.bo.filetype ~= "snacks_dashboard" then
+					vim.o.showtabline = saved_tabline
+				end
+			end,
+		})
+	end
+end
+
 -- BarBar keymaps
 local opts = { noremap = true, silent = true }
 map("n", "bk", "<Cmd>BufferPick<CR>", opts)
@@ -50,18 +66,8 @@ map("n", "<leader>q", function()
 		local remaining = vim.tbl_filter(function(b)
 			return vim.api.nvim_buf_is_valid(b) and vim.bo[b].buflisted and vim.api.nvim_buf_get_name(b) ~= ""
 		end, vim.api.nvim_list_bufs())
-		if #remaining == 0 and Snacks and Snacks.dashboard then
-			local saved_tabline = vim.o.showtabline
-			Snacks.dashboard()
-			-- Restore tabline when leaving dashboard (snacks hides it but may not restore)
-			vim.api.nvim_create_autocmd("BufEnter", {
-				once = true,
-				callback = function()
-					if vim.bo.filetype ~= "snacks_dashboard" then
-						vim.o.showtabline = saved_tabline
-					end
-				end,
-			})
+		if #remaining == 0 then
+			_show_dashboard()
 		end
 	end)
 end, { noremap = true, silent = true, desc = "Close buffer (dashboard if last)" })

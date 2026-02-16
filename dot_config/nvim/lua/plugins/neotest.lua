@@ -30,13 +30,7 @@ return {
 				end,
 				desc = "Test: Debug nearest",
 			},
-			{
-				"<leader>ts",
-				function()
-					require("neotest").summary.toggle()
-				end,
-				desc = "Test: Summary",
-			},
+			-- <leader>vt summary toggle is in the view keybinds below
 			{
 				"<leader>to",
 				function()

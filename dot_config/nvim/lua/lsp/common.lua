@@ -1,4 +1,4 @@
--- lua/plugins/lsp/common.lua
+-- lua/lsp/common.lua
 local M = {}
 
 vim.diagnostic.config({

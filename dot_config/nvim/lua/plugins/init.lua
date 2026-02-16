@@ -116,10 +116,6 @@ return {
 	{ "linux-cultist/venv-selector.nvim", cmd = "VenvSelect", opts = { search_venv_managers = false } },
 
 	{
-		"MeanderingProgrammer/render-markdown.nvim",
-		dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" },
-	},
-	{
 		"folke/snacks.nvim",
 		priority = 1000,
 		lazy = false,

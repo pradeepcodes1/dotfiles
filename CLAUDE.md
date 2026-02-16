@@ -77,10 +77,14 @@ Chezmoi uses special prefixes to determine how files are processed:
   - `basics.zsh.tmpl` - Basic environment setup and eza aliases
   - `log-viewer.zsh` - Log viewing utilities (dotlog, dotlog-stats)
   - `navigation.zsh` - Smart directory navigation with zoxide integration
-  - `plugins.zsh` - Zsh plugin configuration (autosuggestions, zoxide)
+  - `plugins.zsh` - Zsh plugin configuration (fzf-tab, autosuggestions, syntax-highlighting, zoxide, atuin, carapace)
   - `theme.zsh` - Theme management system
   - `tmux.zsh` - Auto-attaches tmux sessions per Aerospace workspace
   - `cp.zsh` - Competitive programming toolkit (`cpt` command)
+  - `nix.zsh` - Nix flake environment switcher (`flake`, `flake-rm` commands)
+  - `ssh.zsh` - SSH wrapper that shows hostname in tmux status bar
+  - `backup.zsh` - Backup function using restic (`backup-system` command)
+  - `config-edit.zsh.tmpl` - Config editing environment (`config-edit` command)
 
 #### 2. Tool Version Management (mise)
 
@@ -91,9 +95,8 @@ Chezmoi uses special prefixes to determine how files are processed:
 #### 3. Package Management
 
 - **Homebrew packages**: `dot_config/brew/packages.tmpl`
-- **Install script**: `.chezmoiscripts/run_after_a-packages.sh.tmpl` installs Homebrew
-- **Tracking script**: `.chezmoiscripts/run_after_b-brew.sh.tmpl` warns about untracked packages
-- Ignores tracking for: `chezmoi`, `gcc`, `mise` (managed separately)
+- **Install script**: `.chezmoiscripts/run_after_20-install-packages.sh.tmpl` runs `brew bundle`
+- **Tools script**: `.chezmoiscripts/run_after_30-setup-tools.sh.tmpl` sets up uv, mise, yazi flavors
 
 #### 4. Neovim Configuration
 
@@ -124,14 +127,15 @@ Chezmoi uses special prefixes to determine how files are processed:
   - `<leader>tt` - Run nearest test
   - `<leader>tf` - Run file tests
   - `<leader>td` - Debug nearest test (via DAP)
-  - `<leader>ts` - Test summary
   - `<leader>to` / `<leader>tO` - Test output / output panel
+  - `<leader>tS` - Stop test
 - **Debug keybinds** (`<leader>d*`):
   - `<leader>db` - Toggle breakpoint
   - `<leader>dc` - Continue/start
   - `<leader>do` / `<leader>di` / `<leader>dO` - Step over/into/out
+  - `<leader>dr` - Toggle REPL
+  - `<leader>dl` - Run last
   - `<leader>dx` - Terminate session
-  - `<leader>du` - Toggle DAP UI
   - `<leader>de` - Eval expression
 - **Special features**:
   - Transparent background support
@@ -153,9 +157,9 @@ Chezmoi uses special prefixes to determine how files are processed:
 
 #### 7. Backup System
 
-- **Script**: `.chezmoiscripts/run_after_d-backup.sh.tmpl`
+- **Shell function**: `backup-system` in `dot_config/zsh/backup.zsh` (lazy-loaded)
 - Uses **restic** for backups
-- Configured via `pass` for repository location
+- Configured via `pass` for repository location and backup sources
 - Auto-initializes repository if needed
 - Retention policy: 7 daily, 4 weekly, 6 monthly
 
