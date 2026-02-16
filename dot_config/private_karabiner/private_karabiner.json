@@ -393,6 +393,70 @@
                 "from": { "key_code": "tab", "modifiers": { "mandatory": ["right_option"] } },
                 "to": [{ "key_code": "l", "modifiers": ["control"] }, { "key_code": "l" }],
                 "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
+                "from": { "key_code": "t", "modifiers": { "mandatory": ["right_option"] } },
+                "to": [
+                  {
+                    "shell_command": "/Users/pradeep/.nix-profile/bin/tmux new-window -n timer /Users/pradeep/.nix-profile/bin/termdown"
+                  }
+                ],
+                "type": "basic"
+              }
+            ]
+          },
+          {
+            "description": "Ctrl+Shift + hjkl for nvim window navigation (Ghostty)",
+            "manipulators": [
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
+                "from": { "key_code": "h", "modifiers": { "mandatory": ["control", "shift"] } },
+                "to": [{ "key_code": "w", "modifiers": ["control"] }, { "key_code": "h" }],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
+                "from": { "key_code": "j", "modifiers": { "mandatory": ["control", "shift"] } },
+                "to": [{ "key_code": "w", "modifiers": ["control"] }, { "key_code": "j" }],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
+                "from": { "key_code": "k", "modifiers": { "mandatory": ["control", "shift"] } },
+                "to": [{ "key_code": "w", "modifiers": ["control"] }, { "key_code": "k" }],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
+                "from": { "key_code": "l", "modifiers": { "mandatory": ["control", "shift"] } },
+                "to": [{ "key_code": "w", "modifiers": ["control"] }, { "key_code": "l" }],
+                "type": "basic"
               }
             ]
           }
