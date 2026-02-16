@@ -54,9 +54,10 @@ set -g set-titles off
 
 set -g history-limit 10000
 
-# Window/pane numbering starts at 1
+# Window/pane numbering starts at 1, renumber on close
 set -g base-index 1
 setw -g pane-base-index 1
+set -g renumber-windows on
 # Split panes (| horizontal, - vertical)
 bind | split-window -h -p 40 -c "#{pane_current_path}"
 bind - split-window -v -p 40 -c "#{pane_current_path}"
