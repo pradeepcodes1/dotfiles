@@ -2,7 +2,7 @@ return {
 	---@type LazySpec
 	{
 		"mikavilpas/yazi.nvim",
-		version = "*", -- use the latest stable version
+		version = "^12.0.0", -- pinned: v13+ requires yazi nightly (kebab-case events)
 		event = "VeryLazy",
 		dependencies = {
 			{ "nvim-lua/plenary.nvim", lazy = true },
@@ -10,7 +10,6 @@ return {
 		-- Keymaps defined in core/keymaps.lua
 		---@type YaziConfig | {}
 		opts = {
-			-- if you want to open yazi instead of netrw, see below for more info
 			open_for_directories = false,
 			keymaps = {
 				show_help = "<f1>",
