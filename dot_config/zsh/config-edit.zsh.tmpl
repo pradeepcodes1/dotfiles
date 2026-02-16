@@ -1,6 +1,11 @@
 # Config edit environment
 # Launches a nix shell for editing chezmoi configuration
 
+config-apply() {
+  local chezmoi_source="{{ .chezmoi.sourceDir }}"
+  "${chezmoi_source}/bootstrap.sh" "$@"
+}
+
 config-edit() {
   local chezmoi_source="{{ .chezmoi.sourceDir }}"
   local config_dev_flake="${chezmoi_source}/nix/config_dev"
