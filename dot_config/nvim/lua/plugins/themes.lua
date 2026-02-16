@@ -8,4 +8,5 @@ return {
 	{
 		"rebelot/kanagawa.nvim",
 	},
+	{ "Ferouk/bearded-nvim", name = "bearded" },
 }
