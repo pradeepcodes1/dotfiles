@@ -118,6 +118,22 @@ return {
 					end
 				end,
 			})
+
+			-- Remove NNP's TermClose autocmds to prevent conflict with yazi/terminal plugins.
+			-- NNP registers TermClose handlers that misinterpret floating terminal windows
+			-- (like yazi) closing, causing nvim to exit unexpectedly.
+			vim.api.nvim_create_autocmd("VimEnter", {
+				once = true,
+				callback = function()
+					vim.schedule(function()
+						for _, ac in ipairs(vim.api.nvim_get_autocmds({ event = "TermClose" })) do
+							if ac.group_name and ac.group_name:match("^NoNeckPain") then
+								vim.api.nvim_del_autocmd(ac.id)
+							end
+						end
+					end)
+				end,
+			})
 		end,
 	},
 }

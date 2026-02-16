@@ -38,7 +38,27 @@ end, { desc = "Toggle inlay hints" })
 -- BarBar keymaps
 local opts = { noremap = true, silent = true }
 map("n", "bk", "<Cmd>BufferPick<CR>", opts)
-map("n", "<leader>q", "<Cmd>BufferClose<CR>", opts)
+map("n", "<leader>q", function()
+	vim.cmd("BufferClose")
+	vim.schedule(function()
+		local remaining = vim.tbl_filter(function(b)
+			return vim.api.nvim_buf_is_valid(b) and vim.bo[b].buflisted and vim.api.nvim_buf_get_name(b) ~= ""
+		end, vim.api.nvim_list_bufs())
+		if #remaining == 0 and Snacks and Snacks.dashboard then
+			local saved_tabline = vim.o.showtabline
+			Snacks.dashboard()
+			-- Restore tabline when leaving dashboard (snacks hides it but may not restore)
+			vim.api.nvim_create_autocmd("BufEnter", {
+				once = true,
+				callback = function()
+					if vim.bo.filetype ~= "snacks_dashboard" then
+						vim.o.showtabline = saved_tabline
+					end
+				end,
+			})
+		end
+	end)
+end, { noremap = true, silent = true, desc = "Close buffer (dashboard if last)" })
 
 -- Project management
 map("n", "<leader>p", function()
