@@ -4,6 +4,11 @@ set -e
 # Source logging (deployed by chezmoi before run_after scripts)
 source "${HOME}/.config/zsh/00-logging.zsh"
 
+# Ensure Nix-installed tools (mise, ya, uv) are on PATH
+if [ -e "$HOME/.nix-profile/bin" ]; then
+  export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+fi
+
 # uv tool setup
 if command -v uv >/dev/null 2>&1; then
   info_log "uv" "Updating uv tool shell..."
@@ -28,4 +33,63 @@ if command -v ya >/dev/null 2>&1; then
   ya pkg add bennyyip/gruvbox-dark 2>/dev/null || true
   ya pkg add Chromium-3-Oxide/everforest-medium 2>/dev/null || true
   info_log "yazi" "Yazi flavors installed"
+fi
+
+# lazysql TUI database client
+if command -v mise >/dev/null 2>&1 && mise which go >/dev/null 2>&1; then
+  info_log "lazysql" "Installing lazysql..."
+  mise exec go -- go install github.com/jorgerojas26/lazysql@latest || true
+fi
+
+# Seed test SQLite DB for lazysql
+_lazysql_db="$HOME/.local/share/lazysql/test.db"
+if command -v sqlite3 >/dev/null 2>&1 && [ ! -f "$_lazysql_db" ]; then
+  info_log "lazysql" "Creating test SQLite database..."
+  mkdir -p "$(dirname "$_lazysql_db")"
+  sqlite3 "$_lazysql_db" <<'SQL'
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  role TEXT DEFAULT 'user',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE projects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  owner_id INTEGER NOT NULL REFERENCES users(id),
+  status TEXT DEFAULT 'active' CHECK(status IN ('active','archived','draft')),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE tasks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id INTEGER NOT NULL REFERENCES projects(id),
+  assignee_id INTEGER REFERENCES users(id),
+  title TEXT NOT NULL,
+  priority INTEGER DEFAULT 3 CHECK(priority BETWEEN 1 AND 5),
+  done BOOLEAN DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO users (name, email, role) VALUES
+  ('Alice', 'alice@example.com', 'admin'),
+  ('Bob', 'bob@example.com', 'user'),
+  ('Carol', 'carol@example.com', 'user');
+
+INSERT INTO projects (name, owner_id, status) VALUES
+  ('Backend API', 1, 'active'),
+  ('Mobile App', 2, 'active'),
+  ('Legacy Site', 1, 'archived');
+
+INSERT INTO tasks (project_id, assignee_id, title, priority, done) VALUES
+  (1, 1, 'Set up CI pipeline', 2, 1),
+  (1, 2, 'Add auth middleware', 1, 0),
+  (1, 3, 'Write integration tests', 3, 0),
+  (2, 2, 'Design onboarding flow', 2, 0),
+  (2, NULL, 'Set up push notifications', 4, 0),
+  (3, 1, 'Migrate DNS records', 1, 1);
+SQL
+  info_log "lazysql" "Test SQLite database created at $_lazysql_db"
 fi
