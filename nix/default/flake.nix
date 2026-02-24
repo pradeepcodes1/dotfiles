@@ -33,6 +33,7 @@
             name = "pradeep-cli";
             paths = with pkgs; [
               # core (chezmoi installed separately, not here)
+              htop
               restic
               unbound
             ];

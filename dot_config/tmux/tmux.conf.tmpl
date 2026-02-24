@@ -30,6 +30,7 @@ bind s choose-session                                                # ROpt+s: c
 # Copy mode
 bind [ copy-mode                                                     # ROpt+[: copy mode
 bind / run-shell 'tmux display-popup -E -w 80% -h 80% "{{ .chezmoi.targetFile | dir }}/relative-copy-mode.sh #{pane_id}"'  # ROpt+/: copy mode with relative line numbers
+bind P display-popup -E -w 90% -h 85% "{{ .chezmoi.targetFile | dir }}/pid-explorer.sh"  # prefix+P: process explorer
 
 set -g mouse on
 set -g focus-events on
@@ -66,11 +67,15 @@ bind r source-file ~/.config/tmux/tmux.conf \; display-message "tmux reloaded"
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
-# Navigate panes with Vim keys (h,j,k,l)
+# Navigate panes with Vim keys (h,j,k,l) or Shift+Arrow
 bind h select-pane -L
 bind j select-pane -D
 bind k select-pane -U
 bind l select-pane -R
+bind S-Left select-pane -L
+bind S-Down select-pane -D
+bind S-Up select-pane -U
+bind S-Right select-pane -R
 
 # Resize panes (+/= to grow, _ to shrink)
 bind + resize-pane -U 5 \; resize-pane -R 5
