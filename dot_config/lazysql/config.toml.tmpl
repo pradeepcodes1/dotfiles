@@ -1,0 +1,11 @@
+[[database]]
+Name = "local-postgres"
+Provider = "postgres"
+DBName = "postgres"
+URL = "postgresql://localhost:5432/postgres?sslmode=disable"
+
+[[database]]
+Name = "local-sqlite"
+Provider = "sqlite3"
+DBName = ""
+URL = "{{ .chezmoi.homeDir }}/.local/share/lazysql/test.db"
