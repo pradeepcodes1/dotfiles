@@ -57,6 +57,12 @@ function _G._show_dashboard()
 	end
 end
 
+-- Split navigation
+map("n", "<leader><Left>", "<C-w>h", { desc = "Move to left split" })
+map("n", "<leader><Right>", "<C-w>l", { desc = "Move to right split" })
+map("n", "<leader><Up>", "<C-w>k", { desc = "Move to split above" })
+map("n", "<leader><Down>", "<C-w>j", { desc = "Move to split below" })
+
 -- BarBar keymaps
 local opts = { noremap = true, silent = true }
 map("n", "bk", "<Cmd>BufferPick<CR>", opts)
@@ -76,6 +82,11 @@ end, { noremap = true, silent = true, desc = "Close buffer (dashboard if last)" 
 map("n", "<leader>p", function()
 	require("telescope").extensions.projects.projects({})
 end, { desc = "Projects" })
+
+-- Splits
+map("n", "<leader>|", "<cmd>vsplit<CR>", { desc = "Split vertical" })
+map("n", "<leader>\\", "<cmd>split<CR>", { desc = "Split horizontal" })
+map("n", "<leader>x", "<C-w>c", { desc = "Close split" })
 
 -- Stop search highlighting when presesing escape
 map("n", "<Esc><Esc>", ":nohlsearch<CR><Esc>", { desc = "Clear search highlighting" })

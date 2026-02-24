@@ -8,6 +8,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		local client = vim.lsp.get_client_by_id(ev.data.client_id)
 		if client then
 			common.on_attach(client, ev.buf)
+			if client.name == "jdtls" then
+				require("lsp.java").on_attach(ev.buf)
+			end
 		end
 	end,
 })
@@ -29,6 +32,7 @@ return {
 					"yamlls",
 					"marksman",
 					"tailwindcss",
+					"lemminx",
 				},
 
 				handlers = {
