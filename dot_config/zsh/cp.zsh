@@ -12,7 +12,7 @@ export MallocNanoZone='0'
 # Set your Competitive Programming home directory.
 # The `:-` syntax uses the value of the environment variable if it exists,
 # otherwise it falls back to the default provided here.
-export CP_HOME=$HOME/Documents/Competitive-Programming
+export CP_HOME=/Volumes/dev/Competitve-Programming
 
 # Default compiler and flags. You can override these by setting them in your shell.
 # -fsanitize=address: Excellent for finding memory bugs like out-of-bounds access.
