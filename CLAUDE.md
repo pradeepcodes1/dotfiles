@@ -53,7 +53,8 @@ chezmoi diff
 chezmoi execute-template < dot_config/brew/packages.tmpl
 
 # Edit config using the config-edit shell function:
-config-edit  # Opens nix shell, then run ./bootstrap.sh to apply
+config-edit  # Opens nix shell with dev tools in chezmoi source dir
+config-apply # Shortcut: runs bootstrap.sh from anywhere
 ```
 
 ## Architecture & Structure
@@ -75,16 +76,20 @@ Chezmoi uses special prefixes to determine how files are processed:
 - **Custom modules** in `dot_config/zsh/`:
   - `00-logging.zsh` - Centralized logging system (sourced first alphabetically)
   - `basics.zsh.tmpl` - Basic environment setup and eza aliases
-  - `log-viewer.zsh` - Log viewing utilities (dotlog, dotlog-stats)
+  - `log-viewer.zsh` - Log viewing utilities (dotlog, dotlog-stats, dotlog-clean)
   - `navigation.zsh` - Smart directory navigation with zoxide integration
   - `plugins.zsh` - Zsh plugin configuration (fzf-tab, autosuggestions, syntax-highlighting, zoxide, atuin, carapace)
-  - `theme.zsh` - Theme management system
+  - `theme.zsh.tmpl` - Theme management, sources modular `theme/` subdirectory
   - `tmux.zsh` - Auto-attaches tmux sessions per Aerospace workspace
   - `cp.zsh` - Competitive programming toolkit (`cpt` command)
   - `nix.zsh` - Nix flake environment switcher (`flake`, `flake-rm` commands)
   - `ssh.zsh` - SSH wrapper that shows hostname in tmux status bar
   - `backup.zsh` - Backup function using restic (`backup-system` command)
-  - `config-edit.zsh.tmpl` - Config editing environment (`config-edit` command)
+  - `config-edit.zsh.tmpl` - Config editing environment (`config-edit`, `config-apply` commands)
+- **Theme system** in `dot_config/zsh/theme/`:
+  - `init.zsh.tmpl` / `config.zsh.tmpl` / `core.zsh.tmpl` - Theme loading and core color definitions
+  - `command.zsh.tmpl` - `theme` command for switching themes at runtime
+  - `apps/` - Per-app theme integration (bat, claude, eza, fzf, ghostty, tmux, yazi, zsh-prompt)
 
 #### 2. Tool Version Management (mise)
 
@@ -111,13 +116,14 @@ Chezmoi uses special prefixes to determine how files are processed:
   - `core/cmp.lua` - Autocompletion setup
   - `core/notes.lua` - Note-taking setup
   - `core/logging.lua` - JSON logging to shared dotfiles log
-- **LSP**: Configured via `lua/lsp/` and `lua/plugins/masonlsp.lua`
-- **Layout management**: `edgy.nvim` orchestrates sidebars/panels:
-  - `aerial.lua` - LSP symbol outline (left sidebar)
-  - `edgy.lua` - Layout orchestrator (manages all panel positions)
-  - `dapui.lua` - Debug adapter UI (right sidebar + bottom panels)
-  - `neotest.lua` - Test runner (neotest + neotest-java for JUnit)
-  - `neck-pain.lua` - Centers editor, auto-disables when sidebars open
+  - `core/jdt.lua` - Java decompiled class buffer support (jdt:// URI handling)
+- **LSP**: `lua/lsp/common.lua` (shared capabilities/on_attach) + `lua/plugins/masonlsp.lua`
+- **Plugins** (each in `lua/plugins/`):
+  - Layout: `edgy.lua` (panel orchestrator), `aerial.lua` (symbol outline), `dapui.lua` (debug UI), `neotest.lua` (test runner), `neck-pain.lua` (center editor)
+  - UI: `barbar.lua` (tab bar, jdt:// support), `lualine.lua` (statusline), `noice.lua` (UI enhancements), `notify.lua` (notifications), `neoscroll.lua` (smooth scroll), `smear.lua` (cursor animation), `themes.lua` (theme loading)
+  - Code: `conform.lua` (formatting), `copilot.lua` (GitHub Copilot), `avante.lua` (Claude AI), `nvim-treesitter.lua`, `todo-comments.lua`, `gitsigns.lua`
+  - Tools: `yazi.lua` (file manager), `session.lua` (session management), `mason.lua` (LSP installer)
+  - `init.lua` - Core plugins: snacks.nvim (dashboard, indent, zen mode), telescope, project.nvim, diffview, nvim-autopairs, Comment.nvim, nvim-java, nvim-cmp, venv-selector
 - **View keybinds** (`<leader>v*`):
   - `<leader>vs` - Toggle symbol outline
   - `<leader>vd` - Toggle debug UI
@@ -148,14 +154,38 @@ Chezmoi uses special prefixes to determine how files are processed:
 - **Config**: `dot_config/tmux/tmux.conf.tmpl`
 - **Prefix**: Changed to `C-l` (not default `C-b`)
 - **Integration**: Auto-attaches to Aerospace workspace-named sessions (see `dot_config/zsh/tmux.zsh`)
+- **Helper scripts** in `dot_config/tmux/`:
+  - `executable_ghostty-exit-handler.sh` - Prevents session detach when last pane exits in Ghostty
+  - `executable_session-cleaner.sh` - Cleans up empty sessions on session switch
+  - `executable_relative-copy-mode.sh` - Copy mode with relative line numbers
+- **Key bindings** (ROpt = Right Option via Karabiner):
+  - Windows: `ROpt+c` new, `ROpt+;/'` prev/next, `ROpt+1-9` select, `ROpt+w` choose
+  - Panes: `h/j/k/l` navigate, `|/-` split, `+/_` resize, `z` zoom, `x` kill
+  - Sessions: `ROpt+d` detach, `ROpt+s` choose, `X` kill session
+  - Copy: `ROpt+[` copy mode, `ROpt+/` copy mode with relative line numbers
+  - Other: `r` reload config, `b` toggle status bar
+- **Features**: renumber-windows on close, theme sourcing from `~/.config/tmux/themes/`, C-k passthrough for Ghostty
 
-#### 6. Secret Management
+#### 6. Ghostty Configuration
+
+- **Config**: `dot_config/ghostty/config`
+- Font: JetBrainsMono NF, size 18
+- Theme integration via `themes/current.conf` (managed by theme.zsh)
+- Keybindings for word navigation (Alt+Left/Right)
+
+#### 7. Karabiner Configuration
+
+- **Config**: `dot_config/private_karabiner/private_karabiner.json` (encrypted)
+- Maps Right Option + key combos to tmux prefix sequences
+- Keybind to launch Ghostty terminal
+
+#### 8. Secret Management
 
 - Uses `pass` (password-store) for secrets
 - Template files use `{{ pass "path/to/secret" }}` syntax
 - Examples in `dot_env.tmpl` for API keys and AWS credentials
 
-#### 7. Backup System
+#### 9. Backup System
 
 - **Shell function**: `backup-system` in `dot_config/zsh/backup.zsh` (lazy-loaded)
 - Uses **restic** for backups
