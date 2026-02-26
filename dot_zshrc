@@ -1,8 +1,3 @@
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
-
 # Force Nix paths to front (Nix is sourced in /etc/zshrc before brew prepends)
 if [ -e "$HOME/.nix-profile/bin" ]; then
   export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
@@ -18,6 +13,13 @@ export XDG_CONFIG_HOME="$HOME/.config"
 autoload -Uz compinit
 compinit -C
 setopt PROMPT_SUBST
+
+# History
+HISTFILE=~/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_IGNORE_ALL_DUPS HIST_FIND_NO_DUPS HIST_SAVE_NO_DUPS
+setopt INC_APPEND_HISTORY HIST_REDUCE_BLANKS
 
 # Enable JSON logging
 export DOTFILES_JSON_LOG=1

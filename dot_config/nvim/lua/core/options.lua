@@ -14,6 +14,23 @@ opt.ignorecase = true
 opt.cursorline = true
 opt.wrap = false
 
+-- Persistent undo
+opt.undofile = true
+
+-- Treesitter-based folding (start with all folds open)
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldlevelstart = 99
+
+-- Spell checking for prose
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "markdown", "gitcommit", "text" },
+	callback = function()
+		vim.opt_local.spell = true
+		vim.opt_local.spelllang = "en_us"
+	end,
+})
+
 -- Smooth scrolling options
 opt.scrolloff = 8 -- Keep 8 lines visible above/below cursor
 opt.sidescrolloff = 8 -- Keep 8 columns visible left/right of cursor
