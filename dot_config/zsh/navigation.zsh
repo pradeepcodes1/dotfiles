@@ -77,45 +77,8 @@ function mkcd() {
   mkdir -p "$1" && builtin cd "$1"
 }
 
-# fzf-cd - Browse and cd using fzf (searches from current directory)
-# Usage: fcd [starting_directory]
-function fcd() {
-  local dir
-  dir=$(fd --type d --hidden --follow --exclude .git ${1:-.} 2>/dev/null | fzf --height 40% --reverse --header "Browse directories")
-  if [ -n "$dir" ]; then
-    builtin cd "$dir"
-  fi
-}
-
 # cdls - cd and ls in one command
 # Usage: cdls directory
 function cdls() {
   builtin cd "$@" && ls
 }
-
-# bd - Go back to a specific parent directory by name
-# Usage: bd dirname
-# Example: If in /a/b/c/d, 'bd b' takes you to /a/b
-function bd() {
-  if [ $# -eq 0 ]; then
-    echo "Usage: bd <parent_directory_name>"
-    return 1
-  fi
-
-  # Build target path by walking up the string, not mutating PWD
-  local target="$PWD"
-  while [ "$target" != "/" ]; do
-    target="${target%/*}"
-    [ -z "$target" ] && target="/"
-    if [ "$(basename "$target")" = "$1" ]; then
-      builtin cd "$target" && zoxide add "$target"
-      return 0
-    fi
-  done
-
-  error_log "nav" "No parent directory named '$1' found"
-  return 1
-}
-
-# Show zoxide stats
-alias zstats='zoxide query -l -s'

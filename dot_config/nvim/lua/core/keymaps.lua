@@ -4,8 +4,6 @@ vim.g.mapleader = " "
 -- basics
 map("i", "jk", "<Esc>", { desc = "Exit insert mode with jk" })
 map("v", "jk", "<Esc>", { desc = "Exit visual mode with jk" })
-map("n", "<ScrollWheelRight>", "<Nop>")
-
 -- Telescope
 -- Note: <leader>e is mapped to Yazi in plugins/yazi.lua
 map("n", "<leader>ff", function()
@@ -40,6 +38,9 @@ end, { desc = "Previous diagnostic" })
 map("n", "<leader>lh", function()
 	vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
 end, { desc = "Toggle inlay hints" })
+map("n", "<leader>ud", function()
+	vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, { desc = "Toggle diagnostics" })
 
 -- Show dashboard and restore tabline when leaving it
 function _G._show_dashboard()

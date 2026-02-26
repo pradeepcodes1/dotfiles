@@ -503,6 +503,20 @@
                     "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
                   }
                 ],
+                "from": { "key_code": "p", "modifiers": { "mandatory": ["right_option"] } },
+                "to": [
+                  { "key_code": "l", "modifiers": ["control"] },
+                  { "key_code": "p", "modifiers": ["shift"] }
+                ],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
                 "from": { "key_code": "t", "modifiers": { "mandatory": ["right_option"] } },
                 "to": [
                   {
