@@ -6,7 +6,6 @@ local M = {}
 local config = {
 	log_dir = vim.fn.expand("$HOME/.local/state/dotfiles/logs"),
 	log_file = "dotfiles.jsonl",
-	max_size_mb = 10,
 	console_level = "WARN", -- WARN/ERROR show via notify
 	file_level = "DEBUG", -- Everything to file
 	enabled = vim.env.DOTFILES_JSON_LOG == "1",
