@@ -21,6 +21,7 @@ map("n", "<leader>fs", function()
 	local is_virtual = bufname:match("^%w+://") and not bufname:match("^file://")
 	require("telescope.builtin").lsp_document_symbols({
 		previewer = not is_virtual,
+		layout_config = is_virtual and { width = 0.35 } or nil,
 	})
 end, { desc = "Find symbols in file" })
 map("n", "<leader>fw", ":Telescope lsp_workspace_symbols<CR>", { desc = "Find symbols in workspace" })
