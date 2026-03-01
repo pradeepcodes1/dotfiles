@@ -32,7 +32,8 @@ if command -v ya >/dev/null 2>&1; then
   ya pkg add muratoffalex/kanagawa-lotus 2>/dev/null || true
   ya pkg add bennyyip/gruvbox-dark 2>/dev/null || true
   ya pkg add Chromium-3-Oxide/everforest-medium 2>/dev/null || true
-  info_log "yazi" "Yazi flavors installed"
+  ya pkg add yazi-rs/plugins:git 2>/dev/null || true
+  info_log "yazi" "Yazi flavors and plugins installed"
 fi
 
 # lazysql TUI database client
