@@ -34,6 +34,7 @@
             paths = with pkgs; [
               # core (chezmoi installed separately, not here)
               htop
+              lnav
               restic
               unbound
             ];
