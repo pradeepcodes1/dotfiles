@@ -13,6 +13,7 @@ fi
 if command -v uv >/dev/null 2>&1; then
   info_log "uv" "Updating uv tool shell..."
   uv tool update-shell 2>/dev/null || true
+  uv tool install termdown 2>/dev/null || true
 fi
 
 # mise setup

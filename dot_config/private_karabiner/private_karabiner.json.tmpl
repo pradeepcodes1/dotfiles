@@ -520,7 +520,7 @@
                 "from": { "key_code": "t", "modifiers": { "mandatory": ["right_option"] } },
                 "to": [
                   {
-                    "shell_command": "/Users/pradeep/.nix-profile/bin/tmux new-window -n timer /Users/pradeep/.nix-profile/bin/termdown"
+                    "shell_command": "{{ .chezmoi.homeDir }}/.nix-profile/bin/tmux new-window -n timer {{ .chezmoi.homeDir }}/.local/bin/termdown"
                   }
                 ],
                 "type": "basic"
