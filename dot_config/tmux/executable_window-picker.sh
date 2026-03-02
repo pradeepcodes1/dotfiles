@@ -1,48 +1,60 @@
 #!/usr/bin/env bash
-# Simple popup window picker (numbers only, no search typing).
+# Popup window picker: static vertical list, current window highlighted.
+# Press a number key to switch directly, q/Esc to quit.
 
 set -u
 
 source_client_tty="${1:-}"
 source_session_name="${2:-}"
+current_window_index="${3:-}"
+
+if command -v tput >/dev/null 2>&1; then
+  tput civis >/dev/null 2>&1 || true
+fi
+printf '\033[?25l' || true
+trap 'tput cnorm >/dev/null 2>&1 || true; printf "\033[?25h" || true' EXIT
 
 if [[ -z "${source_client_tty}" || -z "${source_session_name}" ]]; then
   tmux display-message "window-picker: missing client/session"
   exit 0
 fi
 
-if ! command -v fzf >/dev/null 2>&1; then
-  tmux choose-window
-  exit 0
-fi
-
-window_rows="$(tmux list-windows -t "${source_session_name}" -F '#{window_index}#{?window_active, * ,}' 2>/dev/null)"
+window_rows="$(tmux list-windows -t "${source_session_name}" -F '#{window_index}' 2>/dev/null)"
 if [[ -z "${window_rows}" ]]; then
   printf "No windows found.\n"
   sleep 0.8
   exit 0
 fi
 
-active_pos="$(
-  tmux list-windows -t "${source_session_name}" -F '#{window_active}' 2>/dev/null \
-    | awk '$1 == 1 { print NR; exit }'
-)"
-[[ -z "${active_pos}" ]] && active_pos=1
+if [[ -z "${current_window_index}" ]]; then
+  current_window_index="$(
+    tmux list-clients -F '#{client_tty} #{window_index}' 2>/dev/null \
+      | awk -v tty="${source_client_tty}" '$1 == tty { print $2; exit }'
+  )"
+fi
 
-selection="$(
-  printf '%s\n' "${window_rows}" | fzf \
-    --layout=reverse \
-    --height=100% \
-    --no-input \
-    --no-info \
-    --disabled \
-    --no-multi \
-    --bind "start:pos(${active_pos})" \
-    2>/dev/null || true
-)"
+row=0
+selected_row=1
+while IFS= read -r idx; do
+  row=$((row + 1))
+  if [[ "${idx}" == "${current_window_index}" ]]; then
+    selected_row="${row}"
+    printf "\033[1m> %s\033[0m\n" "${idx}"
+  else
+    printf "  %s\n" "${idx}"
+  fi
+done <<<"${window_rows}"
 
-target_window_index="$(printf '%s' "${selection}" | awk '{print $1}' | tr -cd '0-9')"
-if [[ -n "${target_window_index}" ]] && [[ "${target_window_index}" =~ ^[0-9]+$ ]]; then
+# Keep the input cursor on the highlighted row instead of an empty trailing line.
+printf '\033[%s;1H' "${selected_row}" || true
+
+IFS= read -rsn1 key || exit 0
+if [[ "${key}" == $'\e' || "${key}" == "q" ]]; then
+  exit 0
+fi
+
+if [[ "${key}" =~ ^[0-9]$ ]]; then
+  target_window_index="${key}"
   tmux switch-client -c "${source_client_tty}" -t "${source_session_name}:${target_window_index}" >/dev/null 2>&1 \
     || tmux select-window -t "${source_session_name}:${target_window_index}" >/dev/null 2>&1 \
     || true
