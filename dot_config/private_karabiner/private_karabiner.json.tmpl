@@ -56,6 +56,30 @@
                     "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
                   }
                 ],
+                "from": { "key_code": "right_option", "modifiers": { "optional": ["any"] } },
+                "to": [{ "key_code": "right_option" }],
+                "to_if_held_down": [
+                  {
+                    "shell_command": "sh -lc 'w=$(tmux display-message -p \"#{window_index}\" 2>/dev/null); c=$(tmux display-message -p \"#{client_width}\" 2>/dev/null); [ -n \"$w\" ] && ~/.config/tmux/window-switch-message.sh \"$w\" \"$c\" 600000'"
+                  }
+                ],
+                "to_after_key_up": [
+                  {
+                    "shell_command": "sh -lc 'tmux display-message -d 1 \"\" >/dev/null 2>&1 || true'"
+                  }
+                ],
+                "parameters": {
+                  "basic.to_if_held_down_threshold_milliseconds": 600
+                },
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
                 "from": { "key_code": "c", "modifiers": { "mandatory": ["right_option"] } },
                 "to": [{ "key_code": "l", "modifiers": ["control"] }, { "key_code": "c" }],
                 "type": "basic"

@@ -8,7 +8,7 @@ bind C-l send-prefix
 bind c new-window -c "#{pane_current_path}"                          # ROpt+c: new window
 bind \; previous-window                                              # ROpt+;: previous window
 bind "'" next-window                                                 # ROpt+': next window
-bind w choose-window                                                 # ROpt+w: choose window
+bind w run-shell '{{ .chezmoi.targetFile | dir }}/window-picker-launcher.sh "#{client_tty}" "#{session_name}"'  # ROpt+w: popup window picker
 bind 1 select-window -t :=1                                          # ROpt+1: window 1
 bind 2 select-window -t :=2                                          # ROpt+2: window 2
 bind 3 select-window -t :=3                                          # ROpt+3: window 3
@@ -44,6 +44,7 @@ set -g status-left-length 100
 set -g status-interval 15
 set -g status-left ' #S | #{b:@pane_home}#{?@ssh_host, | #{@ssh_host},} '
 set -g display-time 1000
+set-hook -gu after-select-window
 
 # Source current theme (updated by theme.zsh to persist across tmux reloads)
 run-shell 'tmux source-file ~/.config/tmux/themes/current.conf 2>/dev/null || tmux source-file ~/.config/tmux/themes/${_DOTFILES_THEME_NAME:-kanagawa-dragon}.conf 2>/dev/null || tmux source-file ~/.config/tmux/themes/kanagawa-dragon.conf'
@@ -83,7 +84,7 @@ bind _ resize-pane -D 5 \; resize-pane -L 5
 
 # Initialize TMUX plugin manager (keep at bottom)
 run '~/.tmux/plugins/tpm/tpm'
-bind b set-option -g status
+bind b run-shell -b '{{ .chezmoi.targetFile | dir }}/window-switch-message.sh "#{window_index}" "#{client_width}"'
 
 # Fix C-k passthrough for ghostty
 set -g terminal-features "ghostty:c-k"
