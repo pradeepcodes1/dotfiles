@@ -8,7 +8,7 @@ bind C-l send-prefix
 bind c new-window -c "#{pane_current_path}"                          # ROpt+c: new window
 bind \; previous-window                                              # ROpt+;: previous window
 bind "'" next-window                                                 # ROpt+': next window
-bind w run-shell '{{ .chezmoi.targetFile | dir }}/window-picker-launcher.sh "#{client_tty}" "#{session_name}"'  # ROpt+w: popup window picker
+bind w run-shell '{{ .chezmoi.targetFile | dir }}/window-picker-launcher.sh "#{client_tty}" "#{session_name}" "#{window_index}"'  # ROpt+w: popup window picker
 bind 1 select-window -t :=1                                          # ROpt+1: window 1
 bind 2 select-window -t :=2                                          # ROpt+2: window 2
 bind 3 select-window -t :=3                                          # ROpt+3: window 3
@@ -21,7 +21,7 @@ bind 9 select-window -t :=9                                          # ROpt+9: w
 
 # Pane management (h/j/k/l defined below)
 bind z resize-pane -Z                                                # ROpt+z: zoom pane
-bind x kill-pane                                                      # ROpt+x: kill pane
+bind x run-shell '{{ .chezmoi.targetFile | dir }}/kill-pane-with-popup.sh "#{client_tty}" "#{window_index}"'  # ROpt+x: kill pane + popup
 
 # Session management
 bind d detach-client                                                 # ROpt+d: detach
@@ -39,6 +39,7 @@ set -g default-terminal "screen-256color"
 set -g status-position bottom
 set -g status-justify right
 set -g status-right ""
+set -g status off
 
 set -g status-left-length 100
 set -g status-interval 15
@@ -84,7 +85,7 @@ bind _ resize-pane -D 5 \; resize-pane -L 5
 
 # Initialize TMUX plugin manager (keep at bottom)
 run '~/.tmux/plugins/tpm/tpm'
-bind b run-shell -b '{{ .chezmoi.targetFile | dir }}/window-switch-message.sh "#{window_index}" "#{client_width}"'
+bind b if-shell -F '#{==:#{status},on}' 'set -g status off' 'set -g status on'
 
 # Fix C-k passthrough for ghostty
 set -g terminal-features "ghostty:c-k"
