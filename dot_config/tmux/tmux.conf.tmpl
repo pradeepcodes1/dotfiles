@@ -35,7 +35,7 @@ bind P display-popup -E -w 90% -h 85% "{{ .chezmoi.targetFile | dir }}/pid-explo
 set -g mouse on
 set -g focus-events on
 set-window-option -g mode-keys vi
-set -g default-terminal "screen-256color"
+set -g default-terminal "tmux-256color"
 set -g status-position bottom
 set -g status-justify right
 set -g status-right ""
@@ -87,8 +87,10 @@ bind _ resize-pane -D 5 \; resize-pane -L 5
 run '~/.tmux/plugins/tpm/tpm'
 bind b if-shell -F '#{==:#{status},on}' 'set -g status off' 'set -g status on'
 
-# Fix C-k passthrough for ghostty
-set -g terminal-features "ghostty:c-k"
+# Ghostty terminal features
+set -g terminal-features "xterm-ghostty:c-k"
+set -as terminal-features ",xterm-ghostty:hyperlinks"
+set -as terminal-features ",xterm-ghostty:usstyle"
 
 # Kill session and switch/create new
 bind-key X confirm-before -p "kill-session '#S'? (y/n)" "\
