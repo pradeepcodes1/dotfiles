@@ -8,7 +8,7 @@ export PATH="$HOME/go/bin:$PATH"
 export EZA_CONFIG_DIR="{{ .chezmoi.homeDir }}/.config/eza"
 
 # Eza aliases
-alias ls='eza --icons -la'
-alias lt='eza --icons --tree'
+alias ls='eza --icons -la --hyperlink'
+alias lt='eza --icons --tree --hyperlink'
 alias lsql='lazysql'
 export EDITOR="nvim"
