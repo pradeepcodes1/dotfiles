@@ -38,6 +38,7 @@
               lnav
               restic
               unbound
+              iina
             ];
           };
         }

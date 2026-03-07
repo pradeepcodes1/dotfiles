@@ -1,6 +1,9 @@
 alias vi=nvim
 alias dev="cd /Volumes/dev"
 
+# Homebrew (after nix so nix takes priority)
+[[ -d /opt/homebrew/bin ]] && export PATH="$PATH:/opt/homebrew/bin"
+
 # Go binaries
 export PATH="$HOME/go/bin:$PATH"
 
