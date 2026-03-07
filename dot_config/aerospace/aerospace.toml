@@ -92,6 +92,10 @@ outer.right = 5
 # '''
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
+# Cycle windows in current workspace
+alt-period = 'focus dfs-next'
+alt-shift-period = 'focus dfs-prev'
+
 alt-slash = 'layout tiles horizontal vertical'
 alt-comma = 'layout accordion horizontal vertical'
 
@@ -187,6 +191,14 @@ alt-shift-semicolon = 'mode service'
 
 # Workspace assignment rules
 # See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-apps
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Preview'
+run = 'layout floating'
+
 [[on-window-detected]]
 if.app-id = 'app.zen-browser.zen'
 run = 'move-node-to-workspace 1'

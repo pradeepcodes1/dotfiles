@@ -30,6 +30,7 @@ bind s choose-session                                                # ROpt+s: c
 # Copy mode
 bind [ copy-mode                                                     # ROpt+[: copy mode
 bind / run-shell 'tmux display-popup -E -w 80% -h 80% "{{ .chezmoi.targetFile | dir }}/relative-copy-mode.sh #{pane_id}"'  # ROpt+/: copy mode with relative line numbers
+bind y run-shell 'tmux display-popup -E -w 80% -h 80% "{{ .chezmoi.targetFile | dir }}/copy-command-block.sh #{pane_id}"'  # ROpt+y: copy command block by number
 bind P display-popup -E -w 90% -h 85% "{{ .chezmoi.targetFile | dir }}/pid-explorer.sh"  # prefix+P: process explorer
 
 set -g mouse on
@@ -91,6 +92,9 @@ bind b if-shell -F '#{==:#{status},on}' 'set -g status off' 'set -g status on'
 set -g terminal-features "xterm-ghostty:c-k"
 set -as terminal-features ",xterm-ghostty:hyperlinks"
 set -as terminal-features ",xterm-ghostty:usstyle"
+
+# Set default cursor to underscore
+set -g cursor-style underline
 
 # Kill session and switch/create new
 bind-key X confirm-before -p "kill-session '#S'? (y/n)" "\

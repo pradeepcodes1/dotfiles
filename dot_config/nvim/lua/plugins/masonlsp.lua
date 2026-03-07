@@ -1,7 +1,15 @@
 local common = require("lsp.common")
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
--- Set up LSP keymaps via LspAttach autocommand (required for vim.lsp.config API)
+-- Set global LSP defaults (capabilities, progress handler)
+vim.lsp.config("*", {
+	capabilities = capabilities,
+	handlers = {
+		["$/progress"] = function() end,
+	},
+})
+
+-- Set up LSP keymaps via LspAttach autocommand
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
 	callback = function(ev)
@@ -34,18 +42,8 @@ return {
 					"tailwindcss",
 					"lemminx",
 				},
-
-				handlers = {
-					function(server_name) -- default handler (optional)
-						vim.lsp.config(server_name, {
-							capabilities = capabilities,
-							handlers = {
-								["$/progress"] = function() end, -- disable progress notifications
-							},
-						})
-						vim.lsp.enable(server_name)
-					end,
-					jdtls = function() end,
+				automatic_enable = {
+					exclude = { "jdtls" },
 				},
 			})
 		end,

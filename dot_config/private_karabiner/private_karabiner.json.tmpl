@@ -386,6 +386,17 @@
                     "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
                   }
                 ],
+                "from": { "key_code": "y", "modifiers": { "mandatory": ["right_option"] } },
+                "to": [{ "key_code": "l", "modifiers": ["control"] }, { "key_code": "y" }],
+                "type": "basic"
+              },
+              {
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"]
+                  }
+                ],
                 "from": {
                   "key_code": "right_arrow",
                   "modifiers": { "mandatory": ["right_option"] }
