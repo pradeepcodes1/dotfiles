@@ -5,7 +5,13 @@ set -euo pipefail
 client_tty="${1:-}"
 window_index="${2:-?}"
 
+# Check pane count before killing — only show message when closing the last pane (whole window)
+pane_count="$(tmux display-message -p '#{window_panes}' 2>/dev/null || echo 1)"
+
 tmux kill-pane >/dev/null 2>&1 || exit 0
+
+# If there were multiple panes, we just closed a split — no message needed
+[[ "${pane_count}" -le 1 ]] || exit 0
 
 message="closed window \"${window_index}\""
 client_width=80
