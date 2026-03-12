@@ -61,4 +61,4 @@ repos:
     hooks:
       - id: prettier
         types_or: [markdown, json, yaml]
-        exclude: ^\.chezmoitemplates/
+        exclude: ^(\.chezmoitemplates/|\.github/)
