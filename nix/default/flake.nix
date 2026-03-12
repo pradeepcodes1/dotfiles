@@ -33,6 +33,46 @@
             name = "pradeep-cli";
             paths = with pkgs; [
               # core (chezmoi installed separately, not here)
+              wget
+              git
+              git-lfs
+              gh
+              neovim
+              tmux
+              zsh
+              lazygit
+
+              # navigation / UX
+              ripgrep
+              fd
+              fzf
+              atuin
+              bat
+              delta
+              btop
+              tree
+              zoxide
+              yazi
+              eza
+
+              # infra
+              docker
+              colima
+              docker-compose
+
+              # network / security
+              httpie
+              jq
+              openssl
+
+              # shell tooling
+              mise
+              zsh-syntax-highlighting
+              zsh-autosuggestions
+              zsh-fzf-tab
+              carapace
+
+              # utilities
               glow
               htop
               lnav
