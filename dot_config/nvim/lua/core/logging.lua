@@ -13,9 +13,18 @@ local config = {
 
 local levels = { DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3 }
 
+-- NOTE: This fix has NOT been tested in a live Neovim environment.
+-- vim.uv.gettimeofday() returns (seconds, microseconds) on most platforms,
+-- but behaviour may differ. Verify timestamps are correct after applying.
+local function get_timestamp()
+	local sec, usec = vim.uv.gettimeofday()
+	local ms = math.floor(usec / 1000)
+	return os.date("!%Y-%m-%dT%H:%M:%S", sec) .. string.format(".%03dZ", ms)
+end
+
 local function build_json(level, component, message, extra)
 	local entry = {
-		ts = os.date("!%Y-%m-%dT%H:%M:%S.000Z"),
+		ts = get_timestamp(),
 		level = level,
 		component = component,
 		msg = message,
