@@ -13,9 +13,15 @@ local config = {
 
 local levels = { DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3 }
 
+local function get_timestamp()
+	local sec, usec = vim.uv.gettimeofday()
+	local ms = math.floor(usec / 1000)
+	return os.date("!%Y-%m-%dT%H:%M:%S", sec) .. string.format(".%03dZ", ms)
+end
+
 local function build_json(level, component, message, extra)
 	local entry = {
-		ts = os.date("!%Y-%m-%dT%H:%M:%S.000Z"),
+		ts = get_timestamp(),
 		level = level,
 		component = component,
 		msg = message,
