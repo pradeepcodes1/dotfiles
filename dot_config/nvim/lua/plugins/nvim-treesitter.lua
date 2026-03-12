@@ -20,6 +20,15 @@ return {
 				"proto",
 			},
 			highlight = { enable = true },
+			incremental_selection = {
+				enable = true,
+				keymaps = {
+					init_selection = "<CR>",
+					node_incremental = "<Tab>",
+					node_decremental = "<S-Tab>",
+					scope_incremental = false,
+				},
+			},
 		})
 	end,
 }
