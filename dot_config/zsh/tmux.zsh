@@ -6,7 +6,7 @@ if command -v tmux &>/dev/null; then
     # Function to find the smallest available session number
     _find_next_session_num() {
       local next_num=1
-      local existing_nums=($(tmux list-sessions -F "#{session_name}" 2>/dev/null | grep -E '^[0-9]+$' | sort -n))
+      local existing_nums=($(tmux list-sessions -F "#{session_name}" 2>/dev/null | grep -oE '^[0-9]+' | sort -n -u))
 
       # Find first gap in numbering
       for num in "${existing_nums[@]}"; do

@@ -8,7 +8,7 @@ bind C-l send-prefix
 bind c new-window -c "#{pane_current_path}"                          # ROpt+c: new window
 bind \; previous-window                                              # ROpt+;: previous window
 bind "'" next-window                                                 # ROpt+': next window
-bind w run-shell '{{ .chezmoi.targetFile | dir }}/window-picker-launcher.sh "#{client_tty}" "#{session_name}" "#{window_index}"'  # ROpt+w: popup window picker
+bind w run-shell '{{ .chezmoi.targetFile | dir }}/flat-window-picker.sh'  # ROpt+w: flat window picker
 bind 1 select-window -t :=1                                          # ROpt+1: window 1
 bind 2 select-window -t :=2                                          # ROpt+2: window 2
 bind 3 select-window -t :=3                                          # ROpt+3: window 3
@@ -25,16 +25,35 @@ bind x run-shell '{{ .chezmoi.targetFile | dir }}/kill-pane-with-popup.sh "#{cli
 
 # Session management
 bind d detach-client                                                 # ROpt+d: detach
-bind s choose-session                                                # ROpt+s: choose session
+bind s choose-session -Z                                             # ROpt+s: choose session
+
+# Session switching by number (Shift+ROpt+1-9 via Karabiner sends prefix + shift+num)
+bind '!' switch-client -t 1
+bind '@' switch-client -t 2
+bind '#' switch-client -t 3
+bind '$' switch-client -t 4
+bind '%' switch-client -t 5
+bind '^' switch-client -t 6
+bind '&' switch-client -t 7
+bind '*' switch-client -t 8
+bind '(' switch-client -t 9
+bind C run-shell 'n=$(tmux list-sessions -F "#{session_name}" | grep -oE "^[0-9]+" | sort -n | awk "BEGIN{n=1}{if(\$1==n)n++}END{print n}"); tmux new-session -d -s "$n" && tmux switch-client -t "$n"'  # Shift+ROpt+c: new session (MEX numbered)
+bind R command-prompt -p "Session label (empty to clear):" "run-shell '{{ .chezmoi.targetFile | dir }}/rename-session.sh \"%%\"'"  # prefix+R: rename session
 
 # Copy mode
 bind [ copy-mode                                                     # ROpt+[: copy mode
 bind / run-shell 'tmux display-popup -E -w 80% -h 80% "{{ .chezmoi.targetFile | dir }}/relative-copy-mode.sh #{pane_id}"'  # ROpt+/: copy mode with relative line numbers
 bind y run-shell '{{ .chezmoi.targetFile | dir }}/copy-command-block.sh #{pane_id}'  # ROpt+y: copy command block by number
 bind P display-popup -E -w 90% -h 85% "{{ .chezmoi.targetFile | dir }}/pid-explorer.sh"  # prefix+P: process explorer
+bind n run-shell '{{ .chezmoi.targetFile | dir }}/notification-center.sh'               # ROpt+n: notification center (bell)
 
+set -g detach-on-destroy off
 set -g mouse on
 set -g focus-events on
+set -g monitor-bell on
+set -g bell-action any
+set -g visual-bell off
+set -g activity-action none
 set-window-option -g mode-keys vi
 set -g default-terminal "tmux-256color"
 set -g status-position bottom
@@ -44,16 +63,17 @@ set -g status off
 
 set -g status-left-length 100
 set -g status-interval 15
-set -g status-left ' #S | #{b:@pane_home}#{?@ssh_host, | #{@ssh_host},} '
+set -g status-left ' #S#{?@flake_env, | #{@flake_env},}#{?@ssh_host, | #{@ssh_host},} '
 set -g display-time 1000
 set-hook -gu after-select-window
 
 # Source current theme (updated by theme.zsh to persist across tmux reloads)
 run-shell 'tmux source-file ~/.config/tmux/themes/current.conf 2>/dev/null || tmux source-file ~/.config/tmux/themes/${_DOTFILES_THEME_NAME:-kanagawa-dragon}.conf 2>/dev/null || tmux source-file ~/.config/tmux/themes/kanagawa-dragon.conf'
 
-# Disable titles/renaming
+# Window renaming: allow programs (Claude Code, etc.) to set titles via OSC sequences,
+# but don't auto-rename from the running command
 set -g automatic-rename off
-set -g allow-rename off
+set -g allow-rename on
 set -g set-titles off
 
 set -g history-limit 10000
@@ -62,9 +82,9 @@ set -g history-limit 10000
 set -g base-index 1
 setw -g pane-base-index 1
 set -g renumber-windows on
-# Split panes (| horizontal, - vertical)
-bind | split-window -h -p 40 -c "#{pane_current_path}"
-bind - split-window -v -p 40 -c "#{pane_current_path}"
+# Split panes (\ horizontal, | vertical)
+bind | split-window -v -p 40 -c "#{pane_current_path}"
+bind \\ split-window -h -p 40 -c "#{pane_current_path}"
 bind r source-file ~/.config/tmux/tmux.conf \; display-message "tmux reloaded"
 
 # List of plugins
@@ -96,12 +116,11 @@ set -as terminal-features ",xterm-ghostty:usstyle"
 # Set default cursor to underscore
 set -g cursor-style underline
 
-# Kill session and switch/create new
+# Kill session and switch to next available (or create new)
 bind-key X confirm-before -p "kill-session '#S'? (y/n)" "\
-    kill-session \; \
-    if-shell '[ -n \"$(tmux list-sessions)\" ]' \
-        'switch-client -l' \
-        'new-session' \
+    if-shell '[ $(tmux list-sessions | wc -l) -gt 1 ]' \
+        'switch-client -n \; kill-session -t \"#S\"' \
+        'new-session \; kill-session -t \"#S\"' \
 "
 # Prevent auto-scroll on mouse selection in copy mode
 bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
