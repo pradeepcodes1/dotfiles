@@ -14,3 +14,6 @@ ssh() {
   # Clear pane option when done
   [[ -n "$TMUX" ]] && tmux set -p -u @ssh_host
 }
+
+# Preserve default SSH completion for the wrapper function
+compdef ssh=ssh

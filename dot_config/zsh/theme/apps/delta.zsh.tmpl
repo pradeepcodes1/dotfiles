@@ -1,0 +1,31 @@
+# Delta (git pager) theme integration — uses bat syntax themes
+
+typeset -A _DOTFILES_DELTA_THEMES
+_DOTFILES_DELTA_THEMES=(
+  [kanagawa-dragon]="TwoDark"
+  [kanagawa-wave]="TwoDark"
+  [kanagawa-lotus]="OneHalfLight"
+  [catppuccin-mocha]="Catppuccin Mocha"
+  [catppuccin-latte]="Catppuccin Latte"
+  [gruvbox-dark]="gruvbox-dark"
+  [gruvbox-light]="gruvbox-light"
+  [everforest-dark]="TwoDark"
+  [everforest-light]="OneHalfLight"
+  [nightfox]="Catppuccin Mocha"
+  [dawnfox]="Catppuccin Latte"
+  [bearded-monokai-black]="TwoDark"
+)
+
+local delta_theme="${_DOTFILES_DELTA_THEMES[$_DOTFILES_THEME_NAME]:-TwoDark}"
+local delta_config="{{ .chezmoi.homeDir }}/.config/delta/themes.gitconfig"
+local delta_light="false"
+[[ "$_DOTFILES_THEME_MODE" == "light" ]] && delta_light="true"
+
+local delta_content="[delta]
+	syntax-theme = $delta_theme
+	light = $delta_light"
+
+mkdir -p "$(dirname "$delta_config")"
+if [[ ! -f "$delta_config" ]] || [[ "$(< "$delta_config")" != "$delta_content" ]]; then
+  echo "$delta_content" > "$delta_config"
+fi
